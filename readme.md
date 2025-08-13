@@ -184,6 +184,24 @@ Please describe the type of video you would like to produce:
 ## 1. 🎬 Agentic Video Editing
 Ever dreamed of creating stunning video edits that captivate your audience? With Agentic-AIGC, you can transform your favorite video clips into breathtaking montages that tell your unique story, complete with perfectly synchronized music and transitions.
 
+In **video production and editing**, finding visual information is crucial, as it allows for better alignment with music, audio, or text. Agentic-AIGC extracts useful visual information from videos, and here we use VideoRAG to index and caption videos of unlimited length. You can configure your settings in `videoragcontent.py`
+
+```
+class VideoRAG:
+    working_dir: str = field(
+        default_factory=lambda: f"./videorag_cache_{datetime.now().strftime('%Y-%m-%d-%H:%M:%S')}"
+    )
+    
+    # video
+    threads_for_split: int = 10
+    video_segment_length: int = 30 # 30 seconds
+    rough_num_frames_per_segment: int = 10 # 5 frames
+```
+Creating videos with Agentic-AIGC requires aligning with the user's ideas, which is a key step. First, the user inputs a query about their video idea, and Agentic-AIGC performs a more granular query decomposition of the user's idea. This results in several sub-queries, each of which can match a video clip in the material library, enabling video creation. When using the Movie Editing feature, the storyboard agent `story_editor.py` percept the available visual material, allowing for more precise generation and utilization of each sub-query.
+
+In the final stage of video production, the duration of each shot may vary. The video editor agent `vid_editor.py` performs fine-grained visual editing based on each retrieved video segment by comparing the video content with the corresponding sub-queries. It selects the moments that best match the visual content with the lowest redundancy for use.
+
+
 ### 1.1 Agentic Movie Edits
 
 🚀 **Technical Details**
@@ -191,6 +209,23 @@ Ever dreamed of creating stunning video edits that captivate your audience? With
 - Automatically extract music rhythm points (optional) setting threshold & mask parameters.
 - Automatically assists with storyboard query design through video content based on user-provided ideas.
 - Automatically complete the editing and integration of the video.
+
+In beat-synced video editing, cuts and transitions align with the music's rhythm. We also enhance the narrative through visual storytelling by featuring high-energy visuals during musical climaxes.
+In the beat synchronization module, we load .mp3 audio files using librosa and calculate RMS (Root Mean Square) energy to identify rhythmic patterns. The system finds rhythm points by detecting peaks in the energy signal above a configurable threshold, with options to filter out points that are too close together temporally (since viewers may not prefer excessive transitions at the beginning of a video). The video transition times and spectrogram with detected rhythm points are sent to `story_editor.py`, enabling the agent to determine which transitions require high-energy frames.
+You can configure your preferences in`music_filter.py`:
+```
+    # Define mask ranges - times in seconds where you don't want to detect rhythm points
+    mask_ranges = [(0, 5)]
+    
+    # Detect rhythm points
+    rhythm_data = agent.detect_rhythm_points(
+        energy_threshold=0.4,
+        min_interval=3.0,
+        smoothing_window=5,
+        mask_ranges=mask_ranges
+    )
+```
+
 
 #### 1.1.1 *Spider-Man: Across the Spider-Verse*
 <a href='https://www.bilibili.com/video/BV1C9Z6Y3ESo/' target='_blank'><img src='assets/spiderman_cover.png' width=60%/></a>
