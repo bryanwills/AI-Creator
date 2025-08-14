@@ -385,6 +385,8 @@ Want to create engaging and hilarious meme videos? Agentic-AIGC helps you craft 
 - Intelligent understanding and transformation of meme concepts
 - Precise audio synthesis and precise scene matching
 
+For the production of Meme Videos, we first extract the audio portion from the video (`mad_tts.py`), then segment it according to specific rules (`mad_tts_slicer.py`) and transcribe it (`transcriber.py`). Next, we use LLM to rewrite the content of the audio segments based on user requirements (`mad_tts_writer.py`), and employ the open-source audio inference tool Fish-Speech to generate audio according to the rewritten script (`mad_tts_infer.py`). Finally, we dynamically adjust the duration of the corresponding segments in the original video based on the generated audio segment lengths and merge the adjusted video segments (`mad_tts_combiner.py`).
+
 #### 2.1.1 Master Ma as AI Researcher
 <table>
 <tr>
@@ -472,12 +474,13 @@ Ready to create music videos realizing your creative ideas? Agentic-AIGC helps y
 - Automatically calibrates and adapts lyrics at the word level via the Analyzer Agent.
 - Automatically divides long rest intervals to reduce melodic errors and enables song covers.
 
-
-<a href='https://www.bilibili.com/video/BV1t8ZCYsEeA/' target='_blank'><img src='assets/airencuoguo_cover.png' width=60%/></a>
-
 🌟 **Key Features:**
 - Automated lyric generation based on themes
 - Intelligent matching of visuals and lyrics
+
+For music video production, we first extract melodic information from MIDI files (`analyzer.py` and `annotator.py`). To achieve high-quality rhythmic impact, we use the open-source music generation tool DiffSinger to generate note-by-note audio (`mad_svc_spliter.py`). Accounting for timing discrepancies in the tool's output, we dynamically adjust segment durations to match the original music (`mad_svc_single.py`). Using user-provided vocal samples, we then perform voice cloning via Seed-VC (`mad_svc_coverist.py`). Finally, we reformat the musical data into the Movie Editing input specification (`mad_svc_translator.py`) to enable seamless integration with downstream agents for final video synthesis.
+
+<a href='https://www.bilibili.com/video/BV1t8ZCYsEeA/' target='_blank'><img src='assets/airencuoguo_cover.png' width=60%/></a>
 
 📝 **Prompts**:
 ```
@@ -496,6 +499,8 @@ Interested in bridging cultural gaps through comedy? Transform popular English t
 - Cultural context adaptation and localization of humor
 - Performance style transformation while preserving core comedic elements
 - Voice generation
+
+To produce high-quality cross-cultural comedy content, we first generate character emotion audio tracks and audience reaction effects (e.g., laughter, applause). Using LLM, we rewrite scripts line by line based on user requirements while annotating speech tones and speaker identities (`adapter.py`). We then select pre-recorded audio samples according to these tone and speaker markers, employing the open-source CosyVoice tool for voice synthesis (`synth.py`). Finally, to create corresponding video footage, we format the audio components into Movie Editing-compatible input specifications (`translator.py`), leveraging the movie editing agent pipeline to assemble the final video output.
 
 #### 2.3.1 English Stand-up Comedy to Chinese Crosstalk
 <table>
