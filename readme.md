@@ -88,6 +88,71 @@ wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth
 ```
 🌟Multiple models are available for your convenience; you may wish to download only those relevant to your project.
 ```
+
+
+<div align="center">
+<table>
+<tr>
+<th align="center">Feature</th>
+<th align="center">Agentic-AIGC</th>
+<th align="center">Director</th>
+<th align="center">Funclip</th>
+<th align="center">NarratoAI</th>
+<th align="center">NotebookLM</th>
+</tr>
+<tr>
+<td align="center">Beat-synced Edits</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">—</td>
+<td align="center">—</td>
+</tr>
+<tr>
+<td align="center">Storytelling Video</td>
+<td align="center">✅</td>
+<td align="center">—</td>
+<td align="center">—</td>
+<td align="center">✅</td>
+<td align="center">—</td>
+</tr>
+<tr>
+<td align="center">Video Overview</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+</tr>
+<tr>
+<td align="center">Meme Video</td>
+<td align="center">✅</td>
+<td align="center">—</td>
+<td align="center">—</td>
+<td align="center">—</td>
+<td align="center">—</td>
+</tr>
+<tr>
+<td align="center">Music Remixes</td>
+<td align="center">✅</td>
+<td align="center">—</td>
+<td align="center">—</td>
+<td align="center">—</td>
+<td align="center">—</td>
+</tr>
+<tr>
+<td align="center">Comedy Remaking</td>
+<td align="center">✅</td>
+<td align="center">—</td>
+<td align="center">—</td>
+<td align="center">—</td>
+<td align="center">—</td>
+</tr>
+</table>
+</div>
+
+
+
 <div align="center">
 
 <table>
