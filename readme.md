@@ -312,7 +312,7 @@ Each "recipe" below corresponds to a specific video type you can create with Age
 
 **Steps:**
 
-1.  **Prepare Source Material:** Place your MIDI file, original lyrics (`.txt`), background music (BGM) file (optional), and target voice sample (`.wav`) in the project.
+1.  **Prepare Source Material:** Place your MIDI file, original lyrics (`.txt`), background music (BGM) file, and target voice sample (`.wav`) in the project.
 2.  **Configure Input:** Edit `Agentic-AIGC/environment/config/mad_svc.yml`. Set paths for `midi_path`, `lyrics_path`, `bgm_path` (if used), `target_voice_path`.
 3.  **Run the Tool:** Execute `python main.py`.
 4.  **Select Type:** When prompted, choose `SVC`.
@@ -326,7 +326,7 @@ Each "recipe" below corresponds to a specific video type you can create with Age
 **Steps:**
 
 1.  **Prepare Source Audio:** Place your source comedy audio file (e.g., `.wav`) in a directory (e.g., `dataset/cross_talk/`).
-2.  **(Optional) Prepare Voice Samples:** Place `.wav` files for the target voices (e.g.,郭德纲, 付航).
+2.  **Prepare Voice Samples:** Place `.wav` files for the target voices (e.g.,郭德纲, 付航, we have placed some ready-to-use samples in the warehouse.).
 3.  **Configure Input:** Edit `Agentic-AIGC/environment/config/cross_talk.yml` (or `talk_show.yml`). Set `audio_path` to your source audio. Set paths for `dou_gen`, `peng_gen` (or relevant character voices). Adjust `output` path.
 4.  **Run the Tool:** Execute `python main.py`.
 5.  **Select Type:** When prompted, choose `Cross Talk` or `Talk Show`.
