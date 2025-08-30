@@ -3,8 +3,7 @@
 
 <div align='center'>
     <h3>
-    One Prompt to Final Cut: AI-Powered Video Creation Unleashed<br/>
-    一句话，一键成片：AI助你实现创意自由
+    One Prompt → Video Creation: AI Unleashed<br/>
     </h3>
     <a href='https://space.bilibili.com/3546868449544308'><img src="https://img.shields.io/badge/bilibili-00A1D6.svg?logo=bilibili&logoColor=white" /></a>&nbsp;
     <a href='https://www.youtube.com/@AI-Creator-is-here'><img src='https://badges.aleen42.com/src/youtube.svg' /></a>&nbsp;
