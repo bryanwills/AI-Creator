@@ -32,7 +32,7 @@ Traditional AIGC approaches rely on single-model generation with limited scope a
 📖 **Ready-to-Use Recipes** - Six comprehensive video production workflows you can immediately adapt and extend for your projects.
 
 <div align='center'>
-<img src='assets/cover_16-9.png' /, width="800" height="600">
+<img src='assets/cover_16-9.png' /, width="700" height="500">
 </div>
 
 ## 🧾 Table of Contents
