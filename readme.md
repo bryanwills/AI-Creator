@@ -5,7 +5,6 @@
     <h3>
     One Prompt → Video Creation: AI Unleashed<br/>
     </h3>
-    <img src='assets/cover_16-9.png' />
 </div>
 
 ## 🎯 Project Introduction
@@ -24,6 +23,10 @@
 - 🔧 **Integration Patterns** - Code examples for combining various AI tools
 - 🌐 **Cross-Modal Applications** - Working with text, audio, and visual content simultaneously
 - 📖 **Ready-to-Use Recipes** - Six different content creation workflows you can adapt and extend
+
+<div align='center'>
+<img src='assets/cover_16-9.png' />
+</div>
 
 ## 🧾 Table of Contents
 
