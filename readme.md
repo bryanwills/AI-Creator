@@ -1,4 +1,4 @@
-<h1 align='center'>🚀 Agentic-AIGC Cookbook: Video Production with Multi-Modal Agents</h1>
+<h1 align='center'>🚀 Agentic-AIGC: Video Production with Multi-Modal Agents</h1>
 <!-- <h1 align='center'>🚀 Agentic-AIGC: Multi-Modal Agents for Video Production</h1> -->
 
 <div align='center'>
