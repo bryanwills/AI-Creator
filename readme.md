@@ -7,9 +7,9 @@
     </h3>
 </div>
 
-## 🎯 Project Introduction
+## 🎯 Introduction
 
-&emsp;&emsp;This project is a **comprehensive cookbook for Agentic-AIGC development** that guides readers through the emerging field of agent-based AI-generated content creation. As AI content generation evolves beyond simple text or image output, the integration of intelligent agents becomes crucial for orchestrating complex, multi-modal creative workflows. This cookbook provides hands-on tutorials, practical recipes, and real-world examples to help developers master the art of building agentic systems for sophisticated content creation.
+This project serves as a **Comprehensive Cookbook for Agentic-AIGC Development**, with a primary focus on video creation workflows. It guides readers through the emerging field of agent-based AI-generated content creation. Video production represents the ultimate complexity challenge in AIGC.
 
 &emsp;&emsp;Unlike traditional AIGC approaches that rely on single-model generation, Agentic-AIGC represents the next frontier where intelligent agents coordinate multiple AI tools, make creative decisions, and maintain coherence across complex production pipelines. Through detailed recipes covering video production, audio synthesis, cross-cultural adaptation, and multi-modal storytelling, this cookbook teaches you how to build systems that can understand intent, reason about creative choices, and execute professional-level content workflows autonomously.
 
