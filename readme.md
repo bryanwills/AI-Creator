@@ -278,7 +278,7 @@ wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth
 
 📋 Each production recipe below represents a distinct video format that can be automatically generated through Agentic-AIGC's intelligent agent system.
 
---
+***
 
 ### ✂️ Video Editing
 
