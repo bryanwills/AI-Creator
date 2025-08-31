@@ -274,9 +274,11 @@ wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth
   
 ---
 
-## 🍽 Recipes: Creating Videos
+## 🍽 Agentic Video Creation: Step-by-Step Recipes
 
 📋 Each production recipe below represents a distinct video format that can be automatically generated through Agentic-AIGC's intelligent agent system.
+
+--
 
 ### ✂️ Video Editing
 
@@ -292,6 +294,8 @@ wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth
 - ⚙️ 6. **(Optional) Adjust Beat Sync**: Modify parameters in music_filter.py (thresholds, masks) if needed.
 - 🎬 7. **Processing & Output**: The system will process, analyze videos, detect beats, retrieve visually relevant clips, and generate the final edited video.
 
+--
+
 ### 📖 Text-to-Video Adaptation
 
 **Goal:** Transform written text (such as novel excerpts) into cinematic video content with AI-generated commentary and visually matched scenes from your source footage.
@@ -305,6 +309,8 @@ wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth
 - 🎯 5. **Select Type**: When prompted, input type eg. Novel-to-Screen Commentary.
 - 💬 6. **Provide Prompt**: Enter a prompt for the commentary script (e.g., "Generate an engaging commentary script with 1500 words.").
 - 🎬 7. **Processing & Output**: The system will generate the script, segment the content, synthesize audio narration, match visual scenes, and produce the final adapted video.
+
+--
 
 ### 📰 Video Summarization
 
