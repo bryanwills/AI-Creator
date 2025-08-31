@@ -278,7 +278,7 @@ wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth
 
 📋 Each production recipe below represents a distinct video format that can be automatically generated through Agentic-AIGC's intelligent agent system.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+---
 
 ### ✂️ Video Editing
 
@@ -294,7 +294,7 @@ wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth
 - ⚙️ 6. **(Optional) Adjust Beat Sync**: Modify parameters in music_filter.py (thresholds, masks) if needed.
 - 🎬 7. **Processing & Output**: The system will process, analyze videos, detect beats, retrieve visually relevant clips, and generate the final edited video.
 
---
+---
 
 ### 📖 Text-to-Video Adaptation
 
@@ -310,7 +310,7 @@ wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth
 - 💬 6. **Provide Prompt**: Enter a prompt for the commentary script (e.g., "Generate an engaging commentary script with 1500 words.").
 - 🎬 7. **Processing & Output**: The system will generate the script, segment the content, synthesize audio narration, match visual scenes, and produce the final adapted video.
 
---
+---
 
 ### 📰 Video Summarization
 
@@ -318,55 +318,57 @@ wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth
 
 **Key Steps:**
 
-- 📁 **Prepare Source Material**: Place your source video/audio file in a directory (e.g., dataset/user_video/).
-- 🎤 **Prepare Voice Sample (Optional)**: Add a short .wav file (e.g., ava_16k.wav) for voice cloning in dataset/video_edit/voice_data/.
-- ✍️ **Prepare Style File (Optional)**: Customize dataset/video_edit/writing_data/present_style.txt to define the summary tone and style.
-- ▶️ **Run the Tool**: Execute python main.py to start the process.
-- 🎯 **Select Type**: When prompted, input the type (e.g., Summary of News).
-- 💬 **Provide Prompt**: Enter specifications for your summary (e.g., "Create a concise tech news summary with conversational tone, maximum 250 words").
-- 🎬 **Processing Complete**: The system will automatically transcribe content, generate summary, synthesize voiceover, match relevant clips, and produce the final video.
+- 📁 1. **Prepare Source Material**: Place your source video/audio file in a directory (e.g., dataset/user_video/).
+- 🎤 2。 **Prepare Voice Sample (Optional)**: Add a short .wav file (e.g., ava_16k.wav) for voice cloning in dataset/video_edit/voice_data/.
+- ✍️ 3. **Prepare Style File (Optional)**: Customize dataset/video_edit/writing_data/present_style.txt to define the summary tone and style.
+- ▶️ 4. **Run the Tool**: Execute python main.py to start the process.
+- 🎯 5. **Select Type**: When prompted, input the type (e.g., Summary of News).
+- 💬 6. **Provide Prompt**: Enter specifications for your summary (e.g., "Create a concise tech news summary with conversational tone, maximum 250 words").
+- 🎬 7. **Processing Complete**: The system will automatically transcribe content, generate summary, synthesize voiceover, match relevant clips, and produce the final video.
 
-### 😂 Meme Video
+---
 
-**Goal:** Remake an existing video by replacing its audio with a humorous or adapted script, keeping video content synced.
+### 😂 Audio Editing
 
-**Steps:**
+**Goal:** Replace existing video audio with custom scripts or narratives. Maintains precise video-audio synchronization for professional dubbing and creative content adaptation.
 
-1.  **Prepare Source Video:** Place your source meme video (e.g., `.mp4`) in a directory (e.g., `dataset/meme_video/`).
-2.  **Configure Input:** Edit `Agentic-AIGC/environment/config/mad_tts.yml`. Set `video_path` to your source video. Adjust `output_path` if needed.
-3.  **Run the Tool:** Execute `python main.py`.
-4.  **Select Type:** When prompted, choose `TTS`.
-5.  **Provide Prompt:** Enter a detailed prompt for rewriting the audio (e.g., "Create a humorous narrative about two PhD students...").
-6.  **Wait:** The system will extract audio, transcribe, rewrite, generate new audio (Fish-Speech), adjust video timing, and combine.
+**Key Steps:**
 
-### 🎵 Music Video (SVC)
+- 📁 1. **Prepare Source Video**: Place your source video file (e.g., .mp4) in a directory (e.g., dataset/meme_video/).
+- ⚙️ 2. **Configure Settings**: Edit Agentic-AIGC/environment/config/mad_tts.yml. Set video_path to your source video and adjust output_path if needed.
+- ▶️ 3. **Run the Tool**: Execute python main.py to start the audio editing process.
+- 🎯 4. **Select Type**: When prompted, choose TTS (Text-to-Speech) for audio generation.
+- ✍️ 5. **Provide Script**: Enter detailed instructions for the new audio content (e.g., "Create a professional narration explaining machine learning concepts with clear pronunciation and appropriate pacing").
+- 🎵 6. **Processing Complete**: The system will extract original audio, transcribe existing content, generate new audio using Fish-Speech technology, synchronize timing with video frames, and produce the final edited video.
 
-**Goal:** Create a cover version of a song using a target voice, potentially synced with visuals.
+### 🎵 AI Cover Creation
 
-**Steps:**
+**Goal:** Generate professional cover versions of songs using custom target voices. Includes precise audio-visual synchronization capabilities.
 
-1.  **Prepare Source Material:** Place your MIDI file, original lyrics (`.txt`), background music (BGM) file, and target voice sample (`.wav`) in the project.
-2.  **Configure Input:** Edit `Agentic-AIGC/environment/config/mad_svc.yml`. Set paths for `midi_path`, `lyrics_path`, `bgm_path` (if used), `target_voice_path`.
-3.  **Run the Tool:** Execute `python main.py`.
-4.  **Select Type:** When prompted, choose `SVC`.
-5.  **Provide Prompt:** Enter a prompt for adapting the lyrics (e.g., "The song is performed by Patrick Star, focusing on the theme of struggles of manuscript submission...").
-6.  **Wait:** The system will process MIDI, generate audio segments (DiffSinger), clone voice (Seed-VC), adjust timing, and prepare for video editing (integrates with Movie Edit pipeline).
+**Key Steps:**
 
-### 🎭 Cross-Culture Comedy
+- 1. 📂 **Prepare Files**: Place MIDI file, lyrics (.txt), background music (BGM), and target voice sample (.wav) in the project directory.
+- 2. ⚙️ **Configure Settings**: Edit Agentic-AIGC/environment/config/mad_svc.yml. Set paths for midi_path, lyrics_path, bgm_path, and target_voice_path.
+- 3. ▶️ **Run Tool**: Execute python main.py.
+- 4. 🎯 **Select Mode**: Choose SVC (Singing Voice Conversion) when prompted.
+- 5. ✍️ **Provide Instructions**: Enter adaptation prompt (e.g., "Rock ballad style with emotional intensity, focusing on perseverance themes").
+- 6. 🎶 **Processing**: System processes MIDI, generates audio (DiffSinger), clones voice (Seed-VC), synchronizes timing, and integrates with video pipeline.
 
-**Goal:** Adapt a comedy audio (e.g., English stand-up) into a different format (e.g., Chinese crosstalk) or vice-versa.
+### 🎭 Cross-Cultural Content Adaptation
 
-**Steps:**
+**Goal:** Adapt audio content (e.g., English talk shows) into different cultural formats (e.g., Chinese crosstalk), or vice versa.
 
-1.  **Prepare Source Audio:** Place your source comedy audio file (e.g., `.wav`) in a directory (e.g., `dataset/cross_talk/`).
-2.  **Prepare Voice Samples:** Place `.wav` files for the target voices (e.g.,郭德纲, 付航, we have placed some ready-to-use samples in the warehouse.).
-3.  **Configure Input:** Edit `Agentic-AIGC/environment/config/cross_talk.yml` (or `talk_show.yml`). Set `audio_path` to your source audio. Set paths for `dou_gen`, `peng_gen` (or relevant character voices). Adjust `output` path.
-4.  **Run the Tool:** Execute `python main.py`.
-5.  **Select Type:** When prompted, choose `Cross Talk` or `Talk Show`.
-6.  **Provide Prompt:** Enter a prompt for adapting the script (e.g., "Generate a Chinese crosstalk script...").
-7.  **Wait:** The system will adapt the script, synthesize voices (CosyVoice), add effects, and prepare for video editing (integrates with Movie Edit pipeline).
+**Key Steps:**
 
+- 1. 📂 **Prepare Source Audio**: Place source audio file (.wav) in the directory (e.g., dataset/cross_talk/).
+- 2. 🎤 **Prepare Voice Samples**: Add target voice .wav files (e.g., Guo Degang, Fu Hang - ready-to-use samples available in repository).
+- 3. ⚙️ **Configure Settings**: Edit Agentic-AIGC/environment/config/cross_talk.yml (or talk_show.yml). Set audio_path to source audio. Configure dou_gen, peng_gen voice paths. Adjust output path.
+- 4. ▶️ **Run Tool**: Execute python main.py.
+- 5. 🎯 **Select Mode**: Choose Cross Talk or Talk Show when prompted.
+- 6. ✍️ **Provide Instructions**: Enter content adaptation prompt (e.g., "Adapt this content into Chinese crosstalk format while maintaining the original humor style").
+- 7. 🎭 **Processing**: System adapts script content, synthesizes target voices using CosyVoice, adds audio effects, and integrates with video editing pipeline.
 
+---
 
 ## 📋 Configuration Details
 
@@ -451,15 +453,13 @@ Feel free to check it out for more entertaining content! 😊
 
 **Note**: All videos are used for research and demonstration purposes only. The audio and visual assets are sourced from the Internet. Please contact us if you believe any content infringes upon your intellectual property rights.
 
-
-
 ---
 
 ## 🙏 Acknowledgements
 
-We would like to express our deepest gratitude to the numerous individuals and organizations that have made Agentic-AIGC possible. This project stands on the shoulders of giants, benefiting from the collective wisdom of the open-source community and the groundbreaking work of AI researchers worldwide.
+We extend our heartfelt appreciation to the countless individuals and organizations who have made Agentic-AIGC possible. This project builds upon the foundation laid by pioneering AI researchers and the vibrant open-source community worldwide. Their collective contributions, shared knowledge, and innovative breakthroughs have been instrumental in bringing this vision to life.
 
-First and foremost, we are indebted to the open-source community and AI service providers whose tools and technologies form the foundation of our work:
+We are deeply grateful to the open-source community and AI service providers whose innovative tools and technologies serve as the cornerstone of our work:
 
 - [CosyVoice](https://github.com/FunAudioLLM/CosyVoice  )
 - [Fish Speech](https://github.com/fishaudio/fish-speech  )
@@ -473,11 +473,11 @@ First and foremost, we are indebted to the open-source community and AI service 
 - [moviepy](https://github.com/Zulko/moviepy  )
 - [ffmpeg](https://github.com/FFmpeg/FFmpeg  )
 
-Our work has been significantly enriched by the creative contributions of content creators across various platforms:
-- The talented creators behind the original video content we used for testing and demonstration
-- The comedy artists whose work inspired our cross-cultural adaptations
-- The filmmakers and production teams behind the movies and TV shows featured in our demos
-- The content creators who have shared their knowledge and insights about video editing techniques
+Our work has been significantly enhanced by the creative contributions of talented content creators across diverse platforms:
+- 🎬 Original video creators whose content served as valuable testing and demonstration material
+- 🎭 Comedy artists whose performances inspired our cross-cultural adaptation features
+- 🎥 Filmmakers and production teams behind the movies and TV shows showcased in our demonstrations
+- ✂️ Content creators who generously shared their expertise and insights on video editing techniques
 
 All content used in our demonstrations is for research purposes only. We deeply respect the intellectual property rights of all content creators and welcome any concerns or feedback regarding content usage.
 - Spider-Man movie editing idea reference Douyin account[@我是不是zx](https://www.douyin.com/user/MS4wLjABAAAApVuuGxyM7CI4MJRHQvc6SAy0J2zrJ12eg3f5jFqCIXk?from_tab_name=main&vid=7468621366913273115)
