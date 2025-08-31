@@ -7,8 +7,6 @@
     </h3>
 </div>
 
----
-
 ## 🎯 Introduction
 
 This project serves as a **Comprehensive Cookbook for Agentic-AIGC Development**, with a primary focus on video creation workflows. It guides readers through the emerging field of agent-based AI-generated content creation. Video production represents the ultimate complexity challenge in AIGC.
@@ -79,6 +77,8 @@ Traditional AIGC approaches rely on single-model generation with limited scope a
 ### 🔧 The Agentic-AIGC Solution
 
 🎯 To directly address these fundamental challenges, **Agentic-AIGC** leverages 🤖 intelligent agent architectures that systematically solve each limitation through 🔄 coordinated automation. Unlike 📱 traditional generative models, the 🧠 agentic approach tackles 🎬 complex video production through ⚡ fully-automated intelligent workflows.
+
+---
 
 ## 🧾 Prerequisites & Setup
 
@@ -153,14 +153,9 @@ mkdir .checkpoints
 cd .checkpoints
 wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth  
 ```
-
-
-
-
+---
 
 **Feature & Model Requirements Table:**
-
-
 
 <div align="center">
 <table>
@@ -277,52 +272,53 @@ wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth
 1.  **API Keys:** Edit `Agentic-AIGC/environment/config/config.yml` to add your LLM API key and base URL.
 2.  **Model Names:** Check and adjust model names in `environment/config/llm.py` according to your LLM provider's requirements. For single-model APIs like official GPT, use the specific model name (e.g., `gpt-4o-mini`) for all entries.
   
+---
 
 ## 🍽 Recipes: Creating Videos
 
-Each "recipe" below corresponds to a specific video type you can create with Agentic-AIGC.
+📋 Each production recipe below represents a distinct video format that can be automatically generated through Agentic-AIGC's intelligent agent system.
 
-### 🎬 Movie Edits (Rhythm-Based)
+### ✂️ Video Editing
 
 **Goal:** Create a video edit synchronized with music beats or based on a user's narrative idea, selecting high-energy or relevant clips from source videos.
 
-**Steps:**
+**Key Steps:**
 
-1.  **Prepare Source Material:** Place your source video clips in a directory (e.g., `dataset/user_video/`).
-2.  **Prepare Music (Optional for beat-sync):** Place your background music file (e.g., `.mp3`) in your project.
-3.  **Run the Tool:** Execute `python main.py`.
-4.  **Select Type:** When prompted, input type `eg. Rhythm-Based Editing`.
-5.  **Provide Prompt:** Enter a detailed description of the story/feel you want (e.g., "Action scenes featuring Spider-Gwen...").
-6.  **(Optional) Adjust Beat Sync:** Modify parameters in `music_filter.py` (thresholds, masks) if needed.
-7.  **Wait:** The system will process, analyze videos, detect beats, retrieve visual relevant clips, and generate the final video.
+- 📁 1. **Prepare Source Material**: Place your source video clips in a directory (e.g., dataset/user_video/).
+- 🎵 2. **Prepare Music (Optional for beat-sync)**: Place your background music file (e.g., .mp3) in your project.
+- ▶️ 3. **Run the Tool**: Execute python main.py.
+- 🎯 4. **Select Type**: When prompted, input type eg. Rhythm-Based Video Editing.
+- 💬 5. **Provide Prompt**: Enter a detailed description of the editing style/feel you want (e.g., "Fast-paced action sequences with dynamic transitions...").
+- ⚙️ 6. **(Optional) Adjust Beat Sync**: Modify parameters in music_filter.py (thresholds, masks) if needed.
+- 🎬 7. **Processing & Output**: The system will process, analyze videos, detect beats, retrieve visually relevant clips, and generate the final edited video.
 
-### 📖 Novel-to-Screen Adaptation
+### 📖 Text-to-Video Adaptation
 
-**Goal:** Turn a text file (like a novel excerpt) into a video with commentary and scenes from provided video sources.
+**Goal:** Transform written text (such as novel excerpts) into cinematic video content with AI-generated commentary and visually matched scenes from your source footage.
 
-**Steps:**
+**Key Steps:**
 
-1.  **Prepare Source Material:** Place your source video clips in a directory (e.g., `dataset/user_video/`). Place your novel `.txt` file in the project.
-2.  **(Optional) Prepare Voice Sample:** Place a short `.wav` file (e.g., `ava_16k.wav`) for voice cloning in `dataset/video_edit/voice_data/`.
-3.  **(Optional) Prepare Style File:** Customize or input `dataset/video_edit/writing_data/present_style.txt` file describing the desired commentary tone.
-4.  **Run the Tool:** Execute `python main.py`.
-5.  **Select Type:** When prompted, input type `eg. Novel-to-Screen Commentary`.
-6.  **Provide Prompt:** Enter a prompt for the commentary script (e.g., "Write fluent commentary script with 1500 words.").
-7.  **Wait:** The system will generate the script, split it, synthesize audio, match scenes, and produce the video.
+- 📁 1. **Prepare Source Material**: Place your source video clips in a directory (e.g., dataset/user_video/). Add your novel .txt file to the project.
+- 🎤 2. **(Optional) Prepare Voice Sample**: Place a short .wav file (e.g., ava_16k.wav) for voice cloning in dataset/video_edit/voice_data/.
+- ✍️ 3. **(Optional) Prepare Style File**: Customize or input dataset/video_edit/writing_data/present_style.txt file describing the desired commentary tone.
+- ▶️ 4. **Run the Tool**: Execute python main.py.
+- 🎯 5. **Select Type**: When prompted, input type eg. Novel-to-Screen Commentary.
+- 💬 6. **Provide Prompt**: Enter a prompt for the commentary script (e.g., "Generate an engaging commentary script with 1500 words.").
+- 🎬 7. **Processing & Output**: The system will generate the script, segment the content, synthesize audio narration, match visual scenes, and produce the final adapted video.
 
-### 📰 News Summary
+### 📰 Video Summarization
 
-**Goal:** Create a summary video from an interview or news source video/audio.
+**Goal:** Generate concise summary videos from lengthy source content. Supports interviews, lectures, meetings, news videos, podcasts, webinars, documentaries, and various video/audio materials.
 
-**Steps:**
+**Key Steps:**
 
-1.  **Prepare Source Material:** Place your source video/audio file in a directory (e.g., `dataset/user_video/`).
-2.  **(Optional) Prepare Voice Sample:** Place a short `.wav` file (e.g., `ava_16k.wav`) for voice cloning in `dataset/video_edit/voice_data/`.
-3.  **(Optional) Prepare Style File:** Customize or input `dataset/video_edit/writing_data/present_style.txt` file for the summary tone.
-4.  **Run the Tool:** Execute `python main.py`.
-5.  **Select Type:** When prompted, input type `eg. Summary of News`.
-6.  **Provide Prompt:** Enter a prompt for the summary (e.g., "Short tech news, colloquial expression within 250 words...").
-7.  **Wait:** The system will transcribe, summarize, synthesize audio, match clips, and generate the video.
+- 📁 **Prepare Source Material**: Place your source video/audio file in a directory (e.g., dataset/user_video/).
+- 🎤 **Prepare Voice Sample (Optional)**: Add a short .wav file (e.g., ava_16k.wav) for voice cloning in dataset/video_edit/voice_data/.
+- ✍️ **Prepare Style File (Optional)**: Customize dataset/video_edit/writing_data/present_style.txt to define the summary tone and style.
+- ▶️ **Run the Tool**: Execute python main.py to start the process.
+- 🎯 **Select Type**: When prompted, input the type (e.g., Summary of News).
+- 💬 **Provide Prompt**: Enter specifications for your summary (e.g., "Create a concise tech news summary with conversational tone, maximum 250 words").
+- 🎬 **Processing Complete**: The system will automatically transcribe content, generate summary, synthesize voiceover, match relevant clips, and produce the final video.
 
 ### 😂 Meme Video
 
