@@ -7,6 +7,8 @@
     </h3>
 </div>
 
+---
+
 ## 🎯 Introduction
 
 This project serves as a **Comprehensive Cookbook for Agentic-AIGC Development**, with a primary focus on video creation workflows. It guides readers through the emerging field of agent-based AI-generated content creation. Video production represents the ultimate complexity challenge in AIGC.
@@ -14,6 +16,8 @@ This project serves as a **Comprehensive Cookbook for Agentic-AIGC Development**
 Creating professional videos requires seamless coordination of script writing, storyboard development, visual scene generation, character animation, audio synthesis, voice acting, background music composition, scene transitions, visual effects, and final editing.
 
 Traditional AIGC approaches rely on single-model generation with limited scope and coordination capabilities. Agentic-AIGC represents the next frontier where intelligent agents orchestrate sophisticated creative ecosystems. These agents coordinate multiple AI tools seamlessly. They make nuanced creative decisions in real-time. Most importantly, they maintain narrative and visual coherence across complex, multi-stage production pipelines.
+
+---
 
 ## ✨ What Will You Gain?
 
@@ -60,6 +64,7 @@ Traditional AIGC approaches rely on single-model generation with limited scope a
 - [🎥 Demos](#-demos)
 - [🙏 Acknowledgements](#-acknowledgements)
 
+---
 
 ## 🍳 What is Agentic-AIGC
 
@@ -70,8 +75,6 @@ Traditional AIGC approaches rely on single-model generation with limited scope a
 🎯 Success in this domain requires seamless i) 🔄 multi-modal alignment to synchronize visual, audio, and textual elements across temporal sequences; ii) 📖 maintaining narrative coherence and visual continuity throughout extended content; iii) 🎨 orchestrating dynamic scene compositions with complex transitions and character interactions, and iv) ⚙️ coordinating sophisticated production pipelines while ensuring professional quality standards across all components.
 
 ❌ These challenges cannot be addressed by generative models alone, as they lack 🎭 orchestration capabilities for complex multi-step creative workflows, and unable to coordinate multiple specialized tools or maintain consistency across interconnected production processes that require 🗺️ deliberate planning and 🔗 cross-modal synchronization.
-
----
 
 ### 🔧 The Agentic-AIGC Solution
 
