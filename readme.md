@@ -28,8 +28,8 @@ Traditional AIGC approaches rely on single-model generation with limited scope a
 - 🔧 **Agent Orchestration Patterns** - Master architectures where specialized agents collaborate to manage complex video workflows autonomously.
 
 ### Production-Ready Solutions
-🌐 **Cross-Modal Applications** - Work with text, audio, and visual content simultaneously while maintaining narrative coherence.
-📖 **Ready-to-Use Recipes** - Six comprehensive video production workflows you can immediately adapt and extend for your projects.
+- 🌐 **Cross-Modal Applications** - Work with text, audio, and visual content simultaneously while maintaining narrative coherence.
+- 📖 **Ready-to-Use Recipes** - Six comprehensive video production workflows you can immediately adapt and extend for your projects.
 
 <div align='center'>
 <img src='assets/cover_16-9.png' /, width="700" height="500">
