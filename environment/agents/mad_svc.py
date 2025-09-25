@@ -163,7 +163,7 @@ class MadSVCAgent:
             analyzer_result = self.analyzer.process_message(analyzer_msg)
 
             single_msg = Message(content={"annotator_result": annotator_result, "analyzer_result": analyzer_result})
-            single_result = self.single.process_message(single_msg)
+            single_result = self.spliter.process_message(single_msg)
 
             name = os.path.basename(self.midi)
             pure_name = os.path.splitext(name)[0]
