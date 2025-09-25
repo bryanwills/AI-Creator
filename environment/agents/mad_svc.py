@@ -54,6 +54,7 @@ class MadSVCAgent:
         self.annotator = MadSVCAnnotator()
         self.analyzer = MadSVCAnalyzer()
         self.spliter = MadSVCSpliter()
+        self.single = MadSVCSingle()
         self.cover = MadSVCCoverist()
         self.translator = MadSVCTranslator()
         self.subtitle = MadSVCSubtitle()
