@@ -9,6 +9,7 @@ from environment.roles.mad_svc.mad_svc_annotator import MadSVCAnnotator
 from environment.roles.mad_svc.mad_svc_coverist import MadSVCCoverist
 from environment.roles.mad_svc.mad_svc_mixer import MadSVCMixer
 from environment.roles.mad_svc.mad_svc_single import MadSVCSingle
+from environment.roles.mad_svc.mad_svc_spliter import MadSVCSpliter
 from environment.roles.mad_svc.mad_svc_subtitle import MadSVCSubtitle
 from environment.roles.mad_svc.mad_svc_translator import MadSVCTranslator
 from environment.roles.vid_adapter import VideoAdapter
