@@ -238,17 +238,14 @@ class BaseSVSInfer:
     def example_run(cls):
         from utils.audio import save_wav
         set_hparams(print_hparams=False)
+        with open(hparams["inp"], 'r', encoding='utf-8') as f:
+            inp = json.load(f)
+        infer_ins = cls(hparams)
+        out = infer_ins.infer_once(inp)
+        os.makedirs('infer_out', exist_ok=True)
+        save_name = hparams['save_name'] + ".wav"
         os.makedirs('../../dataset/mad_svc/cover', exist_ok=True)
-        input_dir = os.path.join('../../', hparams['input_dir'])
-        for f_name in os.listdir(input_dir):
-            f_path = os.path.join(input_dir, f_name)
-            with open(f_path, 'r', encoding='utf-8') as f:
-                inp = json.load(f)
-            infer_ins = cls(hparams)
-            out = infer_ins.infer_once(inp)
-            # os.makedirs('infer_out', exist_ok=True)
-            save_name = f_name.replace('.json', '.wav')
-            save_wav(out, f'../../dataset/mad_svc/cover/{save_name}', hparams['audio_sample_rate'])
+        save_wav(out, f'../../dataset/mad_svc/cover/{save_name}', hparams['audio_sample_rate'])
 
 
 

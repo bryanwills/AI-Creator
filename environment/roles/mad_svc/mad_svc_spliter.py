@@ -67,7 +67,7 @@ class MadSVCSpliter(BaseAgent):
         while i < len(text):
             if i <= len(text) - 2 and text[i:i + 2] == "AP":
                 current_dur = dur_float[notes_pos] if notes_pos < len(dur_float) else 0.3
-                if current_dur > 0.5:
+                if current_dur > 0.2:
                     ap_segments.append({
                         "position": len(tokens),
                         "duration": current_dur,

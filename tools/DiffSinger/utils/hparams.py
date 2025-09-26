@@ -20,8 +20,7 @@ def override_config(old_config: dict, new_config: dict):
             old_config[k] = v
 
 
-def set_hparams(config='', exp_name='', hparams_str='', input_dir='', save_name='', print_hparams=True,
-                global_hparams=True):
+def set_hparams(config='', exp_name='', hparams_str='', inp='', save_name='', print_hparams=True, global_hparams=True):
     if config == '':
         parser = argparse.ArgumentParser(description='neural music')
         parser.add_argument('--config', type=str, default='usr/configs/midi/e2e/opencpop/ds100_adj_rel.yaml',
@@ -29,16 +28,18 @@ def set_hparams(config='', exp_name='', hparams_str='', input_dir='', save_name=
         parser.add_argument('--exp_name', type=str, default='', help='exp_name')
         parser.add_argument('--hparams', type=str, default='',
                             help='location of the data corpus')
-        parser.add_argument('--input_dir', type=str, default='',
-                            help='location of the input audio')
+        parser.add_argument('--inp', type=str, default='',
+                            help='location of the audio info')
+        parser.add_argument('--save_name', type=str, default='',
+                            help='save name')
         parser.add_argument('--infer', action='store_true', help='infer')
         parser.add_argument('--validate', action='store_true', help='validate')
         parser.add_argument('--reset', action='store_true', help='reset hparams')
         parser.add_argument('--debug', action='store_true', help='debug')
         args, unknown = parser.parse_known_args()
     else:
-        args = Args(config=config, exp_name=exp_name, hparams=hparams_str, input_dir=input_dir, infer=False,
-                    validate=False, reset=False, debug=False)
+        args = Args(config=config, exp_name=exp_name, hparams=hparams_str, inp=inp, save_name=save_name,
+                    infer=False, validate=False, reset=False, debug=False)
     args_work_dir = ''
     if args.exp_name != '':
         args.work_dir = args.exp_name
@@ -82,6 +83,7 @@ def set_hparams(config='', exp_name='', hparams_str='', input_dir='', save_name=
             args.config = ckpt_config_path
 
     hparams_ = {}
+
     hparams_.update(load_config(args.config))
 
     if not args.reset:
@@ -104,8 +106,8 @@ def set_hparams(config='', exp_name='', hparams_str='', input_dir='', save_name=
     hparams_['infer'] = args.infer
     hparams_['debug'] = args.debug
     hparams_['validate'] = args.validate
-    hparams_['input_dir'] = args.input_dir
-    # hparams_['save_name'] = args.save_name
+    hparams_['inp'] = args.inp
+    hparams_['save_name'] = args.save_name
 
     global global_print_hparams
     if global_hparams:
