@@ -136,7 +136,7 @@ class MadSVCAgent:
         try:
             output_dir = os.path.dirname(self.output)
             os.makedirs(output_dir, exist_ok=True)
-            # Call main function from vid_editer with our parameters
+            # Call main function from vid_editor with our parameters
             editing_result = main(
                 input_path=self.video_source_dir,  # Use custom video source directory if specified
                 keep_original_audio=False,
@@ -155,16 +155,21 @@ class MadSVCAgent:
         try:
             preload_result = self.preload_video()
 
-            pre_msg = Message(content={"audio_dir": os.path.dirname(self.target)})
-            loudness_result = self.normalizer.process_message(pre_msg)
+            # pre_msg = Message(content={"audio_dir": os.path.dirname(self.target)})
+            # loudness_result = self.normalizer.process_message(pre_msg)
             annotator_msg = Message(content={"midi": self.midi, "lyrics": self.lyrics})
             annotator_result = self.annotator.process_message(annotator_msg)
+
 
             analyzer_msg = Message(content={"annotator_result": annotator_result.content, "reqs": self.reqs})
             analyzer_result = self.analyzer.process_message(analyzer_msg)
 
+            # with open('dataset/mad_svc/script.txt', 'r', encoding='utf-8') as f:
+            #     script = f.read()
+            # analyzer_result = Message(content={"lyrics": script})
             single_msg = Message(content={"annotator_result": annotator_result, "analyzer_result": analyzer_result})
             single_result = self.spliter.process_message(single_msg)
+            # single_result = self.single.process_message(single_msg)
 
             name = os.path.basename(self.midi)
             pure_name = os.path.splitext(name)[0]
