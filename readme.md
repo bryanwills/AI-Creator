@@ -100,7 +100,7 @@ conda create --name aicreator python=3.10
 conda activate aicreator
 
 # 3. Install system dependencies (pynini, ffmpeg)
-conda install -y -c conda-forge pynini==2.1.5 ffmpeg
+conda install -y -c conda-forge pynini==2.1.6 ffmpeg
 
 # 4. Install Python dependencies
 pip install -r requirements.txt
