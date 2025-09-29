@@ -9,7 +9,7 @@ from environment.roles.vid_news.news_loader import content_main
 from environment.roles.vid_news.voice_maker import voice_main
 from environment.roles.vid_news.vid_searcher import video_search_main
 from environment.roles.vid_news.vid_editor import main
-from environment.roles.vid_news.vid_subtitler import subtitler_main
+
 
 class NewsAgent:
     def __init__(self, config):
@@ -180,24 +180,7 @@ class NewsAgent:
             self.logger.error(f"Error in video editing: {str(e)}")
             raise
 
-    def process_subtitle(self):
-        self.logger.info(f"Starting video subtitle processing with output path: {self.output}")
-        try:
-            # Ensure output directory exists
-            output_dir = os.path.dirname(self.output)
-            os.makedirs(output_dir, exist_ok=True)
-            
-            
-            # Call subtitler_main with our parameters
-            subtitle_result = subtitler_main(
-                output_path=self.output
-            )
-            
-            self.logger.info(f"Video subtitle processing completed successfully. Output saved to: {self.output}")
-            return subtitle_result
-        except Exception as e:
-            self.logger.error(f"Error in video subtitle processing: {str(e)}")
-            raise
+
     
     def orchestrator(self):
         """Main orchestration method."""
@@ -225,7 +208,7 @@ class NewsAgent:
             edit_result = self.process_edit()
 
 
-            subtitle_result = self.process_subtitle()
+
             
             self.logger.info("All processing completed successfully")
             
@@ -234,8 +217,7 @@ class NewsAgent:
                 "content_result": content_result,
                 "voice_result": voice_result,
                 "search_result": search_result,
-                "edit_result": edit_result,
-                "process_subtitle": subtitle_result
+                "edit_result": edit_result
             }
             
         except Exception as e:
