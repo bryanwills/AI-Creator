@@ -66,7 +66,7 @@ dependencies = [
   "wget>=3.2",
   "fastapi>=0.115.6",
   "fastapi-cli>=0.0.4",
-  "WeTextProcessing>=1.0.3",
+  "WeTextProcessing>=1.0.4",
   "pandas",
   "numba>=0.61.0",
   "numpy>=1.25.0",
@@ -137,4 +137,5 @@ package-dir = {"fish_audio_preprocess" = "tools/audio-preprocess/fish_audio_prep
 
 [tool.isort]
 profile = "black"
+
 
