@@ -143,9 +143,6 @@ git lfs clone https://huggingface.co/openbmb/MiniCPM-V-2_6-int4
 cd tools
 git lfs clone https://huggingface.co/openai/whisper-large-v3-turbo  
 
-# Download all-MiniLM-L6-v2
-cd tools
-git lfs clone https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2  
 
 # Download ImageBind
 cd tools
@@ -231,12 +228,12 @@ wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth
   <tr>
     <td align="center">Cross Talk</td>
     <td align="center">English Stand-up Comedy to Chinese Crosstalk</td>
-    <td align="center">CosyVoice, MiniCPM, Whisper, ImageBind, all-MiniLM-L6-v2 </td>
+    <td align="center">CosyVoice, MiniCPM, Whisper, ImageBind</td>
   </tr>
   <tr>
     <td align="center">Talk Show</td>
     <td align="center">Chinese Crosstalk to English Stand-up Comedy</td>
-    <td align="center">CosyVoice, MiniCPM, Whisper, ImageBind, all-MiniLM-L6-v2</td>
+    <td align="center">CosyVoice, MiniCPM, Whisper, ImageBind</td>
   </tr>
   <tr>
     <td align="center">MAD TTS</td>
@@ -246,22 +243,22 @@ wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth
   <tr>
     <td align="center">MAD SVC</td>
     <td align="center">AI Music Videos</td>
-    <td align="center">DiffSinger, seed-vc, MiniCPM, Whisper, ImageBind, all-MiniLM-L6-v2</td>
+    <td align="center">DiffSinger, seed-vc, MiniCPM, Whisper, ImageBind</td>
   </tr>
   <tr>
     <td align="center">Rhythm</td>
     <td align="center">Spider-Man: Across the Spider-Verse</td>
-    <td align="center">MiniCPM, Whisper, ImageBind, all-MiniLM-L6-v2</td>
+    <td align="center">MiniCPM, Whisper, ImageBind</td>
   </tr>
   <tr>
     <td align="center">Comm</td>
     <td align="center">Novel-to-Screen Adaptation</td>  
-    <td align="center">MiniCPM, Whisper, ImageBind, all-MiniLM-L6-v2</td>
+    <td align="center">MiniCPM, Whisper, ImageBind</td>
   </tr>
   <tr>
     <td align="center">News</td>
     <td align="center">Tech News: OpenAI's GPT-4o Image Generation Release</td>
-    <td align="center">MiniCPM, Whisper, ImageBind, all-MiniLM-L6-v2</td>
+    <td align="center">MiniCPM, Whisper, ImageBind</td>
   </tr>
 </table>
 
@@ -384,23 +381,6 @@ Input settings for different video types are managed in YAML files located in `A
 *   `dou_gen`, `peng_gen`, etc.: Paths to specific voice sample files for cloning.
 
 Always ensure paths in these YAML files are correct relative to your project structure.
-
-### Character Image for Visual Retrieval Enhancement
-
-To improve character recognition during video editing/retrieval:
-
-1.  Navigate to `dataset/video_edit/face_db`.
-2.  Create a folder named exactly after the character (e.g., `Spiderman`, `Batman`).
-3.  Place clear images of that character's face inside the corresponding folder.
-4.  Example structure:
-    ```
-    face_db/
-    ├── Spiderman/
-    │   ├── image01.png
-    │   └── image02.png
-    └── Batman/
-        └── image01.png
-    ```
 
 ### Running the Tool
 

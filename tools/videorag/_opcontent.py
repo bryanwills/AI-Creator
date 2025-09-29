@@ -1,12 +1,11 @@
 import re
 import json
 import os
-import torch
-from sentence_transformers import SentenceTransformer
 
 from .base import (
     QueryParam
 )
+
 
 
 
@@ -25,35 +24,8 @@ async def _refine_visual_sentence_segmentation_retrieval_query(
     # Join the segments with semicolons
     return segments
 
-def compute_cosine_similarity(vec1, vec2):
-    """Compute cosine similarity between two vectors using PyTorch"""
-    # Convert to torch tensors if they aren't already
-    if not isinstance(vec1, torch.Tensor):
-        vec1 = torch.tensor(vec1, dtype=torch.float32)
-    if not isinstance(vec2, torch.Tensor):
-        vec2 = torch.tensor(vec2, dtype=torch.float32)
-    
-    # Normalize vectors
-    vec1_normalized = vec1 / vec1.norm()
-    vec2_normalized = vec2 / vec2.norm()
-    
-    # Compute cosine similarity
-    similarity = torch.dot(vec1_normalized, vec2_normalized).item()
-    return similarity
 
-def compute_text_similarity(text1, text2):
-    """Compute cosine similarity between two text strings"""
-    # Generate embeddings
-    # Load sentence embedding model
-    current_dir = os.getcwd()
-    model_id = os.path.join(current_dir, 'tools/all-MiniLM-L6-v2')
-    sentence_model = SentenceTransformer(model_id)
-    embedding1 = sentence_model.encode(text1, show_progress_bar=False)
-    embedding2 = sentence_model.encode(text2, show_progress_bar=False)
-    
-    # Compute cosine similarity
-    similarity = compute_cosine_similarity(embedding1, embedding2)
-    return similarity
+
 
 async def videorag_query(
     query,
@@ -72,6 +44,8 @@ async def videorag_query(
 
     visual_retrieved_segments = []  # List to store segments for each scene
     used_segments = set()  # Set to track already used segments across all scenes
+
+    
 
     # Get the current file's directory
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -92,9 +66,11 @@ async def videorag_query(
     with open(os.path.join(working_dir, 'kv_store_video_segments.json'), 'r', encoding ='utf-8') as file:
         kvdata = json.load(file)
 
+
     # Calculate segments to exclude for each movie source
     movie_segments_info = {}
     segment_duration = 30  # Default segment duration of 30 seconds
+
 
     # Try to determine segment duration from the first movie's first segment
     if kvdata:
@@ -138,107 +114,71 @@ async def videorag_query(
         # Query video segments based on scene description
         segment_results = await video_segment_feature_vdb.query(scene)
         
-        if not segment_results:
+        if len(segment_results):
+            # Get more results to have alternatives if top ones are already used
+            top_results = segment_results[:20]  # Increased to have more options
+            
+            # Try each result in order, skipping those already used
+            selected_segment = None
+            
+            for result in top_results:
+                segment_id = result['__id__']
+                
+                # Skip if segment has already been used in previous scenes
+                if segment_id in used_segments:
+                    continue
+                
+                # Parse segment ID to extract movie_id and segment_num
+                parts = segment_id.split("_")
+                
+                # Check if segment ID is valid and within valid range for its source movie
+                is_valid_segment = False
+                
+                if len(parts) >= 2:
+                    # Extract movie_id and segment_number based on segment_id format
+                    if len(parts) == 3:  # Format: movie_video_id_section
+                        movie_id = parts[0]
+                        try:
+                            segment_num = int(parts[2])
+                            is_valid_format = True
+                        except ValueError:
+                            is_valid_format = False
+                    elif len(parts) == 2:  # Format: movie_section
+                        movie_id = parts[0]
+                        try:
+                            segment_num = int(parts[1])
+                            is_valid_format = True
+                        except ValueError:
+                            is_valid_format = False
+                    else:
+                        is_valid_format = False
+                        
+                    # Check if the segment is within the valid range for its movie
+                    if is_valid_format and movie_id in movie_segments_info:
+                        valid_range = movie_segments_info[movie_id]["valid_range"]
+                        if valid_range[0] <= segment_num <= valid_range[1]:
+                            is_valid_segment = True
+                
+                # If segment is valid, select it
+                if is_valid_segment:
+                    selected_segment = segment_id
+                    break  # Found a valid segment, stop looking
+            
+            if selected_segment:
+                # Mark as used so it won't be selected for future scenes
+                used_segments.add(selected_segment)
+                visual_retrieved_segments.append([selected_segment])
+            else:
+                # If no suitable segment found, append empty list
+                visual_retrieved_segments.append([])
+        else:
             # If no segments found, append empty list
             visual_retrieved_segments.append([])
-            continue
-            
-        # Get top-k results (getting more to have options)
-        top_results = segment_results[:20]
-        
-        # Filter out invalid segments and already used segments
-        valid_results = []
-        
-        for result in top_results:
-            segment_id = result['__id__']
-            
-            # Skip if segment has already been used in previous scenes
-            if segment_id in used_segments:
-                continue
-            
-            # Parse segment ID to extract movie_id and segment_num
-            parts = segment_id.split("_")
-            
-            # Check if segment ID is valid and within valid range for its source movie
-            is_valid_segment = False
-            
-            if len(parts) >= 2:
-                # Extract movie_id and segment_number based on segment_id format
-                if len(parts) == 3:  # Format: movie_video_id_section
-                    movie_id = parts[0]
-                    try:
-                        segment_num = int(parts[2])
-                        is_valid_format = True
-                    except ValueError:
-                        is_valid_format = False
-                elif len(parts) == 2:  # Format: movie_section
-                    movie_id = parts[0]
-                    try:
-                        segment_num = int(parts[1])
-                        is_valid_format = True
-                    except ValueError:
-                        is_valid_format = False
-                else:
-                    is_valid_format = False
-                    
-                # Check if the segment is within the valid range for its movie
-                if is_valid_format and movie_id in movie_segments_info:
-                    valid_range = movie_segments_info[movie_id]["valid_range"]
-                    if valid_range[0] <= segment_num <= valid_range[1]:
-                        is_valid_segment = True
-            
-            # If segment is valid, add to valid results
-            if is_valid_segment:
-                valid_results.append(result)
-        
-        if not valid_results:
-            # No valid segments found
-            visual_retrieved_segments.append([])
-            continue
-        
-        # Calculate cosine similarity for each valid segment with the scene description
-        segment_similarities = []
-        
-        for result in valid_results:
-            segment_id = result['__id__']
-            
-            # Extract the movie_id and segment_num from segment_id
-            parts = segment_id.split("_")
-            if len(parts) == 3:  # Format: movie_video_id_section
-                movie_id = parts[0]
-                segment_num = parts[2]
-            elif len(parts) == 2:  # Format: movie_section
-                movie_id = parts[0]
-                segment_num = parts[1]
-            else:
-                continue  # Skip if format doesn't match
-            
-            # Get the segment content from kv_store_video_segments.json
-            if movie_id in kvdata and segment_num in kvdata[movie_id]:
-                segment_content = kvdata[movie_id][segment_num].get("content", "")
-                
-                # Compute similarity between scene description and segment content
-                similarity = compute_text_similarity(scene, segment_content)
-                segment_similarities.append((segment_id, similarity))
-        
-        # Sort segments by similarity score in descending order
-        segment_similarities.sort(key=lambda x: x[1], reverse=True)
-        
-        # Select the segment with highest similarity
-        if segment_similarities:
-            selected_segment = segment_similarities[0][0]
-            used_segments.add(selected_segment)
-            visual_retrieved_segments.append([selected_segment])
-        else:
-            visual_retrieved_segments.append([])
     
+
     query_for_visual_retrieval = scene_sentences
     
-
-
-
-
-
+ 
     
 
     visual_retrieved_segments = [

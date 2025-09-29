@@ -54,8 +54,7 @@ class Pre_Loader:
             'voice_data',
             'voice_gen',
             'writing_data',
-            'video_output',
-            'face_db'
+            'video_output'
         ]
         
         # Create all subdirectories

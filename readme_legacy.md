@@ -373,22 +373,6 @@ Input settings for different video types are managed in YAML files located in `A
 
 Always ensure paths in these YAML files are correct relative to your project structure.
 
-### Character Image for Visual Retrieval Enhancement
-
-To improve character recognition during video editing/retrieval:
-
-1.  Navigate to `dataset/video_edit/face_db`.
-2.  Create a folder named exactly after the character (e.g., `Spiderman`, `Batman`).
-3.  Place clear images of that character's face inside the corresponding folder.
-4.  Example structure:
-    ```
-    face_db/
-    ├── Spiderman/
-    │   ├── image01.png
-    │   └── image02.png
-    └── Batman/
-        └── image01.png
-    ```
 
 ### Running the Tool
 
