@@ -6,4 +6,4 @@
 #   output: "dataset/user_output_video/output_video.mp4"
 
 ##  Video Assets Directory
-#   video_source_dir: "dataset/user_video/
+#   video_source_dir: "dataset/user_video/"
