@@ -5,6 +5,8 @@
     <h3>
     One Prompt → Video Creation: AI Unleashed<br/>
     </h3>
+    <a href="./Communication.md"><img src="https://img.shields.io/badge/💬Feishu-Group-07c160?style=for-the-badge&logoColor=white&labelColor=1a1a2e"></a>
+    <a href="./Communication.md"><img src="https://img.shields.io/badge/WeChat-Group-07c160?style=for-the-badge&logo=wechat&logoColor=white&labelColor=1a1a2e"></a>
 </div>
 
 ## 🎯 Introduction
