@@ -359,28 +359,53 @@ OS: Linux, Windows
 ```
 
 ### 📥 **Clone and Install**
-
+We use uv to manage the environment. For uv installation, please refer to the https://docs.astral.sh/uv/getting-started/installation/.
 ```bash
-
-
+git clone https://github.com/HKUDS/ViMax.git
+cd ViMax
+uv sync
 ```
 
-
-
-### 🤖 **LLM Configuration**
-
-```bash
-
-```
 
 ### 🎯 **Usage**
-
+main_idea2video.py is used to convert your ideas into videos. You need to set API configuration in it, then fill idea and user_requirement variables. Like
 ```bash
-
+idea = \
+"""
+If a cat and a dog are best friends, what would happen when they meet a new cat?
+"""
+user_requirement = \
+"""
+For children, do not exceed 3 scenes.
+"""
+style = "Cartoon"
 ```
+
+main_script2video.py generates a video based on a specific script, and you similarly need to set up the API configuration inside it, then fill the script and user_requirement variables. Like
+```bash
+script = \
+"""
+EXT. SCHOOL GYM - DAY
+A group of students are practicing basketball in the gym. The gym is large and open, with a basketball hoop at one end and a large crowd of spectators at the other end. John (18, male, tall, athletic) is the star player, and he is practicing his dribble and shot. Jane (17, female, short, athletic) is the assistant coach, and she is helping John with his practice. The other students are watching the practice and cheering for John.
+John: (dribbling the ball) I'm going to score a basket!
+Jane: (smiling) Good job, John!
+John: (shooting the ball) Yes!
+Jane: (clapping) Great shot, John!
+John: (dribbling the ball) I'm going to score a basket!
+Jane: (smiling) Good job, John!
+John: (shooting the ball) Yes!
+Jane: (clapping) Great shot, John!
+...
+"""
+user_requirement = \
+"""
+Fast-paced with no more than 20 shots.
+"""
+style = "Realistic"
+```
+
+
 
 
 ---
-
-
 
