@@ -193,7 +193,7 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
   <video src="https://github.com/user-attachments/assets/cc0b0bcd-e7db-4839-950b-0b03949637bd" controls width="100%"></video>
 </td>
 <td align="center" width="33%">
-  <video src="https://github.com/user-attachments/assets/8844746d-9ec4-46b8-bcb2-64164ebe4ffd" controls width="100%"></video>
+  <video src="https://github.com/user-attachments/assets/85919b59-80f0-461a-af7e-a93d3fb412fc" controls width="100%"></video>
 </td>
 </tr>
 
