@@ -1,7 +1,7 @@
 <div align="center">
   <img src="./assets/vimax.png" width="20%"> 
 
-  <h1 align="center">ViMax: Agentic Video Ageneration</h1>
+  <h1 align="center">ViMax: Agentic Video Generation</h1>
 
   <div align="center">
   </div>
