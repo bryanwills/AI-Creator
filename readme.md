@@ -1,470 +1,431 @@
-<h1 align='center'>🚀 Agentic-AIGC: Video Production with <br/> Multi-Modal Agents</h1>
-<!-- <h1 align='center'>🚀 Agentic-AIGC: Multi-Modal Agents for Video Production</h1> -->
+<div align="center">
+  <img src="./assets/vimax.png" width="20%"> 
 
-<div align='center'>
-    <h3>
-    One Prompt → Video Creation: AI Unleashed<br/>
-    </h3>
+  <h1 align="center">ViMax: Agentic Video Ageneration</h1>
+
+  <div align="center">
+  </div>
+
+  <p align="center">
+    <img src="https://img.shields.io/badge/🐍Python-3.12-00d9ff?style=for-the-badge&logo=python&logoColor=white&labelColor=1a1a2e">
+	<a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/badge/⚡uv-Ready-ff6b6b?style=for-the-badge&logo=python&logoColor=white&labelColor=1a1a2e"></a>
+	<img src="https://img.shields.io/badge/License-MIT-4ecdc4?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="MIT License">
+  </p>
+
+  <p align="center">
     <a href="./Communication.md"><img src="https://img.shields.io/badge/💬Feishu-Group-07c160?style=for-the-badge&logoColor=white&labelColor=1a1a2e"></a>
     <a href="./Communication.md"><img src="https://img.shields.io/badge/WeChat-Group-07c160?style=for-the-badge&logo=wechat&logoColor=white&labelColor=1a1a2e"></a>
+  </p>
+
+  <p align="center">
+    <a href='https://www.youtube.com/@AI-Creator-is-here'><img src='https://badges.aleen42.com/src/youtube.svg' /></a>&nbsp;
+    <a href='https://space.bilibili.com/3546868449544308'><img src="https://img.shields.io/badge/bilibili-00A1D6.svg?logo=bilibili&logoColor=white" /></a>
+  </p>
+
 </div>
-
-## 🎯 Introduction
-
-This project serves as a **Comprehensive Cookbook for Agentic-AIGC Development**, with a primary focus on video creation workflows. It guides readers through the emerging field of agent-based AI-generated content creation. Video production represents the ultimate complexity challenge in AIGC.
-
-Creating professional videos requires seamless coordination of script writing, storyboard development, visual scene generation, character animation, audio synthesis, voice acting, background music composition, scene transitions, visual effects, and final editing.
-
-Traditional AIGC approaches rely on single-model generation with limited scope and coordination capabilities. Agentic-AIGC represents the next frontier where intelligent agents orchestrate sophisticated creative ecosystems. These agents coordinate multiple AI tools seamlessly. They make nuanced creative decisions in real-time. Most importantly, they maintain narrative and visual coherence across complex, multi-stage production pipelines.
-
----
-
-## ✨ What Will You Gain?
-
-### Core Knowledge & Skills
-- 📚 **Agentic-AIGC Fundamentals** - Deep understanding of agent-based content generation concepts and architectural patterns
-- 🍳 **Hands-On Experience** - Working implementations of complete video production workflows from concept to final output
-- 🤖 **Multi-Tool Coordination** - Practical examples of orchestrating different AI models for seamless creative collaboration
-
-### Autonomous Video Creation Agents
-- 🎬 **Intelligent Video Production** - Build agents that make independent creative decisions throughout video production pipelines.
-- 🎵 **Self-Directed Audio Processing** - Develop agents that autonomously handle voice synthesis, music selection, and audio-visual synchronization.
-- 🔧 **Agent Orchestration Patterns** - Master architectures where specialized agents collaborate to manage complex video workflows autonomously.
-
-### Production-Ready Solutions
-- 🌐 **Cross-Modal Applications** - Work with text, audio, and visual content simultaneously while maintaining narrative coherence.
-- 📖 **Ready-to-Use Recipes** - Six comprehensive video production workflows you can immediately adapt and extend for your projects.
-
-<div align='center'>
-<img src='assets/cover_16-9.png' /, width="700" height="500">
-</div>
-
-## 🧾 Table of Contents
-
-- [🎯 Project Introduction](#-project-introduction)
-  - [✨ What Will You Gain?](#-what-will-you-gain)
-- [🧾 Table of Contents](#-table-of-contents)
-- [🍳 What is Agentic-AIGC](#-what-is-agentic-aigc)
-- [🧾 Prerequisites \& Setup](#-prerequisites--setup)
-  - [Environment](#environment)
-  - [Clone and Install](#clone-and-install)
-  - [Download Required Models](#download-required-models)
-  - [Configure LLM](#configure-llm)
-- [🍽 Recipes: Creating Videos](#-recipes-creating-videos)
-  - [🎬 Movie Edits (Rhythm-Based)](#-movie-edits-rhythm-based)
-  - [📖 Novel-to-Screen Adaptation](#-novel-to-screen-adaptation)
-  - [📰 News Summary](#-news-summary)
-  - [😂 Meme Video](#-meme-video)
-  - [🎵 Music Video (SVC)](#-music-video-svc)
-  - [🎭 Cross-Culture Comedy](#-cross-culture-comedy)
-- [📋 Configuration Details](#-configuration-details)
-  - [Input Configuration](#input-configuration)
-  - [Character Image for Visual Retrieval Enhancement](#character-image-for-visual-retrieval-enhancement)
-  - [Running the Tool](#running-the-tool)
-- [🎥 Demos](#-demos)
-- [🙏 Acknowledgements](#-acknowledgements)
-
----
-
-## 🍳 What is Agentic-AIGC
-
-🚀 Recent breakthroughs in generative AI have transformed multimedia content creation across diverse domains. Powered by advanced diffusion models and Large Language Models (LLMs), AI-Generated Content (AIGC) has achieved remarkable success in 🖼️ image generation, 🎵 audio creation, 🎮 interactive media, and 🎭 multimodal experiences.
-
-⚡ While these achievements are impressive, creating truly high-quality, sophisticated multimedia content--particularly 🎬 complex videos--presents challenges that extend far beyond simple generation tasks.
-
-🎯 Success in this domain requires seamless i) 🔄 multi-modal alignment to synchronize visual, audio, and textual elements across temporal sequences; ii) 📖 maintaining narrative coherence and visual continuity throughout extended content; iii) 🎨 orchestrating dynamic scene compositions with complex transitions and character interactions, and iv) ⚙️ coordinating sophisticated production pipelines while ensuring professional quality standards across all components.
-
-❌ These challenges cannot be addressed by generative models alone, as they lack 🎭 orchestration capabilities for complex multi-step creative workflows, and unable to coordinate multiple specialized tools or maintain consistency across interconnected production processes that require 🗺️ deliberate planning and 🔗 cross-modal synchronization.
-
-### 🔧 The Agentic-AIGC Solution
-
-🎯 To directly address these fundamental challenges, **Agentic-AIGC** leverages 🤖 intelligent agent architectures that systematically solve each limitation through 🔄 coordinated automation. Unlike 📱 traditional generative models, the 🧠 agentic approach tackles 🎬 complex video production through ⚡ fully-automated intelligent workflows.
-
----
-
-## 🧾 Prerequisites & Setup
-
-This section walks you through the environment setup to get Agentic-AIGC running on your device.
-
-### Environment
-
-*   **GPU Memory:** 8GB
-*   **System:** Linux, Windows
-
-### Clone and Install
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/HKUDS/Agentic-AIGC.git
-
-# 2. Create and activate a Conda environment
-conda create --name aicreator python=3.10
-conda activate aicreator
-
-# 3. Install system dependencies (pynini, ffmpeg)
-conda install -y -c conda-forge pynini==2.1.6 ffmpeg
-
-# 4. Install Python dependencies
-pip install -r requirements.txt
-```
-
-### Download Required Models
-
-Ensure `git-lfs` is installed first: [https://git-lfs.com](https://git-lfs.com)
-
-```bash
-git lfs install
-```
-
-Navigate to the `tools` directory and download the necessary models. You only need to download the models relevant to the video types you want to create (see feature/model table below).
-
-```bash
-# Example downloads (adjust paths and models as needed)
-
-# Download CosyVoice
-cd tools/CosyVoice
-huggingface-cli download PillowTa1k/CosyVoice --local-dir pretrained_models
-
-# Download fish-speech
-cd tools/fish-speech
-huggingface-cli download fishaudio/fish-speech-1.5 --local-dir checkpoints/fish-speech-1.5
-
-# Download seed-vc
-cd tools/seed-vc
-huggingface-cli download PillowTa1k/seed-vc --local-dir checkpoints
-
-# Download DiffSinger
-cd tools/DiffSinger
-huggingface-cli download PillowTa1k/DiffSinger --local-dir checkpoints
-
-# Download MiniCPM
-cd tools
-git lfs clone https://huggingface.co/openbmb/MiniCPM-V-2_6-int4  
-
-# Download Whisper
-cd tools
-git lfs clone https://huggingface.co/openai/whisper-large-v3-turbo  
-
-
-# Download ImageBind
-cd tools
-mkdir .checkpoints
-cd .checkpoints
-wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth  
-```
----
-
-**Feature & Model Requirements Table:**
-
 <div align="center">
-<table>
-<tr>
-<th align="center">Feature</th>
-<th align="center">Agentic-AIGC</th>
-<th align="center">Director</th>
-<th align="center">Funclip</th>
-<th align="center">NarratoAI</th>
-<th align="center">NotebookLM</th>
-</tr>
-<tr>
-<td align="center">Beat-synced Edits</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">—</td>
-<td align="center">—</td>
-</tr>
-<tr>
-<td align="center">Storytelling Video</td>
-<td align="center">✅</td>
-<td align="center">—</td>
-<td align="center">—</td>
-<td align="center">✅</td>
-<td align="center">—</td>
-</tr>
-<tr>
-<td align="center">Video Overview</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-</tr>
-<tr>
-<td align="center">Meme Video</td>
-<td align="center">✅</td>
-<td align="center">—</td>
-<td align="center">—</td>
-<td align="center">—</td>
-<td align="center">—</td>
-</tr>
-<tr>
-<td align="center">Music Remixes</td>
-<td align="center">✅</td>
-<td align="center">—</td>
-<td align="center">—</td>
-<td align="center">—</td>
-<td align="center">—</td>
-</tr>
-<tr>
-<td align="center">Comedy Remaking</td>
-<td align="center">✅</td>
-<td align="center">—</td>
-<td align="center">—</td>
-<td align="center">—</td>
-<td align="center">—</td>
-</tr>
-</table>
+	
+<p>
+	<a href="README.md"><img src="https://img.shields.io/badge/English-1a1a2e?style=for-the-badge"></a>
+    <a href="README_ZH.md"><img src="https://img.shields.io/badge/中文版-1a1a2e?style=for-the-badge"></a>
+</p>
+    <a href="#quick-start" style="text-decoration: none;">
+      <img src="https://img.shields.io/badge/Quick%20Start-Get%20Started%20Now-FFC107?style=for-the-badge&logo=rocket&logoColor=white&labelColor=1a1a2e">
+    </a>
+
 </div>
 
-
+---
 
 <div align="center">
 
-<table>
-  <tr>
-    <th align="center">Feature Type</th>
-    <th align="center">Video Demo</th>
-    <th align="center">Required Models</th>
-  </tr>
-  <tr>
-    <td align="center">Cross Talk</td>
-    <td align="center">English Stand-up Comedy to Chinese Crosstalk</td>
-    <td align="center">CosyVoice, MiniCPM, Whisper, ImageBind</td>
-  </tr>
-  <tr>
-    <td align="center">Talk Show</td>
-    <td align="center">Chinese Crosstalk to English Stand-up Comedy</td>
-    <td align="center">CosyVoice, MiniCPM, Whisper, ImageBind</td>
-  </tr>
-  <tr>
-    <td align="center">MAD TTS</td>
-    <td align="center">Xiao-Ming-Jian-Mo(小明剑魔) Meme</td>
-    <td align="center">fish-speech</td>
-  </tr>
-  <tr>
-    <td align="center">MAD SVC</td>
-    <td align="center">AI Music Videos</td>
-    <td align="center">DiffSinger, seed-vc, MiniCPM, Whisper, ImageBind</td>
-  </tr>
-  <tr>
-    <td align="center">Rhythm</td>
-    <td align="center">Spider-Man: Across the Spider-Verse</td>
-    <td align="center">MiniCPM, Whisper, ImageBind</td>
-  </tr>
-  <tr>
-    <td align="center">Comm</td>
-    <td align="center">Novel-to-Screen Adaptation</td>  
-    <td align="center">MiniCPM, Whisper, ImageBind</td>
-  </tr>
-  <tr>
-    <td align="center">News</td>
-    <td align="center">Tech News: OpenAI's GPT-4o Image Generation Release</td>
-    <td align="center">MiniCPM, Whisper, ImageBind</td>
-  </tr>
-</table>
+
+
+https://github.com/user-attachments/assets/39c668f7-4ab3-4a64-9e54-2303b2ae3902
+
+
+
 
 </div>
 
-### Configure LLM
-
-1.  **API Keys:** Edit `Agentic-AIGC/environment/config/config.yml` to add your LLM API key and base URL.
-2.  **Model Names:** Check and adjust model names in `environment/config/llm.py` according to your LLM provider's requirements. For single-model APIs like official GPT, use the specific model name (e.g., `gpt-4o-mini`) for all entries.
-  
 ---
 
-## 🍽 Agentic Video Creation: Step-by-Step Recipes
 
-📋 Each production recipe below represents a distinct video format that can be automatically generated through Agentic-AIGC's intelligent agent system.
+## 📑 Table of Contents
 
----
-
-### ✂️ Video Editing
-
-**Goal:** Create a video edit synchronized with music beats or based on a user's narrative idea, selecting high-energy or relevant clips from source videos.
-
-**Key Steps:**
-
-- 📁 1. **Prepare Source Material**: Place your source video clips in a directory (e.g., dataset/user_video/).
-- 🎵 2. **Prepare Music (Optional for beat-sync)**: Place your background music file (e.g., .mp3) in your project.
-- ▶️ 3. **Run the Tool**: Execute python main.py.
-- 🎯 4. **Select Type**: When prompted, input type eg. Rhythm-Based Video Editing.
-- 💬 5. **Provide Prompt**: Enter a detailed description of the editing style/feel you want (e.g., "Fast-paced action sequences with dynamic transitions...").
-- ⚙️ 6. **(Optional) Adjust Beat Sync**: Modify parameters in music_filter.py (thresholds, masks) if needed.
-- 🎬 7. **Processing & Output**: The system will process, analyze videos, detect beats, retrieve visually relevant clips, and generate the final edited video.
+- [💡 Key Features](#key-features)
+- [🏗️ Architecture](#️-architecture)
+- [🚀 Quick Start](#quick-start)
+- [🔮 Demos](#demos)
+- [💖 Acknowledgments](#acknowledgments)
 
 ---
+## 💡Key Features
 
-### 📖 Text-to-Video Adaptation
+<br/>
 
-**Goal:** Transform written text (such as novel excerpts) into cinematic video content with AI-generated commentary and visually matched scenes from your source footage.
-
-**Key Steps:**
-
-- 📁 1. **Prepare Source Material**: Place your source video clips in a directory (e.g., dataset/user_video/). Add your novel .txt file to the project.
-- 🎤 2. **(Optional) Prepare Voice Sample**: Place a short .wav file (e.g., ava_16k.wav) for voice cloning in dataset/video_edit/voice_data/.
-- ✍️ 3. **(Optional) Prepare Style File**: Customize or input dataset/video_edit/writing_data/present_style.txt file describing the desired commentary tone.
-- ▶️ 4. **Run the Tool**: Execute python main.py.
-- 🎯 5. **Select Type**: When prompted, input type eg. Novel-to-Screen Commentary.
-- 💬 6. **Provide Prompt**: Enter a prompt for the commentary script (e.g., "Generate an engaging commentary script with 1500 words.").
-- 🎬 7. **Processing & Output**: The system will generate the script, segment the content, synthesize audio narration, match visual scenes, and produce the final adapted video.
-
----
-
-### 📰 Video Summarization
-
-**Goal:** Generate concise summary videos from lengthy source content. Supports interviews, lectures, meetings, news videos, podcasts, webinars, documentaries, and various video/audio materials.
-
-**Key Steps:**
-
-- 📁 1. **Prepare Source Material**: Place your source video/audio file in a directory (e.g., dataset/user_video/).
-- 🎤 2。 **Prepare Voice Sample (Optional)**: Add a short .wav file (e.g., ava_16k.wav) for voice cloning in dataset/video_edit/voice_data/.
-- ✍️ 3. **Prepare Style File (Optional)**: Customize dataset/video_edit/writing_data/present_style.txt to define the summary tone and style.
-- ▶️ 4. **Run the Tool**: Execute python main.py to start the process.
-- 🎯 5. **Select Type**: When prompted, input the type (e.g., Summary of News).
-- 💬 6. **Provide Prompt**: Enter specifications for your summary (e.g., "Create a concise tech news summary with conversational tone, maximum 250 words").
-- 🎬 7. **Processing Complete**: The system will automatically transcribe content, generate summary, synthesize voiceover, match relevant clips, and produce the final video.
-
----
-
-### 😂 Audio Editing
-
-**Goal:** Replace existing video audio with custom scripts or narratives. Maintains precise video-audio synchronization for professional dubbing and creative content adaptation.
-
-**Key Steps:**
-
-- 📁 1. **Prepare Source Video**: Place your source video file (e.g., .mp4) in a directory (e.g., dataset/meme_video/).
-- ⚙️ 2. **Configure Settings**: Edit Agentic-AIGC/environment/config/mad_tts.yml. Set video_path to your source video and adjust output_path if needed.
-- ▶️ 3. **Run the Tool**: Execute python main.py to start the audio editing process.
-- 🎯 4. **Select Type**: When prompted, choose TTS (Text-to-Speech) for audio generation.
-- ✍️ 5. **Provide Script**: Enter detailed instructions for the new audio content (e.g., "Create a professional narration explaining machine learning concepts with clear pronunciation and appropriate pacing").
-- 🎵 6. **Processing Complete**: The system will extract original audio, transcribe existing content, generate new audio using Fish-Speech technology, synchronize timing with video frames, and produce the final edited video.
-
-### 🎵 AI Cover Creation
-
-**Goal:** Generate professional cover versions of songs using custom target voices. Includes precise audio-visual synchronization capabilities.
-
-**Key Steps:**
-
-- 1. 📂 **Prepare Files**: Place MIDI file, lyrics (.txt), background music (BGM), and target voice sample (.wav) in the project directory.
-- 2. ⚙️ **Configure Settings**: Edit Agentic-AIGC/environment/config/mad_svc.yml. Set paths for midi_path, lyrics_path, bgm_path, and target_voice_path.
-- 3. ▶️ **Run Tool**: Execute python main.py.
-- 4. 🎯 **Select Mode**: Choose SVC (Singing Voice Conversion) when prompted.
-- 5. ✍️ **Provide Instructions**: Enter adaptation prompt (e.g., "Rock ballad style with emotional intensity, focusing on perseverance themes").
-- 6. 🎶 **Processing**: System processes MIDI, generates audio (DiffSinger), clones voice (Seed-VC), synchronizes timing, and integrates with video pipeline.
-
-### 🎭 Cross-Cultural Content Adaptation
-
-**Goal:** Adapt audio content (e.g., English talk shows) into different cultural formats (e.g., Chinese crosstalk), or vice versa.
-
-**Key Steps:**
-
-- 1. 📂 **Prepare Source Audio**: Place source audio file (.wav) in the directory (e.g., dataset/cross_talk/).
-- 2. 🎤 **Prepare Voice Samples**: Add target voice .wav files (e.g., Guo Degang, Fu Hang - ready-to-use samples available in repository).
-- 3. ⚙️ **Configure Settings**: Edit Agentic-AIGC/environment/config/cross_talk.yml (or talk_show.yml). Set audio_path to source audio. Configure dou_gen, peng_gen voice paths. Adjust output path.
-- 4. ▶️ **Run Tool**: Execute python main.py.
-- 5. 🎯 **Select Mode**: Choose Cross Talk or Talk Show when prompted.
-- 6. ✍️ **Provide Instructions**: Enter content adaptation prompt (e.g., "Adapt this content into Chinese crosstalk format while maintaining the original humor style").
-- 7. 🎭 **Processing**: System adapts script content, synthesizes target voices using CosyVoice, adds audio effects, and integrates with video editing pipeline.
-
----
-
-## 📋 Configuration Details
-
-### Input Configuration
-
-Input settings for different video types are managed in YAML files located in `Agentic-AIGC/environment/config/`. Common parameters include:
-
-*   `reqs`: A prompt or instruction for the specific agent.
-*   `audio_path`: Path to the source audio file.
-*   `video_source_dir`: Path to the directory containing source video clips.
-*   `novel_path`: Path to the source text file (for novel adaptation).
-*   `output`: Path for the final generated video file.
-*   `dou_gen`, `peng_gen`, etc.: Paths to specific voice sample files for cloning.
-
-Always ensure paths in these YAML files are correct relative to your project structure.
-
-### Running the Tool
-
-After setup and configuration:
-
-1.  Activate your Conda environment: `conda activate aicreator`.
-2.  Run the main script from the project root: `python main.py`.
-3.  Follow the on-terminal prompts to select the video type and provide any required input.
-
-## 🎥 Demos
-
-<table>
+<table align="center" width="100%" style="border: none; table-layout: fixed;">
 <tr>
-<td align="center" width="33%">
-<a href="https://www.bilibili.com/video/BV1C9Z6Y3ESo/" target='_blank'><img src="assets/spiderman_cover.png" width="100%"></a>
-Movie Edits
+<td width="25%" align="center" style="vertical-align: top; padding: 20px;">
+
+<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
+<h3 style="margin: 0; padding: 0;">🌟 <strong>Idea2Video</strong></h3>
+</div>
+
+<div align="center" style="margin: 15px 0;">
+  <img src="https://img.shields.io/badge/IDEA-GENERATION-ff6b6b?style=for-the-badge&logo=algorithm&logoColor=white" alt="Algorithm Badge" />
+</div>
+
+<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
+<p align="center"><strong>From Spark to Screen</strong></p>
+</div>
+
+<div style="height: 60px; display: flex; align-items: center; justify-content: center;">
+<p align="center">Transform <strong> raw ideas </strong> into complete video stories through intelligent multi-agent workflows automating <strong> storytelling, character design, and production </strong>.
+</p>
+</div>
+
+
+
 </td>
-<td align="center" width="33%">
-<a href="https://www.bilibili.com/video/BV1ucZ6YmEBU/" target='_blank'><img src="assets/masterma_cover.png" width="100%"></a>
-Meme Videos
+<td width="25%" align="center" style="vertical-align: top; padding: 20px;">
+
+<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
+<h3 style="margin: 0; padding: 0;">🎨 <strong>Novel2Video</strong></h3>
+</div>
+
+<div align="center" style="margin: 15px 0;">
+  <img src="https://img.shields.io/badge/NOVEL-ADAPTATION-4ecdc4?style=for-the-badge&logo=book&logoColor=white" alt="Frontend Badge" />
+</div>
+
+<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
+<p align="center"><strong>Smart Literary Adaptation Engine</strong></p>
+</div>
+
+<div style="height: 60px; display: flex; align-items: center; justify-content: center;">
+<p align="center">Transform <strong>complete novels</strong> into <strong>episodic video content</strong> with intelligent narrative compression, character tracking, and scene-by-scene visual adaptation</p>
+</div>
+
+
+
 </td>
-<td align="center" width="33%">
-<a href="https://www.bilibili.com/video/BV1t8ZCYsEeA/" target='_blank'><img src="assets/airencuoguo_cover.png" width="100%"></a>
-Music Videos
+<td width="25%" align="center" style="vertical-align: top; padding: 20px;">
+
+<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
+<h3 style="margin: 0; padding: 0;">⚙️ <strong>Script2Video</strong></h3>
+</div>
+
+<div align="center" style="margin: 15px 0;">
+  <img src="https://img.shields.io/badge/SCRIPT-ADAPTATION-9b59b6?style=for-the-badge&logo=server&logoColor=white" alt="Backend Badge" />
+</div>
+
+<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
+<p align="center"><strong>Unlimited Screenplay Video Creation</strong></p>
+</div>
+
+<div style="height: 60px; display: flex; align-items: center; justify-content: center;">
+<p align="center">Unleash your creativity by writing <strong>any screenplay</strong> from personal stories to epic adventures, giving you complete control over every aspect of your visual storytelling.</p>
+</div>
+
+
+
+
+
 </td>
-</tr>
-<tr>
-<td align="center" width="33%">
-<a href="https://www.bilibili.com/video/BV1ucZ6YmESg/" target='_blank'><img src="assets/adapted_crosstalk_cover.png" width="100%"></a>
-Verbal Comedy Arts
-</td>
-<td align="center" width="33%">
-<a href="https://www.bilibili.com/video/BV1TmZ6YjEvV/" target='_blank'><img src="assets/joylife_cover.png" width="100%"></a>
-Commentary Video
-</td>
-<td align="center" width="33%">
-<a href="https://www.bilibili.com/video/BV12mZ6YLEqW/" target='_blank'><img src="assets/openai_news_cover.png" width="100%"></a>
-Video Overview
+<td width="25%" align="center" style="vertical-align: top; padding: 20px;">
+
+<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
+<h3 style="margin: 0; padding: 0;">🤳 <strong>AutoCameo</strong></h3>
+</div>
+
+<div align="center" style="margin: 15px 0;">
+  <img src="https://img.shields.io/badge/INTERACTIVE-GENERATION-FFC107?style=for-the-badge&logo=server&logoColor=white" alt="Backend Badge" />
+</div>
+
+<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
+<p align="center"><strong>Generate Video from Your Photo</strong></p>
+</div>
+
+<div style="height: 60px; display: flex; align-items: center; justify-content: center;">
+<p align="center"> <strong>Create your own cameo</strong> video, transforming yourself/pet into a guest star who appears across limitless creative scripts, cinematic sequences, and interactive storylines.</p>
+</div>
+
+
+
 </td>
 </tr>
 </table>
 
-For additional demo usage details, please refer to:  
-👉 [Demos Documentation](demos_documents.md)
+<br/>
 
 
-You can find more fun videos on our Bilibili channel here:  
-👉 [Bilibili Homepage](https://space.bilibili.com/3546868449544308)  
-Feel free to check it out for more entertaining content! 😊
 
-**Note**: All videos are used for research and demonstration purposes only. The audio and visual assets are sourced from the Internet. Please contact us if you believe any content infringes upon your intellectual property rights.
+
 
 ---
 
-## 🙏 Acknowledgements
+## 🔮Demos
 
-We extend our heartfelt appreciation to the countless individuals and organizations who have made Agentic-AIGC possible. This project builds upon the foundation laid by pioneering AI researchers and the vibrant open-source community worldwide. Their collective contributions, shared knowledge, and innovative breakthroughs have been instrumental in bringing this vision to life.
+<table>
+<tr>
 
-We are deeply grateful to the open-source community and AI service providers whose innovative tools and technologies serve as the cornerstone of our work:
+<td align="center" width="33%">
+  <video src="https://github.com/user-attachments/assets/4ab73cd2-cf91-4a88-a389-eae3aa376e1e" controls width="100%"></video>
+</td>
+<td align="center" width="33%">
+  <video src="https://github.com/user-attachments/assets/2915a938-587a-4b37-aa70-51d6214a3219" controls width="100%"></video>
+</td>
+<td align="center" width="33%">
+  <video src="https://github.com/user-attachments/assets/3b33c188-3831-42fb-b68c-28dac9bbd5d4" controls width="100%"></video>
+</td>
+</tr>
+<tr>
+<td align="center" width="33%">
+  <video src="https://github.com/user-attachments/assets/c4a3d7de-e002-42ea-8247-231534f5d395" controls width="100%"></video>
+</td>
+<td align="center" width="33%">
+  <video src="https://github.com/user-attachments/assets/d9023db6-bd48-4860-bd24-a4b036f88e23" controls width="100%"></video>
+</td>
+<td align="center" width="33%">
+  <video src="https://github.com/user-attachments/assets/745e2ca2-eef1-4b80-8dc9-7dcd04143e1d" controls width="100%"></video>
+</td>
+</tr>
 
-- [CosyVoice](https://github.com/FunAudioLLM/CosyVoice  )
-- [Fish Speech](https://github.com/fishaudio/fish-speech  )
-- [Seed-VC](https://github.com/Plachtaa/seed-vc  )
-- [DiffSinger](https://github.com/MoonInTheRiver/DiffSinger  )
-- [VideoRAG](https://github.com/HKUDS/VideoRAG  )
-- [ImageBind](https://github.com/facebookresearch/ImageBind  )
-- [whisper](https://github.com/openai/whisper  )
-- [MiniCPM](https://github.com/OpenBMB/MiniCPM-o  )
-- [Librosa](https://github.com/librosa/librosa  )
-- [moviepy](https://github.com/Zulko/moviepy  )
-- [ffmpeg](https://github.com/FFmpeg/FFmpeg  )
+<tr>
+<td align="center" width="33%">
+  <video src="https://github.com/user-attachments/assets/0c8862c4-a9f2-495f-8040-002d72a5c4f5" controls width="100%"></video>
+</td>
+<td align="center" width="33%">
+  <video src="https://github.com/user-attachments/assets/dab57ee0-1133-407b-8db5-c784611c5df3" controls width="100%"></video>
+</td>
+<td align="center" width="33%">
+  <video src="https://github.com/user-attachments/assets/91ad0708-260b-44d3-b6a2-9ebfdd568a29" controls width="100%"></video>
+</td>
+</tr>
 
-Our work has been significantly enhanced by the creative contributions of talented content creators across diverse platforms:
-- 🎬 Original video creators whose content served as valuable testing and demonstration material
-- 🎭 Comedy artists whose performances inspired our cross-cultural adaptation features
-- 🎥 Filmmakers and production teams behind the movies and TV shows showcased in our demonstrations
-- ✂️ Content creators who generously shared their expertise and insights on video editing techniques
 
-All content used in our demonstrations is for research purposes only. We deeply respect the intellectual property rights of all content creators and welcome any concerns or feedback regarding content usage.
-- Spider-Man movie editing idea reference Douyin account[@我是不是zx](https://www.douyin.com/user/MS4wLjABAAAApVuuGxyM7CI4MJRHQvc6SAy0J2zrJ12eg3f5jFqCIXk?from_tab_name=main&vid=7468621366913273115)
 
-<!-- # Framework of Agentic-AIGC
 
-[First a framework plot]
-Then a short explanation on the framework, without specific technical details. -->
+
+
+
+
+</table>
+
+---
+
+
+
+### 🎯 **End-to-End Video Creation Engine**
+
+**The Challenges**:
+
+- 🌅 **Reference Images**: Time-consuming acquisition, organization, and alignment of reference frames that accurately capture characters, objects, positions, and environments.
+
+- 🫠 **Consistency Check**: Sometimes, the image generator may generate unusable images even if it is given the correct characters, position, environment reference image and prompts.
+
+- 📄 **Scripts Generation**: Professional and high-quality videos need to have rich information density and structured design.
+
+- 📝 **Storyboard Design**: Converting stories into visual narratives requires expertise in cinematography, scene composition, and visual storytelling that most creators lack.
+
+- 🎬 **Shot Design**: Creating coherent camera sequences with proper angles, transitions, and pacing while maintaining narrative flow across complex scenes.
+
+- 🎨 **Development Delays**: Ensuring character appearances, environments, and artistic style remain consistent across hundreds of shots in long-form content.
+
+- ⏱️ **Production Efficiency**: Traditional video creation involves multiple specialists and lengthy workflows, creating barriers for independent creators and rapid prototyping.
+
+- 🎥 **Scaling AI Generated Video**: AI-generated videos are usually only a few seconds long, high-quality long videos at the minute or even hour level require complex cross-scene continuity and multi-storyboards design and processing capabilities.
+
+
+**ViMAX**: eliminates these production bottlenecks by automating the entire video creation pipeline from narrative input to final video output.
+
+---
+
+
+### 🔥 **Why ViMax?**
+
+| 🧠 **Effortless Production** | 🚀 **Complete Creative Freedom** | 🔊 **Audio and Video Binding** | 🎨 **Professional Quality** | 🤩 **Interactive Video** 
+|:---:|:---:|:---:|:---:|:---:|
+| One-Prompt to Finished Video | From Any Narrative to Reality | Synchronized Storytelling | Movie-Grade Output | Make Your Own Cameo Video
+| Skip the technical complexity—just describe your vision and let ViMax handle script generation, storyboarding, shot design, reference management, and consistency validation | No creative limits—whether it's a trailer, short story, novel chapter, or original concept, ViMax intelligently structures narratives and designs cinematography to bring any idea to life | Seamlessly integrate character voice, and sound effects with visual content to create immersive experiences where audio and video work in perfect harmony | Automated quality control ensures character consistency, proper scene composition, and professional visual standards across every frame of your video | Interact in your own short stories by uploading your photo—ViMax intelligently integrates you as a character with consistent appearance and natural interactions throughout the entire video
+
+
+
+---
+
+
+## 🏗️ Architecture
+
+### 📊 **System Overview**
+
+**ViMax** is a multi-agent video framework that enables automated multi-shot video generation while ensuring character and scene consistency. Our system seamlessly translates your ideas into corresponding videos, allowing you to focus on storytelling rather than technical implementation.
+
+🎯 **Technical Capabilities**:
+
+🧬 **Intelligent Long Script Generation**
+
+RAG-based long script design engine that intelligently analyzes lengthy, novel-like stories and automatically segments them into a multi-scene script format. The process meticulously ensures that all key plot developments and character dialogues are accurately retained within the new structure.
+
+🪄 **Expressive Storyboard Design**
+
+Shot-level storyboard design system that create expressive storyboards through cinematography language based on user requirements and target audiences, which establishs the narrative rhythm for subsequent video generation.
+
+🔮 **Multi-camera Filming Simulation**
+
+Simulates multi-camera filming to deliver an immersive viewing experience while maintaining consistent character positioning and backgrounds within the same scene.
+
+🧸 **Intelligent Reference Images Selection**
+
+Intelligently select the reference image required for the first frame of the current video, including the storyboards that occurred in the previous timeline, to ensure the accuracy of multiple characters and environmental elements as the video becomes longer.
+
+⚙️ **Automated Images Generation**
+
+Based on the selected reference image and the visual logical order on the previous timeline, the prompt of the image generator is automatically generated to reasonably arrange the spatial interaction position between the character and the environment.
+
+✅ **Automated Image Generation Consistency Check**
+
+Generate multiple images in parallel and select the best consistent image as the first frame through MLLM/VLM to imitate the workflow of human creators.
+
+⚡ **High-efficiency Parallel Shot Generation**
+
+Parallel processing for sequential shots captured from the same camera enables highly efficient video production.
+
+
+
+
+
+### 🤖 <strong>Multi-Agent Video Generation Pipeline</strong>
+
+<div align="center">
+  <table align="center" width="100%" style="border: none; border-collapse: collapse;">
+    <tr>
+      <td colspan="3" align="center" style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white; font-weight: bold;">
+        🧠 <strong>INPUT LAYER</strong><br/>
+        📝 Idea & Scripts & Novels • 💭 Natural Language Prompts • 🖼️ Reference Images • 🎨 Style Directives • 🧩 Configs
+      </td>
+    </tr>
+    <tr><td colspan="3" height="20"></td></tr>
+    <tr>
+      <td colspan="3" align="center" style="padding: 15px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); border-radius: 12px; color: white; font-weight: bold;">
+        🧭 <strong>CENTRAL ORCHESTRATION</strong><br/>
+        Agent Scheduling • Stage Transitions • Resource Management • Retry/Fallback Logic
+      </td>
+    </tr>
+    <tr><td colspan="3" height="15"></td></tr>
+    <tr>
+      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #3742fa 0%, #2f3542 100%); border-radius: 10px; color: white; width: 50%;">
+        🧾 <strong>SCRIPT UNDERSTANDING</strong><br/>
+        <small>Character/Environment Extraction • Scene Boundaries • Style Intent</small>
+      </td>
+      <td width="10"></td>
+      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #8c7ae6 0%, #9c88ff 100%); border-radius: 10px; color: white; width: 50%;">
+        🎥 <strong>SCENE & SHOT PLANNING</strong><br/>
+        <small>Storyboard Steps • Shot List • Key Frames & Beats</small>
+      </td>
+    </tr>
+    <tr><td colspan="3" height="15"></td></tr>
+    <tr>
+      <td colspan="3" align="center" style="padding: 15px; background: linear-gradient(135deg, #00d2d3 0%, #54a0ff 100%); border-radius: 12px; color: white; font-weight: bold;">
+        🧪 <strong>VISUAL ASSET PLANNING</strong><br/>
+        Reference Image Selection • Look/Style Guidance • Prompt Conditioning
+      </td>
+    </tr>
+    <tr><td colspan="3" height="15"></td></tr>
+    <tr>
+      <!-- Swapped: ASSET INDEXING is now on the left -->
+      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #e056fd 0%, #f368e0 100%); border-radius: 10px; color: white; width: 50%;">
+        🗂️ <strong>ASSET INDEXING</strong><br/>
+        <small>Frames/Refs Catalog • Embeddings • Retrieval for Reuse</small>
+      </td>
+      <td width="10"></td>
+      <!-- Swapped: CONSISTENCY & CONTINUITY is now on the right -->
+      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #ffa726 0%, #ff7043 100%); border-radius: 10px; color: white; width: 50%;">
+        ♻️ <strong>CONSISTENCY & CONTINUITY</strong><br/>
+        <small>Character/Environment Tracking • Ref Matching • Temporal Coherence</small>
+      </td>
+    </tr>
+    <tr><td colspan="3" height="15"></td></tr>
+    <tr>
+      <td colspan="3" align="center" style="padding: 15px; background: linear-gradient(135deg, #26de81 0%, #20bf6b 100%); border-radius: 12px; color: white; font-weight: bold;">
+        ✂️ <strong>VISUAL SYNTHESIS & ASSEMBLY</strong><br/>
+        Image Generation • Best-Frame Selection • First/Last-Frame→Video • Cut & Timeline Assembly
+      </td>
+    </tr>
+    <tr><td colspan="3" height="15"></td></tr>
+    <tr>
+      <td colspan="3" align="center" style="padding: 20px; background: linear-gradient(135deg, #045de9 0%, #09c6f9 100%); border-radius: 15px; color: white; font-weight: bold;">
+        🚀 <strong>OUTPUT LAYER</strong><br/>
+        🖼️ Frames • 🎞️ Clips & Final Videos • 📜 Logs • 📦 Working Directory Artifacts
+      </td>
+    </tr>
+  </table>
+</div>
+
+
+
+
+
+
+## 🚀Quick Start
+
+### 🖥️ **Environment**
+
+```
+OS: Linux, Windows
+```
+
+### 📥 **Clone and Install**
+We use uv to manage the environment. For uv installation, please refer to the https://docs.astral.sh/uv/getting-started/installation/.
+```bash
+git clone https://github.com/HKUDS/ViMax.git
+cd ViMax
+uv sync
+```
+
+
+### 🎯 **Usage**
+main_idea2video.py is used to convert your ideas into videos. You need to set API configuration in it, then fill idea and user_requirement variables. Like
+```bash
+idea = \
+"""
+If a cat and a dog are best friends, what would happen when they meet a new cat?
+"""
+user_requirement = \
+"""
+For children, do not exceed 3 scenes.
+"""
+style = "Cartoon"
+```
+
+main_script2video.py generates a video based on a specific script, and you similarly need to set up the API configuration inside it, then fill the script and user_requirement variables. Like
+```bash
+script = \
+"""
+EXT. SCHOOL GYM - DAY
+A group of students are practicing basketball in the gym. The gym is large and open, with a basketball hoop at one end and a large crowd of spectators at the other end. John (18, male, tall, athletic) is the star player, and he is practicing his dribble and shot. Jane (17, female, short, athletic) is the assistant coach, and she is helping John with his practice. The other students are watching the practice and cheering for John.
+John: (dribbling the ball) I'm going to score a basket!
+Jane: (smiling) Good job, John!
+John: (shooting the ball) Yes!
+Jane: (clapping) Great shot, John!
+John: (dribbling the ball) I'm going to score a basket!
+Jane: (smiling) Good job, John!
+John: (shooting the ball) Yes!
+Jane: (clapping) Great shot, John!
+...
+"""
+user_requirement = \
+"""
+Fast-paced with no more than 20 shots.
+"""
+style = "Realistic"
+```
+
+
+
+
+---
+
+
+
+
+
