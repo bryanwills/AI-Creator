@@ -54,9 +54,9 @@ https://github.com/user-attachments/assets/39c668f7-4ab3-4a64-9e54-2303b2ae3902
 ## 📑 Table of Contents
 
 - [💡 Key Features](#key-features)
+- [🔮 Demos](#demos)
 - [🏗️ Architecture](#️-architecture)
 - [🚀 Quick Start](#quick-start)
-- [🔮 Demos](#demos)
 - [💖 Acknowledgments](#acknowledgments)
 
 ---
