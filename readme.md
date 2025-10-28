@@ -37,19 +37,15 @@
 
 ---
 
-<div align="center">
-
 ### 🚨 Current Video Generation Limitations:
-❌ Limited to Short Clips - Most AI tools generate only seconds of footage
-❌ Consistency Chaos - Characters and scenes change unpredictably across frames
-❌ Visual-Only Focus - Missing scripts, audio, narrative structure, and storytelling depth
+- ❌ **Limited to Short Clips** - Most AI tools generate only seconds of footage. <br>
+- ❌ **Consistency Chaos** - Characters and scenes change unpredictably across frames. <br>
+- ❌ **Visual-Only Focus** - Missing scripts, audio, narrative structure, and storytelling depth. <br>
 
 ### 💡 ViMax Solution:
 🎬 Director, Screenwriter, and Producer all in one! We're exploring a future where AI becomes a complete creative powerhouse. 💡 Simply input your concept. ViMax autonomously handles the rest. It orchestrates scriptwriting, storyboarding, character creation, and final video generation—all end-to-end. 🚀
 
 https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
-
-
 
 
 
