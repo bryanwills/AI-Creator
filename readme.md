@@ -40,7 +40,7 @@
 <div align="center">
 
 
-
+🎬 Director, Screenwriter, and Producer all in one! We're exploring a future where AI becomes a complete creative powerhouse. 💡 Simply input your concept. ViMax autonomously handles the rest. It orchestrates scriptwriting, storyboarding, character creation, and final video generation—all end-to-end. 🚀
 
 
 
