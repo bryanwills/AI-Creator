@@ -28,25 +28,27 @@ You will receive a planned script within <PLANNED_SCRIPT_START> and <PLANNED_SCR
 6. Avoid camera jargon (e.g., cut to, close-up) and voiceover formatting.
 7. No metaphors.
 8. Repetition for Precision
-Re-state important objects/actors often (vehicle name, seat position, or character role) to remove ambiguity. Accuracy takes precedence over rhythm — redundancy is acceptable.
+Re‑state important objects/actors often (vehicle name, seat position, or character role) to remove ambiguity. Accuracy takes precedence over rhythm — redundancy is acceptable.
 9. Character Features for Dialogue
-For different characters in dialogue, their core tones must be described every times.
+For each character in the conversation, repeat the core voice description (e.g., male, early 50s, South African–North American accent) using the same prompt each time.
+10. Preserve the original narration symbols if exists (eg. Narration: "Everything is looking good").
+
 Example Input: 
-In the two-seater F-18 rear seat SLING: "Everything is looking good. All systems are green, Elon. We're ready for takeoff."
-In the two-seater F-18 front seat Elon Musk: "Understood, Sling. Let's get this show on the road."
-In the two-seater F-18 rear seat SLING: "Roger that. Strap in tight, boss. It's gonna be a smooth ride."
-In the two-seater F-18 front seat ELON MUSK: "Smooth is good. Let's keep it that way."
+In the two-seater F-18 rear seat SLING: "Everything is looking good. All systems are green, Elon. We’re ready for takeoff."
+In the two-seater F-18 front seat Elon Musk: "Understood, Sling. Let’s get this show on the road."
+In the two‑seater F‑18 rear seat SLING: "Roger that. Strap in tight, boss. It’s gonna be a smooth ride."
+In the two‑seater F‑18 front seat ELON MUSK: "Smooth is good. Let’s keep it that way."
 
 Example Output: 
-In the two-seater F-18 rear seat SLING (male, late 20s, Texan accent softened by military precision, confident and energetic.): "Everything is looking good. All systems are green, Elon. We're ready for takeoff."
-In the two-seater F-18 front seat Elon Musk (male, early 50s, South African-North American accent): "Understood, Sling. Let's get this show on the road."
-In the two-seater F-18 rear seat SLING (male, late 20s, Texan accent softened by military precision, confident and energetic.): "Roger that. Strap in tight, boss. It's gonna be a smooth ride."
-In the two-seater F-18 front seat ELON MUSK (male, early 50s, South African-North American accent): "Smooth is good. Let's keep it that way."
+In the two-seater F-18 rear seat SLING (male, late 20s, Texan accent softened by military precision, confident and energetic.): "Everything is looking good. All systems are green, Elon. We’re ready for takeoff."
+In the two-seater F-18 front seat Elon Musk (male, early 50s, South African–North American accent): "Understood, Sling. Let’s get this show on the road."
+In the two‑seater F‑18 rear seat SLING (male, late 20s, Texan accent softened by military precision, confident and energetic.): "Roger that. Strap in tight, boss. It’s gonna be a smooth ride."
+In the two‑seater F‑18 front seat ELON MUSK (male, early 50s, South African–North American accent): "Smooth is good. Let’s keep it that way."
 10. Roles & Positions Description
-Always specify who is where and what they're doing.
-Example Input: “In the cockpit front seat of the two-seat F-18, the pilot checks his controls.”
-Example Output: “In the cockpit front seat of the two-seat F-18, Elon Musk checks his controls.”
-Avoid shorthand (“the pilot”) unless you've already identified them in that exact position.
+Always specify who is where and what they’re doing.
+Example Input: “In the cockpit front seat of the two‑seat F‑18, the pilot checks his controls.”
+Example Output: “In the cockpit front seat of the two‑seat F‑18, Elon Musk checks his controls.”
+Avoid shorthand (“the pilot”) unless you’ve already identified them in that exact position.
 
 Warnings
 No camera directions. No metaphors. Do not change the plot.
