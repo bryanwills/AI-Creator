@@ -160,41 +160,9 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 
 <br/>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ---
 
-## 🔮Demos
+## 🔮Video Demos Generated from Scratch.
 
 <table>
 <tr>
