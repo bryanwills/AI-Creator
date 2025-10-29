@@ -57,7 +57,7 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 ## 📑 Table of Contents
 
 - [💡 Key Features](#key-features)
-- [🔮 Demos](#Video Demos Generated from Scratch)
+- [🔮 Demos](#Video-Demos-Generated-from-Scratch)
 - [🏗️ Architecture](#️-architecture)
 - [🚀 Quick Start](#quick-start)
 
