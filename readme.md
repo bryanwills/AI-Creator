@@ -403,7 +403,30 @@ uv sync
 
 
 ### 🎯 **Usage**
-main_idea2video.py is used to convert your ideas into videos. You need to set API configuration in it, then fill idea and user_requirement variables. Like
+main_idea2video.py is used to convert your ideas into videos.
+You need to configure the model and API key information in the configs/idea2video.yaml file, including three parts—the chat model, the image generator, and the video generator, as shown below
+```yaml
+chat_model:
+  init_args:
+    model: deepseek/deepseek-chat-v3.1:free
+    model_provider: openai
+    api_key: <YOUR_API_KEY>
+    base_url: https://openrouter.ai/api/v1
+
+image_generator:
+  class_path: tools.ImageGeneratorNanobananaGoogleAPI
+  init_args:
+    api_key: <YOUR_API_KEY>
+
+video_generator:
+  class_path: tools.VideoGeneratorVeoGoogleAPI
+  init_args:
+    api_key: <YOUR_API_KEY>
+
+working_dir: .working_dir/idea2video
+```
+
+Then, provide a simple yet thoughtful idea and the corresponding creative requirements in main_idea2video.py.
 ```bash
 idea = \
 """
@@ -416,8 +439,9 @@ For children, do not exceed 3 scenes.
 style = "Cartoon"
 ```
 
-main_script2video.py generates a video based on a specific script, and you similarly need to set up the API configuration inside it, then fill the script and user_requirement variables. Like
-```bash
+main_script2video.py generates a video based on a specific script.
+You similarly need to set up the API configuration in configs/script2video.yaml file. Then, provide a scene script and the corresponding creative requirements in main_script2video.py, as shown below.
+```python
 script = \
 """
 EXT. SCHOOL GYM - DAY
@@ -425,21 +449,14 @@ A group of students are practicing basketball in the gym. The gym is large and o
 John: (dribbling the ball) I'm going to score a basket!
 Jane: (smiling) Good job, John!
 John: (shooting the ball) Yes!
-Jane: (clapping) Great shot, John!
-John: (dribbling the ball) I'm going to score a basket!
-Jane: (smiling) Good job, John!
-John: (shooting the ball) Yes!
-Jane: (clapping) Great shot, John!
 ...
 """
 user_requirement = \
 """
 Fast-paced with no more than 20 shots.
 """
-style = "Realistic"
+style = "Animate Style"
 ```
-
-
 
 
 ---
