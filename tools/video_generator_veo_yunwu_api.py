@@ -3,17 +3,16 @@ from typing import List, Optional
 from PIL import Image
 import asyncio
 import aiohttp
-import requests
-from tools.video_generator.base import VideoGeneratorOutput, BaseVideoGenerator
+from interfaces.video_output import VideoOutput
 from utils.image import image_path_to_b64
 
 
-class VeoVideoGenerator(BaseVideoGenerator):
+class VideoGeneratorVeoYunwuAPI:
     def __init__(
         self,
         api_key: str,
-        t2v_model: str = "veo3-fast-frames",  # text to video
-        ff2v_model: str = "veo3-fast-frames",   # first frame to video
+        t2v_model: str = "veo3.1-fast",  # text to video
+        ff2v_model: str = "veo3.1-fast",   # first frame to video
         flf2v_model: str = "veo2-fast-frames",  # first and last frame to video
     ):
         """
@@ -42,7 +41,9 @@ class VeoVideoGenerator(BaseVideoGenerator):
         self,
         prompt: str = "",
         reference_image_paths: List[Image.Image] = [],
-    ) -> VideoGeneratorOutput:
+        aspect_ratio: str = "16:9",
+        **kwargs,
+    ) -> VideoOutput:
         if len(reference_image_paths) == 0:
             model = self.t2v_model
         elif len(reference_image_paths) == 1:
@@ -63,7 +64,7 @@ class VeoVideoGenerator(BaseVideoGenerator):
         }
         # only veo3 supports aspect ratio setting
         if model.startswith("veo3"):
-            payload["aspect_ratio"] = "16:9"
+            payload["aspect_ratio"] = aspect_ratio
 
         headers = {
             "Accept": "application/json",
@@ -78,10 +79,11 @@ class VeoVideoGenerator(BaseVideoGenerator):
                 async with aiohttp.ClientSession() as session:
                     async with session.post(url, headers=headers, json=payload) as response:
                         response = await response.json()
+                        logging.debug(f"Response: {response}")
                         task_id = response["id"]
+                        logging.info(f"Video generation task created successfully. Task ID: {task_id}")
             except Exception as e:
-                logging.error(f"Error occurred while creating video generation task: {e}")
-                logging.info("Retrying in 1 second...")
+                logging.error(f"Error occurred while creating video generation task: {e}. Retrying in 1 second...")
                 await asyncio.sleep(1)
                 continue
             break
@@ -98,18 +100,17 @@ class VeoVideoGenerator(BaseVideoGenerator):
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f"{self.base_url}/v1/video/query?id={task_id}", headers=headers) as response:
                         payload = await response.json()
+                        logging.debug(f"Response: {payload}")
                         status = payload["status"]
             except Exception as e:
-                logging.error(f"Error occurred while querying video generation task: {e}")
-                logging.info("Retrying in 1 second...")
+                logging.error(f"Error occurred while querying video generation task: {e}. Retrying in 1 second...")
                 await asyncio.sleep(1)
                 continue
 
             if status == "completed":
                 logging.info(f"Video generation completed successfully")
                 video_url = payload["video_url"]
-                video = VideoGeneratorOutput(fmt="url", ext="mp4", data=video_url)
-                return video
+                return VideoOutput(fmt="url", ext="mp4", data=video_url)
             elif status == "failed":
                 logging.error(f"Video generation failed: \n{payload}")
                 break

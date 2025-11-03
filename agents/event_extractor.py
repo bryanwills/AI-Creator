@@ -6,8 +6,9 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain.chat_models import init_chat_model
 from pydantic import BaseModel, Field
-from components.event import Event
 from tenacity import retry, stop_after_attempt
+
+from interfaces import Event
 
 system_prompt_template_extract_events = \
 """

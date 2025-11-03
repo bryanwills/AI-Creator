@@ -105,6 +105,8 @@ Additionally, you will receive a sequence of potential characters, each containi
 (2) 'medium' cases often involve the introduction of new characters and a character turns from the back to face the front (facing the camera).
 (3) 'small' cases usually involve minor changes, such as expression changes, movement and pose changes of existing characters(e.g., walking, sitting down, standing up), moderate camera movements(e.g., pan, tilt, track).
 - When describing a character, it is necessary to indicate the direction they are facing.
+- The first shot must establish the overall scene environment, using the widest possible shot.
+- Use as few camera positions as possible.
 """
 
 

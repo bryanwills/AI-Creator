@@ -9,70 +9,25 @@ from moviepy import VideoFileClip, concatenate_videoclips
 from PIL import Image
 from pipelines.base import BasePipeline
 from agents import *
+import yaml
 from interfaces import *
-
+from langchain.chat_models import init_chat_model
 from utils.timer import Timer
-
-from tools.image_generator.base import BaseImageGenerator
-from tools.video_generator.base import BaseVideoGenerator
+import importlib
 
 class Script2VideoPipeline:
-    """
-    0. 根据剧本，生成人物列表(character list)
-
-    1.1 根据剧本，生成镜头描述(brief description)
-    1.2 根据人物描述，生成人物肖像(character portrait)
-
-    2.1 构建camera tree  [依赖 1.1]
-    2.2 根据brief description解耦decompose，得到(description)  [依赖 1.1]
-
-    3.1 根据camera tree，找到root camera的第一个镜头，生成第一个镜头的第一个帧(first_frame)  [依赖 2.1 2.2]
-    3.2 启动每个camera的协程，
-
-    3.2.1 生成过渡视频(transition video)，获取该camera的第一个帧
-    3.2.2 启动该camera后续所有镜头的协程，生成每个镜头
-
-    3.2.2.1 生成该镜头的首帧（是某个camera parent的先生成）
-    3.2.2.2 生成该镜头的尾帧
-    3.2.2.3 生成该镜头的视频
-
-    """
-
-
-    """
-    ----{working_dir}
-        |---- characters.json
-        |---- character_portraits_registry.json
-        |---- character_portraits
-        |       |---- {character_idx}_{character_identifier_in_scene}
-        |                  |---- front.png
-        |                  |---- side.png
-        |                  |---- back.png
-        |
-        |---- shots
-        |       |---- {shot_idx}
-        |               |
-        |               |---- shot_description.json
-        |               |---- first_frame_selector_output.json
-        |               |---- last_frame_selector_output.json
-        |               |---- first_frame.png
-        |               |---- last_frame.png
-        |               |---- video.mp4
-        |       |---- final_video.mp4
-    """
-
 
     # events
-    character_portrait_events = {}  # 由 0 设置，由 1.2 标记完成，character_idx -> asyncio.Event
-    shot_desc_events = {}  # 由 1.1 设置，由 2.2 标记完成，shot_idx -> asyncio.Event
-    frame_events = {}  # 由 2.2 设置，由 3.2.2.1 或 3.1 标记完成，shot_idx -> frame_type -> asyncio.Event
+    character_portrait_events = {}
+    shot_desc_events = {}
+    frame_events = {}
 
 
     def __init__(
         self,
         chat_model: str,
-        image_generator: BaseImageGenerator,
-        video_generator: BaseVideoGenerator,
+        image_generator,
+        video_generator,
         working_dir: str,
     ):
 
@@ -91,6 +46,34 @@ class Script2VideoPipeline:
 
 
 
+    @classmethod
+    def init_from_config(
+        cls,
+        config_path: str,
+    ):
+        with open(config_path, "r") as f:
+            config = yaml.safe_load(f)
+
+        chat_model_args = config["chat_model"]["init_args"]
+        chat_model = init_chat_model(**chat_model_args)
+
+        image_generator_cls_module, image_generator_cls_name = config["image_generator"]["class_path"].rsplit(".", 1)
+        image_generator_cls = getattr(importlib.import_module(image_generator_cls_module), image_generator_cls_name)
+        image_generator_args = config["image_generator"]["init_args"]
+        image_generator = image_generator_cls(**image_generator_args)
+
+        video_generator_cls_module, video_generator_cls_name = config["video_generator"]["class_path"].rsplit(".", 1)
+        video_generator_cls = getattr(importlib.import_module(video_generator_cls_module), video_generator_cls_name)
+        video_generator_args = config["video_generator"]["init_args"]
+        video_generator = video_generator_cls(**video_generator_args)
+
+        return cls(
+            chat_model=chat_model,
+            image_generator=image_generator,
+            video_generator=video_generator,
+            working_dir=config["working_dir"],
+        )
+
     async def __call__(
         self,
         script: str,
@@ -100,18 +83,19 @@ class Script2VideoPipeline:
         character_portraits_registry: Optional[Dict[str, Dict[str, Dict[str, str]]]] = None,
     ):
         if characters is None:
+            characters = await self.extract_characters(script=script)
 
-            characters_path = os.path.join(self.working_dir, "characters.json")
-            if os.path.exists(characters_path):
-                with open(characters_path, "r", encoding="utf-8") as f:
-                    characters = [CharacterInScene.model_validate(c) for c in json.load(f)]
-                print(f"🚀 Loaded {len(characters)} characters from existing file.")
-            else:
-                print(f"🔍 Extracting characters from script...")
-                characters = await self.extract_characters(script=script)
-                with open(characters_path, "w", encoding="utf-8") as f:
-                    json.dump([c.model_dump() for c in characters], f, ensure_ascii=False, indent=4)
-                print(f"☑️ Extracted {len(characters)} characters from script and saved to {characters_path}.")
+            # characters_path = os.path.join(self.working_dir, "characters.json")
+            # if os.path.exists(characters_path):
+            #     with open(characters_path, "r", encoding="utf-8") as f:
+            #         characters = [CharacterInScene.model_validate(c) for c in json.load(f)]
+            #     print(f"🚀 Loaded {len(characters)} characters from existing file.")
+            # else:
+            #     print(f"🔍 Extracting characters from script...")
+            #     characters = await self.extract_characters(script=script)
+            #     with open(characters_path, "w", encoding="utf-8") as f:
+            #         json.dump([c.model_dump() for c in characters], f, ensure_ascii=False, indent=4)
+            #     print(f"☑️ Extracted {len(characters)} characters from script and saved to {characters_path}.")
 
         if character_portraits_registry is None:
             character_portraits_registry_path = os.path.join(self.working_dir, "character_portraits_registry.json")
@@ -182,7 +166,7 @@ class Script2VideoPipeline:
                 for shot_description in shot_descriptions
             ]
             final_video = concatenate_videoclips(video_clips)
-            final_video.write_videofile(final_video_path)
+            final_video.write_videofile(final_video_path, codec="libx264", preset="medium")
             print(f"☑️ Concatenated videos, saved to {final_video_path}.")
 
         return final_video_path
@@ -355,7 +339,7 @@ class Script2VideoPipeline:
 
             print(f"🎬 Starting video generation for shot {shot_description.idx}...")
             video_output = await self.video_generator.generate_single_video(
-                prompt=shot_description.motion_desc,
+                prompt=shot_description.motion_desc + "\n" + shot_description.audio_desc,
                 reference_image_paths=frame_paths,
             )
             video_output.save(video_path)
