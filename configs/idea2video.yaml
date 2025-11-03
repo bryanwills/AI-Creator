@@ -1,21 +1,21 @@
 chat_model:
   init_args:
-    model: gemini-pro-latest
+    model: deepseek/deepseek-chat-v3.1:free
     model_provider: openai
-    api_key: sk-9Ei9aZqeYEFAfrCb3Wq3aS0JNZ7mtMUUVLU2a2S5WW5JSBd7
-    base_url: https://yunwu.ai/v1
+    api_key: 
+    base_url: https://openrouter.ai/api/v1
 
 
 image_generator:
-  class_path: tools.ImageGeneratorNanobananaYunwuAPI
+  class_path: tools.ImageGeneratorNanobananaGoogleAPI
   init_args:
-    api_key: sk-9Ei9aZqeYEFAfrCb3Wq3aS0JNZ7mtMUUVLU2a2S5WW5JSBd7
+    api_key: 
 
 
 video_generator:
-  class_path: tools.VideoGeneratorVeoYunwuAPI
+  class_path: tools.VideoGeneratorVeoGoogleAPI
   init_args:
-    api_key: sk-9Ei9aZqeYEFAfrCb3Wq3aS0JNZ7mtMUUVLU2a2S5WW5JSBd7
+    api_key: 
 
 
 working_dir: .working_dir/idea2video
