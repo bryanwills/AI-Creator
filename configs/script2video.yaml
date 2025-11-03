@@ -1,57 +1,21 @@
-character_extractor:
-  class_path: agents.character_extractor.CharacterExtractor
+chat_model:
   init_args:
-    api_key: 
-    base_url: 
-    chat_model: gpt-5-2025-08-07
-
-
-storyboard_generator:
-  class_path: agents.storyboard_generator.StoryboardGenerator
-  init_args:
-    api_key: 
-    base_url: 
-    chat_model: gpt-5-2025-08-07
-
-reference_image_selector:
-  class_path: agents.reference_image_selector.ReferenceImageSelector
-  init_args:
-    api_key: 
-    base_url: 
-    chat_model: gpt-5-2025-08-07
+    model: gemini-pro-latest
+    model_provider: openai
+    api_key: sk-9Ei9aZqeYEFAfrCb3Wq3aS0JNZ7mtMUUVLU2a2S5WW5JSBd7
+    base_url: https://yunwu.ai/v1
 
 
 image_generator:
-  class_path: tools.image_generator.gemini.GeminiImageGenerator
+  class_path: tools.ImageGeneratorNanobananaYunwuAPI
   init_args:
-    api_key: 
-    base_url: 
-    api_version: v1beta
-    model: gemini-2.5-flash-image-preview
-
-# image_generator:z
-
-
-best_image_selector:
-  class_path: agents.best_image_selector.BestImageSelector
-  init_args:
-    api_key: 
-    base_url: 
-    chat_model: gpt-5-2025-08-07
+    api_key: sk-9Ei9aZqeYEFAfrCb3Wq3aS0JNZ7mtMUUVLU2a2S5WW5JSBd7
 
 
 video_generator:
-  class_path: tools.video_generator.veo.VeoVideoGenerator
+  class_path: tools.VideoGeneratorVeoYunwuAPI
   init_args:
-    api_key: 
-    t2v_model: veo3-fast-frames  # text to video
-    ff2v_model: veo3-fast-frames   # first frame to video
-    flf2v_model: veo2-fast-frames  # first and last frame to video
+    api_key: sk-9Ei9aZqeYEFAfrCb3Wq3aS0JNZ7mtMUUVLU2a2S5WW5JSBd7
 
 
-# video_generator:
-#   class_path: tools.video_generator.wan.WanVideoGenerator
-#   init_args:
-#     api_key: 
-#     ff2v_model: wan2_2-ff2v
-#     flf2v_model: wan2_2-flf2v
+working_dir: .working_dir/script2video

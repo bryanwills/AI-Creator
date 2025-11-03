@@ -1,15 +1,5 @@
 import asyncio
 from pipelines.script2video_pipeline import Script2VideoPipeline
-from langchain.chat_models import init_chat_model
-from tools.image_generator.gemini import GeminiImageGenerator
-from tools.video_generator.veo import VeoVideoGenerator
-
-
-# SET YOUR OWN API KEYS AND BASE URLS HERE
-chat_model_name = "gemini-pro-latest"
-api_key = ""
-base_url = ""
-working_dir = ".working_dir/script2video"
 
 
 # SET YOUR OWN SCRIPT, USER REQUIREMENT, AND STYLE HERE
@@ -20,36 +10,25 @@ A group of students are practicing basketball in the gym. The gym is large and o
 John: (dribbling the ball) I'm going to score a basket!
 Jane: (smiling) Good job, John!
 John: (shooting the ball) Yes!
-Jane: (clapping) Great shot, John!
-John: (dribbling the ball) I'm going to score a basket!
-Jane: (smiling) Good job, John!
-John: (shooting the ball) Yes!
-Jane: (clapping) Great shot, John!
-...
+John:(The shot misses. He seems frustrated.) Argh! My follow-through feels off today.
+Jane:(Walks over, analytical.) Your elbow is drifting out. Remember, straight as an arrow.
+John:(Nods, taking the ball again.) Straight as an arrow... Let me try again.
+(John takes another shot. This time, the ball swishes through the net perfectly.)
+Jane:(Clapping.) There it is! Perfect form! That's the shot we need for the championship.
+John:(Retrieving the ball, smiling with renewed confidence.) Thanks, Coach Jane. I just needed you to point it out. One more time?
 """
 user_requirement = \
 """
-Fast-paced with no more than 20 shots.
+Fast-paced with no more than 15 shots.
 """
-style = "Realistic"
+style = "Anime Style"
 
 
-pipeline = Script2VideoPipeline(
-    chat_model=init_chat_model(
-        chat_model_name=chat_model_name,
-        api_key=api_key,
-        base_url=base_url,
-    ),
-    image_generator=GeminiImageGenerator(
-        api_key=api_key,
-        base_url=base_url,
-    ),
-    video_generator=VeoVideoGenerator(
-        api_key=api_key,
-        t2v_model="veo3-fast-frames",
-        ff2v_model="veo3-fast-frames",
-        flf2v_model="veo2-fast-frames",
-    ),
-    working_dir=working_dir,
-)
-asyncio.run(pipeline(script=script, user_requirement=user_requirement, style=style))
+
+async def main():
+    pipeline = Script2VideoPipeline.init_from_config(config_path="configs/script2video.yaml")
+    await pipeline(script=script, user_requirement=user_requirement, style=style)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

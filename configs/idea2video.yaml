@@ -1,8 +1,21 @@
-idea2script_pipeline:
-  class_path: pipelines.idea2script_pipeline.Idea2ScriptPipeline
-  config_path: configs/idea2script.yaml
+chat_model:
+  init_args:
+    model: gemini-pro-latest
+    model_provider: openai
+    api_key: sk-9Ei9aZqeYEFAfrCb3Wq3aS0JNZ7mtMUUVLU2a2S5WW5JSBd7
+    base_url: https://yunwu.ai/v1
 
-script2video_pipeline:
-  class_path: pipelines.script2video_pipeline.Script2VideoPipeline
-  config_path: configs/script2video.yaml
 
+image_generator:
+  class_path: tools.ImageGeneratorNanobananaYunwuAPI
+  init_args:
+    api_key: sk-9Ei9aZqeYEFAfrCb3Wq3aS0JNZ7mtMUUVLU2a2S5WW5JSBd7
+
+
+video_generator:
+  class_path: tools.VideoGeneratorVeoYunwuAPI
+  init_args:
+    api_key: sk-9Ei9aZqeYEFAfrCb3Wq3aS0JNZ7mtMUUVLU2a2S5WW5JSBd7
+
+
+working_dir: .working_dir/idea2video
