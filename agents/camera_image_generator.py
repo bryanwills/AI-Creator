@@ -11,8 +11,6 @@ from scenedetect.detectors import ContentDetector
 
 from interfaces import ShotDescription, ShotBriefDescription, Camera, ImageOutput, VideoOutput
 
-from tools.image_generator.base import BaseImageGenerator
-from tools.video_generator.base import BaseVideoGenerator
 
 from moviepy import VideoFileClip
 from PIL import Image
@@ -55,6 +53,7 @@ Shot 1: Close-up of the Alice's face. Her expression shifts from surprise to del
 - When a broader perspective is not available, choose the shot with the largest overlapping field of view as the parent (the one with the most information overlap), or a shot can also serve as the parent of a reverse shot. When two cameras can be the parent of each other, choose the one with the smaller index as the parent of the camera with the larger index.
 - Only one camera can exist without a parent.
 - When describing the elements lost in a shot, carefully compare the details between the parent shot and the child shot. For example, the parent shot is a medium shot of Character A and Character B facing each other (both in profile to the camera), while the child shot is a close-up of Character A (with Character A facing the camera directly). In this case, the child shot lacks the frontal view information of Character A.
+- The first camera must be the root of the camera tree.
 """
 
 
@@ -105,9 +104,9 @@ class CameraImageGenerator:
 
     def __init__(
         self,
-        chat_model: str,
-        image_generator: BaseImageGenerator,
-        video_generator: BaseVideoGenerator,
+        chat_model,
+        image_generator,
+        video_generator,
     ):
         self.chat_model = chat_model
         self.image_generator = image_generator

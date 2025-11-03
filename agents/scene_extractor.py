@@ -1,11 +1,10 @@
 from langchain_community.vectorstores import FAISS
-from components.event import Event
+from interfaces import Event, Scene
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain.chat_models import init_chat_model
 from pydantic import BaseModel, Field
 from typing import List, Optional, Literal, Tuple, Dict
 from langchain_core.output_parsers import PydanticOutputParser
-from components.scene import Scene
 from tenacity import retry, stop_after_attempt
 import logging
 

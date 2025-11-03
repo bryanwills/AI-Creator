@@ -7,6 +7,9 @@ from typing import List, Dict, Optional
 import asyncio
 import json
 from moviepy import VideoFileClip, concatenate_videoclips
+import yaml
+from langchain.chat_models import init_chat_model
+import importlib
 
 class Idea2VideoPipeline:
     def __init__(
@@ -26,6 +29,33 @@ class Idea2VideoPipeline:
         self.character_extractor = CharacterExtractor(chat_model=self.chat_model)
         self.character_portraits_generator = CharacterPortraitsGenerator(image_generator=self.image_generator)
 
+    @classmethod
+    def init_from_config(
+        cls,
+        config_path: str,
+    ):
+        with open(config_path, "r") as f:
+            config = yaml.safe_load(f)
+
+        chat_model_args = config["chat_model"]["init_args"]
+        chat_model = init_chat_model(**chat_model_args)
+
+        image_generator_cls_module, image_generator_cls_name = config["image_generator"]["class_path"].rsplit(".", 1)
+        image_generator_cls = getattr(importlib.import_module(image_generator_cls_module), image_generator_cls_name)
+        image_generator_args = config["image_generator"]["init_args"]
+        image_generator = image_generator_cls(**image_generator_args)
+
+        video_generator_cls_module, video_generator_cls_name = config["video_generator"]["class_path"].rsplit(".", 1)
+        video_generator_cls = getattr(importlib.import_module(video_generator_cls_module), video_generator_cls_name)
+        video_generator_args = config["video_generator"]["init_args"]
+        video_generator = video_generator_cls(**video_generator_args)
+
+        return cls(
+            chat_model=chat_model,
+            image_generator=image_generator,
+            video_generator=video_generator,
+            working_dir=config["working_dir"],
+        )
 
     async def extract_characters(
         self,

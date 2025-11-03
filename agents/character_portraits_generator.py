@@ -10,8 +10,6 @@ from typing import List, Optional, Dict
 from tenacity import retry, stop_after_attempt
 from interfaces import CharacterInScene, ImageOutput
 from langchain_core.messages import HumanMessage, SystemMessage
-
-from tools.image_generator.base import BaseImageGenerator
 from utils.retry import after_func
 
 
@@ -37,7 +35,7 @@ Generate a full-body, back-view portrait of character {identifier} based on the 
 class CharacterPortraitsGenerator:
     def __init__(
         self,
-        image_generator: BaseImageGenerator,
+        image_generator,
     ):
         self.image_generator = image_generator
 

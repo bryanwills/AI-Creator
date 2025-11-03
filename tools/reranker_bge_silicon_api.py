@@ -6,7 +6,7 @@ from tenacity import retry, stop_after_attempt
 import logging
 
 
-class SiliconReranker:
+class RerankerBgeSiliconapi:
     def __init__(
         self,
         api_key: str,
