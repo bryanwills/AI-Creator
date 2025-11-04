@@ -264,11 +264,12 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 
 ### ☄️ **Coming Soon**
 
-- 👨‍💻 **Google AI Studio API interface**
+- 👨‍💻 **Google AI Studio API config✅**
+- 📹 **Dev mode branch✅**
 - 🤳 **AutoCameo integrate**
 - 📺 **More demos**
-- 🎞️ **Shot Planning**
-- 📹 **Base mode pipeline**
+- 🎞️ **Shot planning**
+- 🤖 **New features**
 
 ---
 
