@@ -382,7 +382,7 @@ You need to configure the model and API key information in the configs/idea2vide
 ```yaml
 chat_model:
   init_args:
-    model: deepseek/deepseek-chat-v3.1:free
+    model: google/gemini-2.5-flash-lite-preview-09-2025
     model_provider: openai
     api_key: <YOUR_API_KEY>
     base_url: https://openrouter.ai/api/v1
