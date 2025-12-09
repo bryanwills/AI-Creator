@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./assets/vimax.png" width="20%"> 
+  <img src="./assets/vimax.png"> 
 
   <h1 align="center">ViMax: Agentic Video Generation</h1>
 
