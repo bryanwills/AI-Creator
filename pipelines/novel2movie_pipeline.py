@@ -6,20 +6,47 @@ import yaml
 import json
 import importlib
 import asyncio
-from typing import List, Dict
+from typing import Any, List, Dict
 from langchain.embeddings import CacheBackedEmbeddings
 from langchain.storage import LocalFileStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from PIL import Image
 
-from components.event import Event
-from components.scene import Scene
-from components.character import CharacterInScene, CharacterInNovel, CharacterInEvent
-from pipelines.base import BasePipeline
+from interfaces import (
+    Event,
+    Scene,
+    CharacterInScene,
+    CharacterInNovel,
+    CharacterInEvent,
+)
 from tenacity import retry
 
-class Novel2MoviePipeline(BasePipeline):
+class Novel2MoviePipeline:
+    def __init__(
+        self,
+        novel_compressor: Any,
+        event_extractor: Any,
+        embeddings: Any,
+        rerank_model: Any,
+        scene_extractor: Any,
+        global_information_planner: Any,
+        image_generator: Any,
+        rewriter: Any,
+        script2video_pipeline: Any,
+        working_dir: str,
+    ):
+        self.novel_compressor = novel_compressor
+        self.event_extractor = event_extractor
+        self.embeddings = embeddings
+        self.rerank_model = rerank_model
+        self.scene_extractor = scene_extractor
+        self.global_information_planner = global_information_planner
+        self.image_generator = image_generator
+        self.rewriter = rewriter
+        self.script2video_pipeline = script2video_pipeline
+        self.working_dir = working_dir
+        os.makedirs(self.working_dir, exist_ok=True)
 
     async def __call__(
         self,
