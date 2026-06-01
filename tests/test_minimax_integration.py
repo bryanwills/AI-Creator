@@ -42,7 +42,7 @@ class TestPipelineConfigResolution(unittest.TestCase):
 
     def _make_minimax_config(self, **overrides):
         base = {
-            "model": "MiniMax-M2.7",
+            "model": "MiniMax-M3",
             "model_provider": "minimax",
             "api_key": "test-key",
         }
@@ -54,7 +54,7 @@ class TestPipelineConfigResolution(unittest.TestCase):
         resolved = resolve_chat_model_config(config)
         self.assertEqual(resolved["model_provider"], "openai")
         self.assertEqual(resolved["base_url"], "https://api.minimax.io/v1")
-        self.assertEqual(resolved["model"], "MiniMax-M2.7")
+        self.assertEqual(resolved["model"], "MiniMax-M3")
         self.assertEqual(resolved["api_key"], "test-key")
 
     def test_minimax_highspeed_model(self):
@@ -63,15 +63,15 @@ class TestPipelineConfigResolution(unittest.TestCase):
         self.assertEqual(resolved["model"], "MiniMax-M2.7-highspeed")
         self.assertEqual(resolved["model_provider"], "openai")
 
-    def test_minimax_m25_model(self):
-        config = self._make_minimax_config(model="MiniMax-M2.5")
+    def test_minimax_m27_model(self):
+        config = self._make_minimax_config(model="MiniMax-M2.7")
         resolved = resolve_chat_model_config(config)
-        self.assertEqual(resolved["model"], "MiniMax-M2.5")
+        self.assertEqual(resolved["model"], "MiniMax-M2.7")
 
     @patch.dict(os.environ, {"MINIMAX_API_KEY": "env-api-key"})
     def test_env_key_fallback_in_config(self):
         config = {
-            "model": "MiniMax-M2.7",
+            "model": "MiniMax-M3",
             "model_provider": "minimax",
         }
         resolved = resolve_chat_model_config(config)
@@ -96,7 +96,7 @@ class TestPipelineConfigResolution(unittest.TestCase):
         resolved = resolve_chat_model_config(config)
         self.assertEqual(resolved["model_provider"], "openai")
         self.assertEqual(resolved["base_url"], "https://api.minimax.io/v1")
-        self.assertEqual(resolved["model"], "MiniMax-M2.7")
+        self.assertEqual(resolved["model"], "MiniMax-M3")
 
     def test_temperature_clamping_in_pipeline_flow(self):
         config = self._make_minimax_config(temperature=2.0)
@@ -127,7 +127,7 @@ class TestPipelineInitFromConfig(unittest.TestCase):
         call_kwargs = mock_init.call_args[1]
         self.assertEqual(call_kwargs["model_provider"], "openai")
         self.assertEqual(call_kwargs["base_url"], "https://api.minimax.io/v1")
-        self.assertEqual(call_kwargs["model"], "MiniMax-M2.7")
+        self.assertEqual(call_kwargs["model"], "MiniMax-M3")
 
     @patch("pipelines.script2video_pipeline.init_chat_model")
     @patch("pipelines.script2video_pipeline.RenderBackend.from_config")
@@ -143,7 +143,7 @@ class TestPipelineInitFromConfig(unittest.TestCase):
         call_kwargs = mock_init.call_args[1]
         self.assertEqual(call_kwargs["model_provider"], "openai")
         self.assertEqual(call_kwargs["base_url"], "https://api.minimax.io/v1")
-        self.assertEqual(call_kwargs["model"], "MiniMax-M2.7")
+        self.assertEqual(call_kwargs["model"], "MiniMax-M3")
 
     @patch("pipelines.idea2video_pipeline.init_chat_model")
     @patch("pipelines.idea2video_pipeline.RenderBackend.from_config")
