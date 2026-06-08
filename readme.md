@@ -473,34 +473,6 @@ For children, do not exceed 3 scenes.
 style = "Cartoon"
 ```
 
-#### Using MiniMax as Chat Model Provider
-
-[MiniMax](https://www.minimaxi.com/) models can be used as an alternative chat model provider. MiniMax offers OpenAI-compatible API access to models such as **MiniMax-M3** (latest) and **MiniMax-M2.7** (1M context window).
-
-Simply set `model_provider: minimax` in your config — the base URL is resolved automatically:
-```yaml
-chat_model:
-  init_args:
-    model: MiniMax-M3
-    model_provider: minimax
-    api_key: <YOUR_MINIMAX_API_KEY>
-```
-
-Or export the API key as an environment variable and leave `api_key` empty:
-```bash
-export MINIMAX_API_KEY=<YOUR_KEY>
-```
-
-See `configs/idea2video_minimax.yaml` and `configs/script2video_minimax.yaml` for complete examples.
-
-| Model | Note |
-|---|---|
-| MiniMax-M3 | Latest, recommended |
-| MiniMax-M2.7 | Previous generation, 1M context |
-| MiniMax-M2.7-highspeed | Fast variant of M2.7 |
-
----
-
 main_script2video.py generates a video based on a specific script.
 You similarly need to set up the API configuration in configs/script2video.yaml file. Then, provide a scene script and the corresponding creative requirements in main_script2video.py, as shown below.
 ```python
