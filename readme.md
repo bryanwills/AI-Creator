@@ -269,7 +269,7 @@ ViMax now also includes an **Agents Loop + TUI** workflow for interactive planni
 
 - 👨‍💻 **Google AI Studio API config✅**
 - 🤖 **Agents Loop + TUI✅**
-- 📄 **Technical Report☑️**
+- 📄 **Technical Report✅**
 
 ---
 
