@@ -13,6 +13,7 @@ from interfaces import *
 from langchain.chat_models import init_chat_model
 from tools.render_backend import RenderBackend
 from utils.provider_presets import resolve_chat_model_config
+from utils.text import safe_path_component
 
 
 def _pipeline_print(quiet: bool, message: str) -> None:
@@ -44,12 +45,6 @@ def _scoped_progress(progress, **scope):
 
 class Script2VideoPipeline:
 
-    # events
-    character_portrait_events = {}
-    shot_desc_events = {}
-    frame_events = {}
-
-
     def __init__(
         self,
         chat_model: str,
@@ -57,6 +52,12 @@ class Script2VideoPipeline:
         video_generator,
         working_dir: str,
     ):
+        # Per-instance coordination events; these were once class attributes,
+        # which leaked shot/frame state across scenes when one pipeline object
+        # (or several) rendered more than one scene.
+        self.character_portrait_events = {}
+        self.shot_desc_events = {}
+        self.frame_events = {}
 
         self.chat_model = chat_model
         self.image_generator = image_generator
@@ -156,6 +157,9 @@ class Script2VideoPipeline:
         progress: Callable[[str, str, Dict[str, Any] | None], None] | None = None,
     ):
         _emit_render_progress(progress, "render_start", "Starting script2video render")
+        self.character_portrait_events = {}
+        self.shot_desc_events = {}
+        self.frame_events = {}
         if characters is None:
             _emit_render_progress(progress, "extract_characters", "Extracting characters before render")
             characters = await self.extract_characters(script=script, quiet=quiet)
@@ -227,7 +231,7 @@ class Script2VideoPipeline:
         )
         _emit_render_progress(progress, "camera_tree_ready", "Camera tree ready", {"camera_count": len(camera_tree)})
 
-        priority_shot_idxs = [camera.parent_cam_idx for camera in camera_tree if camera.parent_cam_idx is not None]
+        priority_shot_idxs = _collect_priority_shot_idxs(camera_tree)
         _emit_render_progress(progress, "frames_start", "Generating frames for cameras", {"camera_count": len(camera_tree), "shot_count": len(shot_descriptions)})
         tasks = [
             self.generate_frames_for_single_camera(
@@ -338,12 +342,16 @@ class Script2VideoPipeline:
                     print(f"☑️ Generated new camera image for shot {first_shot_idx} (not completed), saved to {new_camera_image_path}.")
                     _emit_render_progress(progress, "new_camera_image_done", f"New camera image for shot {first_shot_idx} extracted", {"camera_idx": camera.idx, "shot_idx": first_shot_idx, "path": new_camera_image_path})
 
-                    available_image_path_and_text_pairs.append(
-                        (
-                            new_camera_image_path,
-                            f"The composition and background are correct but some elements may be wrong. The wrong elements should be replaced.\nWrong elements: {camera.missing_info}.\nYou must select this image as the main reference and replace the characters in the image with the provided character portraits. Don't change the background."
-                        )
+                # Offer the new-camera image regardless of whether it was just
+                # generated or already on disk: when this sat in the else branch
+                # above, resumed runs silently dropped the key composition
+                # reference and produced different frames than fresh runs.
+                available_image_path_and_text_pairs.append(
+                    (
+                        new_camera_image_path,
+                        f"The composition and background are correct but some elements may be wrong. The wrong elements should be replaced.\nWrong elements: {camera.missing_info}.\nYou must select this image as the main reference and replace the characters in the image with the provided character portraits. Don't change the background."
                     )
+                )
 
 
             # 如果子镜头缺少信息，则需要选择参考图像生成
@@ -553,12 +561,7 @@ class Script2VideoPipeline:
             _pipeline_print(quiet, f"🚀 Loaded {len(camera_tree)} cameras from existing file.")
             return camera_tree
 
-        cameras: List[Camera] = []
-        for shot_description in shot_descriptions:
-            if shot_description.cam_idx not in [camera.idx for camera in cameras]:
-                cameras.append(Camera(idx=shot_description.cam_idx, active_shot_idxs=[shot_description.idx]))
-            else:
-                cameras[shot_description.cam_idx].active_shot_idxs.append(shot_description.idx)
+        cameras = _group_shots_into_cameras(shot_descriptions)
 
         camera_tree = await self.camera_image_generator.construct_camera_tree(cameras=cameras, shot_descs=shot_descriptions)
         with open(camera_tree_path, "w", encoding="utf-8") as f:
@@ -634,7 +637,7 @@ class Script2VideoPipeline:
         style: str,
         progress: Callable[[str, str, Dict[str, Any] | None], None] | None = None,
     ):
-        character_dir = os.path.join(self.working_dir, "character_portraits", f"{character.idx}_{character.identifier_in_scene}")
+        character_dir = os.path.join(self.working_dir, "character_portraits", f"{character.idx}_{safe_path_component(character.identifier_in_scene)}")
         os.makedirs(character_dir, exist_ok=True)
         _emit_render_progress(progress, "character_portrait_start", f"Generating portraits for {character.identifier_in_scene}", {"character_idx": character.idx, "identifier": character.identifier_in_scene})
 
@@ -773,3 +776,29 @@ class Script2VideoPipeline:
             }
 
         return shot_description
+
+
+def _group_shots_into_cameras(shot_descriptions: List[ShotDescription]) -> List[Camera]:
+    """Group shots by their camera index.
+
+    Cameras are looked up by their idx field, not by list position: cameras are
+    appended in order of first appearance, so positional indexing would attach
+    shots to the wrong camera whenever the LLM emits cam indices out of order.
+    """
+    cameras: List[Camera] = []
+    cameras_by_idx: Dict[int, Camera] = {}
+    for shot_description in shot_descriptions:
+        camera = cameras_by_idx.get(shot_description.cam_idx)
+        if camera is None:
+            camera = Camera(idx=shot_description.cam_idx, active_shot_idxs=[shot_description.idx])
+            cameras_by_idx[shot_description.cam_idx] = camera
+            cameras.append(camera)
+        else:
+            camera.active_shot_idxs.append(shot_description.idx)
+    return cameras
+
+
+def _collect_priority_shot_idxs(camera_tree: List[Camera]) -> List[int]:
+    """Shot indices that other cameras depend on (compared against shot idxs, so
+    they must come from parent_shot_idx, not the camera index space)."""
+    return [camera.parent_shot_idx for camera in camera_tree if camera.parent_shot_idx is not None]
