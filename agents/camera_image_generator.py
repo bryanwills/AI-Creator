@@ -140,13 +140,18 @@ class CameraImageGenerator:
 
         chain = self.chat_model | parser
         response: CameraTreeResponse = await chain.ainvoke(messages)
+        if len(response.camera_parent_items) != len(cameras):
+            raise ValueError(
+                f"Camera tree response has {len(response.camera_parent_items)} items "
+                f"for {len(cameras)} cameras."
+            )
         for cam, parent_cam_item in zip(cameras, response.camera_parent_items):
             cam.parent_cam_idx = parent_cam_item.parent_cam_idx if parent_cam_item is not None else None
             cam.parent_shot_idx = parent_cam_item.parent_shot_idx if parent_cam_item is not None else None
             cam.reason = parent_cam_item.reason if parent_cam_item is not None else None
-            cam.parent_shot_idx = parent_cam_item.parent_shot_idx if parent_cam_item is not None else None
             cam.is_parent_fully_covers_child = parent_cam_item.is_parent_fully_covers_child if parent_cam_item is not None else None
             cam.missing_info = parent_cam_item.missing_info if parent_cam_item is not None else None
+        _validate_camera_tree(cameras)
         return cameras
 
 
@@ -219,3 +224,28 @@ class CameraImageGenerator:
             size="1600x900",
         )
         return image_output
+
+
+def _validate_camera_tree(cameras: List[Camera]) -> None:
+    """Reject parent assignments that would deadlock frame generation.
+
+    Frame generation for a camera awaits an event set by its parent's shot, so a
+    cycle (or a parent pointing at itself or at a nonexistent camera) would make
+    every camera in the loop wait forever with no error surfaced.
+    """
+    by_idx = {cam.idx: cam for cam in cameras}
+    for cam in cameras:
+        if cam.parent_cam_idx is None:
+            continue
+        if cam.parent_cam_idx == cam.idx:
+            raise ValueError(f"Camera {cam.idx} lists itself as its parent.")
+        if cam.parent_cam_idx not in by_idx:
+            raise ValueError(f"Camera {cam.idx} references unknown parent camera {cam.parent_cam_idx}.")
+    for cam in cameras:
+        seen = set()
+        current = cam
+        while current.parent_cam_idx is not None:
+            if current.idx in seen:
+                raise ValueError(f"Cycle detected in camera parent graph involving camera {current.idx}.")
+            seen.add(current.idx)
+            current = by_idx[current.parent_cam_idx]
