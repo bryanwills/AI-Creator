@@ -138,6 +138,7 @@ class Novel2MoviePipeline:
             with open(event_path, "r", encoding="utf-8") as f:
                 extracted_events.append(Event.model_validate(json.load(f)))
         while len(extracted_events) == 0 or not extracted_events[-1].is_last:
+            _ensure_extraction_cap(len(extracted_events), MAX_EXTRACTED_EVENTS, "events")
             next_event = self.event_extractor.extract_next_event(
                 novel_text=compressed_novel,
                 extracted_events=extracted_events,
@@ -224,6 +225,7 @@ class Novel2MoviePipeline:
                 scenes_dir = os.path.join(working_dir_scenes, f"event_{event.index}")
                 os.makedirs(scenes_dir, exist_ok=True)
                 while len(previous_scenes) == 0 or not previous_scenes[-1].is_last:
+                    _ensure_extraction_cap(len(previous_scenes), MAX_SCENES_PER_EVENT, "scenes")
                     next_scene = await self.scene_extractor.get_next_scene(
                         relevant_chunks=list(event_idx_to_relevant_chunk_score_dict.get(event.index, {}).keys()),
                         event=event,
@@ -990,3 +992,17 @@ class Novel2MoviePipeline:
                 )
                 print(f"✅ Generated video for event {event.index}, scene {scene.idx}, saved to {scene_video_dir}")
         print("📋 Step 7: Generate the video for each scene".center(80, "-"))
+
+
+# is_last flags are asserted by the LLM only; cap the extraction loops so a
+# model that never sets one cannot spend tokens forever.
+MAX_EXTRACTED_EVENTS = 50
+MAX_SCENES_PER_EVENT = 30
+
+
+def _ensure_extraction_cap(count: int, cap: int, what: str) -> None:
+    if count >= cap:
+        raise RuntimeError(
+            f"Extraction reached {count} {what} without an is_last marker (cap: {cap}); "
+            "aborting to avoid unbounded LLM calls."
+        )
