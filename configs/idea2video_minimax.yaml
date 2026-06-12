@@ -11,7 +11,7 @@ chat_model:
   init_args:
     model: MiniMax-M3
     model_provider: minimax
-    api_key: <YOUR_MINIMAX_API_KEY>
+    api_key:  # leave empty to use the MINIMAX_API_KEY environment variable
     # base_url is auto-resolved to https://api.minimax.io/v1
   max_requests_per_minute: 500
   max_requests_per_day: 2000
@@ -19,14 +19,14 @@ chat_model:
 image_generator:
   class_path: tools.ImageGeneratorNanobananaGoogleAPI
   init_args:
-    api_key: <YOUR_API_KEY>
+    api_key:
   max_requests_per_minute: 10
   max_requests_per_day: 500
 
 video_generator:
   class_path: tools.VideoGeneratorVeoGoogleAPI
   init_args:
-    api_key: <YOUR_API_KEY>
+    api_key:
   max_requests_per_minute: 2
   max_requests_per_day: 10
 
