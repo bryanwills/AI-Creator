@@ -1,14 +1,33 @@
 from __future__ import annotations
 
+import asyncio
 import json
+import logging
 from dataclasses import dataclass, field
 from typing import Any
 from uuid import uuid4
 
-from openai import AsyncOpenAI
+from openai import APIConnectionError, APITimeoutError, AsyncOpenAI
 
 from .config import llm_api_key, llm_base_url, llm_model
 from .models import ToolCall
+
+LLM_MAX_ATTEMPTS = 3
+LLM_RETRY_BACKOFF_SECONDS = (1.0, 4.0)
+LLM_REQUEST_TIMEOUT_SECONDS = 300.0
+
+
+def _is_retryable_llm_error(exc: BaseException) -> bool:
+    """Rate limits, server errors, and connection problems are transient;
+    auth/validation errors will never succeed and must surface immediately."""
+    status = getattr(exc, "status_code", None)
+    if status is not None:
+        try:
+            status = int(status)
+        except (TypeError, ValueError):
+            return False
+        return status == 429 or status >= 500
+    return isinstance(exc, (APIConnectionError, APITimeoutError))
 
 
 @dataclass(slots=True)
@@ -25,10 +44,21 @@ class OpenAICompatibleLLM:
         self.api_key = api_key or llm_api_key()
         if not self.api_key:
             raise RuntimeError("VIMAX_LLM_API_KEY is required for the agent LLM client")
-        self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
+        self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url, timeout=LLM_REQUEST_TIMEOUT_SECONDS)
 
     async def complete(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]]) -> AssistantMessage:
-        response = await self.client.chat.completions.create(model=self.model, messages=messages, tools=tools or None, tool_choice="auto" if tools else None)
+        for attempt in range(LLM_MAX_ATTEMPTS):
+            try:
+                response = await self.client.chat.completions.create(model=self.model, messages=messages, tools=tools or None, tool_choice="auto" if tools else None)
+                break
+            except Exception as exc:
+                if attempt == LLM_MAX_ATTEMPTS - 1 or not _is_retryable_llm_error(exc):
+                    raise
+                delay = LLM_RETRY_BACKOFF_SECONDS[min(attempt, len(LLM_RETRY_BACKOFF_SECONDS) - 1)]
+                logging.warning("LLM call failed (%s); retrying in %.1fs (attempt %d/%d)", exc, delay, attempt + 1, LLM_MAX_ATTEMPTS)
+                await asyncio.sleep(delay)
+        if not response.choices:
+            raise RuntimeError("LLM response contained no choices (content filter or relay error)")
         message = response.choices[0].message
         text = message.content or ""
         calls: list[ToolCall] = []
