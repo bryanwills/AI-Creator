@@ -1,13 +1,38 @@
 from __future__ import annotations
 
 import json
+import logging
+import os
 import re
+from contextlib import contextmanager
 from datetime import datetime
+from functools import wraps
 from pathlib import Path
 from typing import Any
 
+try:
+    import fcntl
+except ImportError:  # pragma: no cover - non-POSIX platforms
+    fcntl = None
+
 
 STALE_KEYS = ["story", "characters", "script", "storyboard", "shot_descriptions", "camera_tree", "frames", "clips", "final_video"]
+
+
+def _synchronized(method):
+    """Hold the index file lock across a read-modify-write cycle.
+
+    Every mutator loads the whole sessions file, edits it, and saves it back;
+    without a lock, two concurrent writers (threads or processes) silently
+    drop each other's updates.
+    """
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        with self._locked():
+            return method(self, *args, **kwargs)
+
+    return wrapper
 
 
 class SessionIndex:
@@ -26,14 +51,40 @@ class SessionIndex:
         if not self.sessions_path.exists():
             self.save({"active_session_id": "", "sessions": {}})
 
+    @contextmanager
+    def _locked(self):
+        if fcntl is None:
+            yield
+            return
+        lock_path = self.vimax_dir / "sessions.lock"
+        with open(lock_path, "a+", encoding="utf-8") as handle:
+            fcntl.flock(handle, fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                fcntl.flock(handle, fcntl.LOCK_UN)
+
     def load(self) -> dict[str, Any]:
         try:
             return json.loads(self.sessions_path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, FileNotFoundError):
+        except FileNotFoundError:
+            return {"active_session_id": "", "sessions": {}}
+        except json.JSONDecodeError:
+            # A corrupt file usually means a crash mid-write. Returning empty
+            # state is fine for this call, but the next save() would overwrite
+            # the file and destroy every session — keep the evidence first.
+            backup = self.sessions_path.with_name(f"sessions.json.corrupt-{datetime.now().strftime('%Y%m%d-%H%M%S-%f')}")
+            try:
+                os.replace(self.sessions_path, backup)
+                logging.error("sessions.json was corrupt; preserved it at %s and starting with empty state", backup)
+            except OSError:
+                logging.error("sessions.json is corrupt and could not be backed up; starting with empty state")
             return {"active_session_id": "", "sessions": {}}
 
     def save(self, data: dict[str, Any]) -> None:
-        self.sessions_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp_path = self.sessions_path.with_name("sessions.json.tmp")
+        tmp_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        os.replace(tmp_path, self.sessions_path)
 
     def active(self) -> dict[str, Any] | None:
         data = self.load()
@@ -48,6 +99,7 @@ class SessionIndex:
         record = self.load().get("sessions", {}).get(normalized)
         return self._with_session_defaults(record) if isinstance(record, dict) else None
 
+    @_synchronized
     def create(self, idea: str = "", user_requirement: str = "", style: str = "", session_id: str | None = None) -> dict[str, Any]:
         data = self.load()
         sessions = data.setdefault("sessions", {})
@@ -87,6 +139,7 @@ class SessionIndex:
             return active
         return self.create(idea=idea, user_requirement=user_requirement, style=style)
 
+    @_synchronized
     def set_active(self, session_id: str) -> dict[str, Any]:
         normalized = self._normalize_session_id(session_id)
         data = self.load()
@@ -96,6 +149,7 @@ class SessionIndex:
         self.save(data)
         return dict(data["sessions"][normalized])
 
+    @_synchronized
     def update_stage(self, session_id: str, stage: str, summary: str = "") -> None:
         data = self.load()
         record = data.get("sessions", {}).get(session_id)
@@ -107,6 +161,7 @@ class SessionIndex:
         record["updated_at"] = datetime.now().isoformat(timespec="seconds")
         self.save(data)
 
+    @_synchronized
     def mark_stale(self, session_id: str, keys: list[str]) -> None:
         data = self.load()
         record = data.get("sessions", {}).get(session_id)
@@ -118,6 +173,7 @@ class SessionIndex:
         record["updated_at"] = datetime.now().isoformat(timespec="seconds")
         self.save(data)
 
+    @_synchronized
     def update_compaction(self, session_id: str, result: dict[str, Any]) -> None:
         data = self.load()
         session = data.get("sessions", {}).get(session_id)
@@ -151,6 +207,7 @@ class SessionIndex:
         record = self.get(session_id) if session_id else self.active()
         return str((record or {}).get("compacted_summary", "") or "")
 
+    @_synchronized
     def append_turn_record(self, session_id: str, record: dict[str, Any]) -> None:
         data = self.load()
         session = data.get("sessions", {}).get(session_id)

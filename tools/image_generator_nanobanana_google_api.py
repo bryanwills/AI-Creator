@@ -7,7 +7,7 @@ from typing import List, Optional
 from google import genai
 from google.genai import types
 from google.genai.errors import ClientError
-from tenacity import retry, stop_after_attempt
+from tenacity import retry, stop_after_attempt, wait_exponential
 from interfaces.image_output import ImageOutput
 from utils.retry import after_func
 from utils.rate_limiter import RateLimiter
@@ -25,7 +25,7 @@ class ImageGeneratorNanobananaGoogleAPI:
             api_key=api_key,
         )
 
-    @retry(stop=stop_after_attempt(3), after=after_func)
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, max=30), after=after_func)
     async def generate_single_image(
         self,
         prompt: str,

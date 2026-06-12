@@ -183,44 +183,70 @@ function App() {
   });
 
   useEffect(() => {
-    const {command, args} = agentCommand();
-    const child = spawn(command, args, {cwd: repoRoot, env: process.env});
-    childRef.current = child;
+    let unmounted = false;
+    let respawnCount = 0;
 
-    child.stdout.setEncoding('utf8');
-    child.stdout.on('data', (chunk: string) => {
-      bufferRef.current += chunk;
-      const parts = bufferRef.current.split('\n');
-      bufferRef.current = parts.pop() ?? '';
-      for (const part of parts) {
-        consumeJsonLine(part);
-      }
-    });
+    function startAgent() {
+      const {command, args} = agentCommand();
+      const child = spawn(command, args, {cwd: repoRoot, env: process.env});
+      childRef.current = child;
+      bufferRef.current = '';
 
-    child.stderr.setEncoding('utf8');
-    child.stderr.on('data', (chunk: string) => {
-      for (const line of chunk.split('\n')) {
-        if (!line.trim()) continue;
-        appendLine({kind: 'terminal', text: `[stderr]: ${line}`});
-      }
-    });
+      // Without a listener, an EPIPE on stdin (child dying mid-write) is an
+      // uncaught exception that takes down the whole TUI.
+      child.stdin.on('error', (error: Error) => {
+        appendLine({kind: 'error', text: `agent stdin error: ${error.message}`});
+      });
 
-    child.on('error', (error) => {
-      appendLine({kind: 'error', text: `agent process error: ${error.message}`});
-    });
+      child.stdout.setEncoding('utf8');
+      child.stdout.on('data', (chunk: string) => {
+        respawnCount = 0;
+        bufferRef.current += chunk;
+        const parts = bufferRef.current.split('\n');
+        bufferRef.current = parts.pop() ?? '';
+        for (const part of parts) {
+          consumeJsonLine(part);
+        }
+      });
 
-    child.on('exit', (code, signal) => {
-      childRef.current = null;
-      setBusy(false);
-      if (code && code !== 0) {
-        appendLine({kind: 'error', text: `agent process exited with code ${code}`});
-      } else if (signal) {
-        appendLine({kind: 'status', text: `agent process stopped by ${signal}`});
-      }
-    });
+      child.stderr.setEncoding('utf8');
+      child.stderr.on('data', (chunk: string) => {
+        for (const line of chunk.split('\n')) {
+          if (!line.trim()) continue;
+          appendLine({kind: 'terminal', text: `[stderr]: ${line}`});
+        }
+      });
+
+      child.on('error', (error) => {
+        appendLine({kind: 'error', text: `agent process error: ${error.message}`});
+      });
+
+      child.on('exit', (code, signal) => {
+        childRef.current = null;
+        setBusy(false);
+        if (code && code !== 0) {
+          appendLine({kind: 'error', text: `agent process exited with code ${code}`});
+        } else if (signal) {
+          appendLine({kind: 'status', text: `agent process stopped by ${signal}`});
+        }
+        if (unmounted) return;
+        if (respawnCount >= 3) {
+          appendLine({kind: 'error', text: 'agent process keeps exiting; giving up on restarts (quit and relaunch)'});
+          return;
+        }
+        respawnCount += 1;
+        appendLine({kind: 'status', text: `restarting agent process (attempt ${respawnCount}/3)...`});
+        setTimeout(() => {
+          if (!unmounted) startAgent();
+        }, 1000);
+      });
+    }
+
+    startAgent();
 
     return () => {
-      child.kill();
+      unmounted = true;
+      childRef.current?.kill();
     };
   }, []);
 
