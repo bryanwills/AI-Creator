@@ -178,7 +178,7 @@ class ReferenceImageSelector:
 
             try:
                 ref = await chain.ainvoke(messages)
-                filtered_image_path_and_text_pairs = [available_image_path_and_text_pairs[i] for i in ref.ref_image_indices]
+                filtered_image_path_and_text_pairs = select_pairs_by_indices(available_image_path_and_text_pairs, ref.ref_image_indices)
                 logging.info(f"Filtered image idx:{ref.ref_image_indices}")
                 
             except Exception as e:
@@ -211,8 +211,8 @@ class ReferenceImageSelector:
         chain = self.chat_model | parser
 
         try:
-            response = await chain.ainvoke(messages)        
-            reference_image_path_and_text_pairs = [filtered_image_path_and_text_pairs[i] for i in response.ref_image_indices]
+            response = await chain.ainvoke(messages)
+            reference_image_path_and_text_pairs = select_pairs_by_indices(filtered_image_path_and_text_pairs, response.ref_image_indices)
             return {
                 "reference_image_path_and_text_pairs": reference_image_path_and_text_pairs,
                 "text_prompt": response.text_prompt,
@@ -223,3 +223,14 @@ class ReferenceImageSelector:
             raise e
 
 
+
+
+def select_pairs_by_indices(pairs, indices):
+    """Index into pairs with LLM-emitted indices, rejecting out-of-range values.
+
+    Negative indices would silently select the wrong image via Python indexing.
+    """
+    invalid = [i for i in indices if i < 0 or i >= len(pairs)]
+    if invalid:
+        raise ValueError(f"ref_image_indices out of range: {invalid} (have {len(pairs)} images)")
+    return [pairs[i] for i in indices]

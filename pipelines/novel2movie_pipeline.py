@@ -22,6 +22,8 @@ from interfaces import (
 )
 from tenacity import retry
 
+from utils.text import safe_path_component
+
 
 
 def _pipeline_print(quiet: bool, message: str) -> None:
@@ -388,7 +390,7 @@ class Novel2MoviePipeline:
 
         async def generate_base_portrait(sem, character: CharacterInNovel):
             async with sem:
-                image_path = os.path.join(base_character_portrait_dir, f"character_{character.index}_{character.identifier_in_novel}.png")
+                image_path = os.path.join(base_character_portrait_dir, f"character_{character.index}_{safe_path_component(character.identifier_in_novel)}.png")
                 if os.path.exists(image_path):
                     return image_path
                 prompt = f"Generate a full-body, front-view portrait based on the following description, in the style of {style}:"
@@ -405,7 +407,7 @@ class Novel2MoviePipeline:
 
         async def generate_scene_portrait(sem, base_character_image_path: str, character: CharacterInScene, event_idx: int, scene_idx: int):
             async with sem:
-                image_path = os.path.join(working_dir_character_portrait, f"event_{event_idx}", f"scene_{scene_idx}", f"character_{character.idx}_{character.identifier_in_scene}.png")
+                image_path = os.path.join(working_dir_character_portrait, f"event_{event_idx}", f"scene_{scene_idx}", f"character_{character.idx}_{safe_path_component(character.identifier_in_scene)}.png")
                 os.makedirs(os.path.dirname(image_path), exist_ok=True)
                 if os.path.exists(image_path):
                     return image_path
@@ -425,7 +427,7 @@ class Novel2MoviePipeline:
         scene_portrait_tasks = []
         sem = asyncio.Semaphore(3)
         for character in characters_in_novel:
-            base_path = os.path.join(base_character_portrait_dir, f"character_{character.index}_{character.identifier_in_novel}.png")
+            base_path = os.path.join(base_character_portrait_dir, f"character_{character.index}_{safe_path_component(character.identifier_in_novel)}.png")
             for event_idx, identifier_in_event in character.active_events.items():
                 event_characters = event_idx_to_characters_in_event[int(event_idx)]
                 character_in_event = [char for char in event_characters if char.identifier_in_event == identifier_in_event][0]
@@ -449,7 +451,7 @@ class Novel2MoviePipeline:
                 for character in scene.characters:
                     character_portraits_registry[character.identifier_in_scene] = {
                         "portrait": {
-                            "path": os.path.join(working_dir_character_portrait, f"event_{event.index}", f"scene_{scene.idx}", f"character_{character.idx}_{character.identifier_in_scene}.png"),
+                            "path": os.path.join(working_dir_character_portrait, f"event_{event.index}", f"scene_{scene.idx}", f"character_{character.idx}_{safe_path_component(character.identifier_in_scene)}.png"),
                             "description": f"A portrait of {character.identifier_in_scene}",
                         }
                     }
@@ -854,7 +856,7 @@ class Novel2MoviePipeline:
 
         async def generate_portrait_for_character(sem, character: CharacterInNovel):
             async with sem:
-                image_path = os.path.join(base_character_portrait_dir, f"character_{character.index}_{character.identifier_in_novel}.png")
+                image_path = os.path.join(base_character_portrait_dir, f"character_{character.index}_{safe_path_component(character.identifier_in_novel)}.png")
                 
                 if os.path.exists(image_path):
                     print(f"⏭️ Skipping portrait generation for character {character.idx} as it already exists.")
@@ -935,7 +937,7 @@ class Novel2MoviePipeline:
         sem = asyncio.Semaphore(3)
         tasks = []
         for character in characters_in_novel:
-            character_base_image_path = os.path.join(base_character_portrait_dir, f"character_{character.index}_{character.identifier_in_novel}.png")
+            character_base_image_path = os.path.join(base_character_portrait_dir, f"character_{character.index}_{safe_path_component(character.identifier_in_novel)}.png")
             for event_idx, identifier_in_event in character.active_events.items():
                 characters_in_event: List[CharacterInEvent] = event_idx_to_characters_in_event[event_idx]
                 character_in_event = [char for char in characters_in_event if char.identifier_in_event == identifier_in_event][0]  # TODO: 这里的数据结构没有做好，居然还要遍历查找。。。

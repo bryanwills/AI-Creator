@@ -11,6 +11,7 @@ import yaml
 from langchain.chat_models import init_chat_model
 from tools.render_backend import RenderBackend
 from utils.provider_presets import resolve_chat_model_config
+from utils.text import safe_path_component
 
 
 def _pipeline_print(quiet: bool, message: str) -> None:
@@ -156,7 +157,7 @@ class Idea2VideoPipeline:
         style: str,
     ):
         character_dir = os.path.join(
-            self.working_dir, "character_portraits", f"{character.idx}_{character.identifier_in_scene}")
+            self.working_dir, "character_portraits", f"{character.idx}_{safe_path_component(character.identifier_in_scene)}")
         os.makedirs(character_dir, exist_ok=True)
 
         front_portrait_path = os.path.join(character_dir, "front.png")
