@@ -5,7 +5,6 @@ import logging
 import asyncio
 import time
 from typing import Any, Callable, Optional, Dict, List, Tuple, Literal
-from moviepy import VideoFileClip, concatenate_videoclips
 from PIL import Image
 from agents import *
 import yaml
@@ -14,6 +13,7 @@ from langchain.chat_models import init_chat_model
 from tools.render_backend import RenderBackend
 from utils.provider_presets import resolve_chat_model_config
 from utils.text import safe_path_component
+from utils.video import concatenate_video_files
 
 
 def _pipeline_print(quiet: bool, message: str) -> None:
@@ -263,12 +263,10 @@ class Script2VideoPipeline:
         else:
             print(f"🎬 Starting concatenating videos...")
             _emit_render_progress(progress, "concat_start", "Concatenating video clips", {"shot_count": len(shot_descriptions)})
-            video_clips = [
-                VideoFileClip(os.path.join(self.working_dir, "shots", f"{shot_description.idx}", "video.mp4"))
-                for shot_description in shot_descriptions
-            ]
-            final_video = concatenate_videoclips(video_clips)
-            final_video.write_videofile(final_video_path, codec="libx264", preset="medium")
+            concatenate_video_files(
+                [os.path.join(self.working_dir, "shots", f"{shot_description.idx}", "video.mp4") for shot_description in shot_descriptions],
+                final_video_path,
+            )
             print(f"☑️ Concatenated videos, saved to {final_video_path}.")
             _emit_render_progress(progress, "concat_done", "Final video concatenated", {"path": final_video_path})
 

@@ -6,12 +6,12 @@ from interfaces import CharacterInScene
 from typing import List, Dict, Optional
 import asyncio
 import json
-from moviepy import VideoFileClip, concatenate_videoclips
 import yaml
 from langchain.chat_models import init_chat_model
 from tools.render_backend import RenderBackend
 from utils.provider_presets import resolve_chat_model_config
 from utils.text import safe_path_component
+from utils.video import concatenate_video_files
 
 
 def _pipeline_print(quiet: bool, message: str) -> None:
@@ -247,9 +247,6 @@ class Idea2VideoPipeline:
             _pipeline_print(quiet, f"🚀 Skipped concatenating videos, already exists.")
         else:
             _pipeline_print(quiet, f"🎬 Starting concatenating videos...")
-            video_clips = [VideoFileClip(final_video_path)
-                           for final_video_path in all_video_paths]
-            final_video = concatenate_videoclips(video_clips)
-            final_video.write_videofile(final_video_path)
+            concatenate_video_files(all_video_paths, final_video_path)
             _pipeline_print(quiet, f"☑️ Concatenated videos, saved to {final_video_path}.")
         return final_video_path

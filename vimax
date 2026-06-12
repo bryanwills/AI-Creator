@@ -75,7 +75,7 @@ case "$command" in
       echo "error: ui dependencies are missing. Run: cd $ROOT/ui && npm install" >&2
       exit 2
     fi
-    exec "$ROOT/ui/node_modules/.bin/tsx" "$ROOT/ui/src/cli.tsx" "${tui_args[@]}"
+    exec "$ROOT/ui/node_modules/.bin/tsx" "$ROOT/ui/src/cli.tsx" ${tui_args[@]+"${tui_args[@]}"}
     ;;
   --help|-h|help)
     usage

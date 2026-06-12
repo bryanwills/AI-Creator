@@ -1,5 +1,6 @@
 import logging
 import requests
+from moviepy import VideoFileClip, concatenate_videoclips
 from utils.retry import download_retry
 
 
@@ -20,3 +21,24 @@ def download_video(url, save_path):
     except Exception as e:
         logging.error(f"Error downloading video: {e}")
         raise e
+
+
+def concatenate_video_files(video_paths, output_path, codec="libx264", preset="medium"):
+    """Concatenate video files, releasing every ffmpeg reader even on failure.
+
+    Each VideoFileClip keeps an ffmpeg subprocess and file handle open until
+    closed; leaking them exhausts file descriptors on long multi-scene runs.
+    """
+    clips = []
+    final = None
+    try:
+        for path in video_paths:
+            clips.append(VideoFileClip(path))
+        final = concatenate_videoclips(clips)
+        final.write_videofile(output_path, codec=codec, preset=preset)
+    finally:
+        if final is not None:
+            final.close()
+        for clip in clips:
+            clip.close()
+    return output_path

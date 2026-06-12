@@ -4,8 +4,9 @@ These tests verify provider preset resolution and default pipeline config
 loading. They mock the LangChain factory so no real API calls are made.
 
 Heavy multimedia dependencies (moviepy, scenedetect, cv2, google-genai,
-etc.) are stubbed at the module level so the pipeline modules can be
-imported in a lightweight test environment.
+etc.) are stubbed in setUpModule and restored in tearDownModule. Stubbing
+at import time leaked the MagicMocks into sys.modules for every test module
+collected after this one, making suite results import-order dependent.
 """
 
 import importlib
@@ -15,7 +16,6 @@ import types
 import unittest
 from unittest.mock import patch, MagicMock
 
-# ---- stub heavy deps before any project imports ----
 _STUB_MODULES = [
     "moviepy", "cv2", "scenedetect", "scenedetect.detectors",
     "PIL", "PIL.Image",
@@ -25,13 +25,36 @@ _STUB_MODULES = [
     "langchain_community.vectorstores.FAISS",
 ]
 _saved = {}
-for _mod in _STUB_MODULES:
-    _saved[_mod] = sys.modules.get(_mod)
-    mock = MagicMock()
-    # Give stub a __spec__ so importlib.util.find_spec() works
-    mock.__spec__ = importlib.machinery.ModuleSpec(_mod, None)
-    mock.__path__ = []
-    sys.modules[_mod] = mock
+_modules_before_stubs = set()
+
+
+def setUpModule():
+    _modules_before_stubs.update(sys.modules)
+    for _mod in _STUB_MODULES:
+        _saved[_mod] = sys.modules.get(_mod)
+        mock = MagicMock()
+        # Give stub a __spec__ so importlib.util.find_spec() works
+        mock.__spec__ = importlib.machinery.ModuleSpec(_mod, None)
+        mock.__path__ = []
+        sys.modules[_mod] = mock
+
+
+def tearDownModule():
+    # Drop project modules that were first imported while the stubs were
+    # active, so later test modules import them fresh against real libraries.
+    for name in list(sys.modules):
+        if name in _modules_before_stubs:
+            continue
+        if name.split(".")[0] in {"pipelines", "agents", "tools", "interfaces"}:
+            del sys.modules[name]
+    for _mod, original in _saved.items():
+        if original is None:
+            sys.modules.pop(_mod, None)
+        else:
+            sys.modules[_mod] = original
+    _saved.clear()
+    _modules_before_stubs.clear()
+
 
 from utils.provider_presets import resolve_chat_model_config
 
