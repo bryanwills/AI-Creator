@@ -36,6 +36,7 @@ class VideoGeneratorVeoGoogleAPI:
         resolution: str = "1080p",
         aspect_ratio: str = "16:9",
         duration: int = 8,
+        **kwargs,
     ) -> VideoOutput:
 
         params = {
