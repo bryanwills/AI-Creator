@@ -158,6 +158,7 @@ class VideoGeneratorDoubaoSeedanceYunwuAPI:
         aspect_ratio: str = "16:9",
         fps: Literal[16, 24] = 16,
         duration: Literal[5, 10] = 5,
+        **kwargs,
     ) -> VideoOutput:
         """
         Generate a single video by creating a task and waiting for completion.
