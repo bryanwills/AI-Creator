@@ -56,6 +56,18 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 ---
 
 
+### 📰 **News**
+
+- **2026-06-09** 📄 Technical report released.
+- **2026-06-08** 🤖 Agents Loop + TUI workflow integrated for interactive planning, revision, rendering control, session reuse, and context compaction.
+- **2026-06-07** 📖 Novel2Video workflow released.
+- **2026-06-01** 🎬 Google Omni video generator support added.
+- **2026-03-23** ⚡ MiniMax chat model provider support added.
+
+---
+
+
+
 ## 📑 Table of Contents
 
 - [💡 Key Features](#key-features)
@@ -262,16 +274,16 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 ViMax now also includes an **Agents Loop + TUI** workflow for interactive planning, revision, rendering control, session reuse, and context compaction while preserving the original direct pipeline entrypoints.
 
 
+---
+
+### ☄️ **RoadMap**
+
+- 🚧 🖥️ **Web frontend interface**
+- 🚧 🎬 **Seedance 2.0 video generator support**
+- 🚧 🖼️ **GPT-Image 2 image generator support**
 
 ---
 
-### ☄️ **Coming Soon**
-
-- 👨‍💻 **Google AI Studio API config✅**
-- 🤖 **Agents Loop + TUI✅**
-- 📄 **Technical Report✅**
-
----
 
 
 ## 🏗️ Architecture
