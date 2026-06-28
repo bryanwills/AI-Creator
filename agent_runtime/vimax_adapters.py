@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import datetime
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
 import json
 import logging
@@ -10,6 +11,7 @@ from typing import Any
 
 from langchain.chat_models import init_chat_model
 from langchain_openai import OpenAIEmbeddings
+from tenacity import RetryError
 
 from interfaces import CharacterInScene
 from agents.event_extractor import EventExtractor
@@ -193,7 +195,19 @@ class ViMaxAdapters:
                 )
         except Exception as exc:
             self.session_index.update_stage(session_id, "error", f"Narrative planning failed: {exc}")
-            raise
+            checklist = self.session_index.artifact_checklist(session_id)
+            payload = {
+                "session_id": session_id,
+                "working_dir": str(working_dir.relative_to(self.workspace_root)),
+                "error_type": "recoverable_planning_step_failed",
+                "retryable": True,
+                "error": str(exc),
+                "present": [path for path, present in checklist.items() if present],
+                "missing": [path for path, present in checklist.items() if not present],
+            }
+            if runtime:
+                runtime.emit_progress("Narrative planning failed; partial artifacts were kept", stage="planning_failed", metadata=payload)
+            return ToolResult("vimax_narrative_planning", False, f"Narrative planning failed: {exc}", payload)
 
         checklist = self.session_index.artifact_checklist(session_id)
         generated = [path for path, present in checklist.items() if present and not generated_before.get(path)]
@@ -327,11 +341,14 @@ class ViMaxAdapters:
         session_id = session["session_id"]
         checklist = self.session_index.artifact_checklist(session_id)
         missing = _missing_render_dependencies(checklist)
-        if missing:
-            return ToolResult("vimax_render_video", False, f"Dependency missing: {', '.join(missing)}", {"error_type": "dependency_missing", "missing": missing, "session_id": session_id})
-
         working_dir = self.session_index.working_dir(session_id)
+        if missing:
+            payload = {"error_type": "dependency_missing", "missing": missing, "session_id": session_id}
+            _write_render_status(working_dir, status="dependency_missing", payload=payload)
+            return ToolResult("vimax_render_video", False, f"Dependency missing: {', '.join(missing)}", payload)
+
         self.session_index.update_stage(session_id, "rendering", "Rendering video artifacts")
+        _write_render_status(working_dir, status="rendering", payload={"session_id": session_id, "render_started": True, "render_completed": False})
         try:
             chat_model = _build_chat_model()
             image_generator = _build_image_generator()
@@ -344,6 +361,7 @@ class ViMaxAdapters:
                     final_video = await idea_pipeline(idea=str(session.get("idea", "")), user_requirement=str(session.get("user_requirement", "")), style=str(session.get("style", "")), quiet=True)
                 self.session_index.update_stage(session_id, "rendered", "Final video rendered")
                 payload = {"session_id": session_id, "render_mode": "idea2video", "render_started": True, "render_completed": True, "final_video_path": str(Path(final_video).relative_to(self.workspace_root)), "missing": []}
+                _write_render_status(working_dir, status="rendered", payload=payload)
                 return ToolResult("vimax_render_video", True, json.dumps(payload, ensure_ascii=False, indent=2), payload)
             if _script_mode_ready(checklist):
                 script_dir = working_dir / "script2video"
@@ -354,6 +372,7 @@ class ViMaxAdapters:
                     final_video = await pipeline(script=script_text, user_requirement=str(session.get("user_requirement", "")), style=str(session.get("style", "")), characters=characters, quiet=True, progress=_pipeline_progress(runtime, session_id))
                 self.session_index.update_stage(session_id, "rendered", "Final video rendered")
                 payload = {"session_id": session_id, "render_mode": "script2video", "render_started": True, "render_completed": True, "final_video_path": str(Path(final_video).relative_to(self.workspace_root)), "missing": []}
+                _write_render_status(working_dir, status="rendered", payload=payload)
                 return ToolResult("vimax_render_video", True, json.dumps(payload, ensure_ascii=False, indent=2), payload)
             if _novel_mode_ready(checklist):
                 novel_dir = working_dir / "novel2video"
@@ -374,11 +393,30 @@ class ViMaxAdapters:
                     "scene_count": render_result.get("scene_count", 0),
                     "missing": [],
                 }
+                _write_render_status(working_dir, status="rendered", payload=payload)
                 return ToolResult("vimax_render_video", True, json.dumps(payload, ensure_ascii=False, indent=2), payload)
         except Exception as exc:
-            self.session_index.update_stage(session_id, "error", f"Render failed: {exc}")
-            raise
-        return ToolResult("vimax_render_video", False, "No render mode matched current session.", {"error_type": "dependency_missing", "session_id": session_id})
+            unwrapped = _unwrap_retry_error(exc)
+            error_text = _sanitize_error_text(str(unwrapped))
+            wrapped_error_text = _sanitize_error_text(str(exc))
+            self.session_index.update_stage(session_id, "error", f"Render failed: {error_text}")
+            checklist = self.session_index.artifact_checklist(session_id)
+            payload = {
+                "error_type": "render_failed",
+                "retryable": _is_retryable_render_error(unwrapped),
+                "session_id": session_id,
+                "error": error_text,
+                "wrapped_error": wrapped_error_text,
+                "present": [path for path, present in checklist.items() if present],
+                "missing": [path for path, present in checklist.items() if not present],
+            }
+            _write_render_status(working_dir, status="error", payload=payload)
+            if runtime:
+                runtime.emit_progress("Render failed; partial artifacts were kept", stage="render_failed", metadata=payload)
+            return ToolResult("vimax_render_video", False, f"Render failed: {error_text}", payload)
+        payload = {"error_type": "dependency_missing", "session_id": session_id}
+        _write_render_status(working_dir, status="dependency_missing", payload=payload)
+        return ToolResult("vimax_render_video", False, "No render mode matched current session.", payload)
 
     def _resolve_session(self, session_id: str, *, idea: str, script: str, user_requirement: str, style: str) -> dict[str, Any]:
         requested_source = idea or script
@@ -604,6 +642,60 @@ def _build_novel_render_pipeline(working_dir: Path, chat_model: Any, image_gener
         script2video_pipeline=script_pipeline,
         working_dir=str(working_dir),
     )
+
+
+def _unwrap_retry_error(exc: Exception) -> Exception:
+    if isinstance(exc, RetryError):
+        try:
+            return exc.last_attempt.exception() or exc
+        except Exception:
+            return exc
+    return exc
+
+
+def _is_retryable_render_error(exc: Exception) -> bool:
+    text = str(exc).lower()
+    if isinstance(exc, AttributeError):
+        return False
+    if "http 403" in text or "key limit exceeded" in text or "quota" in text:
+        return False
+    return True
+
+
+def _sanitize_error_text(text: str) -> str:
+    sanitized = text
+    for marker in ("workspaces/default/keys/",):
+        if marker in sanitized:
+            prefix, rest = sanitized.split(marker, 1)
+            key_id = []
+            for char in rest:
+                if char.isalnum() or char in "-_":
+                    key_id.append(char)
+                    continue
+                break
+            sanitized = prefix + marker + "<redacted>" + rest[len(key_id):]
+    if "sk-" in sanitized:
+        prefix, rest = sanitized.split("sk-", 1)
+        token = []
+        for char in rest:
+            if char.isalnum() or char in "-_":
+                token.append(char)
+                continue
+            break
+        sanitized = prefix + "sk-<redacted>" + rest[len(token):]
+    return sanitized
+
+
+def _write_render_status(working_dir: Path, *, status: str, payload: dict[str, Any]) -> None:
+    working_dir.mkdir(parents=True, exist_ok=True)
+    event = {
+        "timestamp": datetime.now().isoformat(timespec="seconds"),
+        "status": status,
+        **payload,
+    }
+    (working_dir / "render_status.json").write_text(json.dumps(event, ensure_ascii=False, indent=2), encoding="utf-8")
+    with (working_dir / "render_events.jsonl").open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(event, ensure_ascii=False) + "\n")
 
 
 def _write_characters_if_missing(path: Path, characters: list[CharacterInScene]) -> None:

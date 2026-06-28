@@ -20,6 +20,11 @@ class FakeLLM:
         return self.replies.pop(0)
 
 
+class FailingLLM:
+    async def complete(self, messages, tools):
+        raise RuntimeError("provider returned invalid response shape")
+
+
 class AgentLoopTests(unittest.IsolatedAsyncioTestCase):
     async def test_no_tool_call_finishes(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -102,6 +107,18 @@ class AgentLoopTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(loop.history[0]["role"], "system")
             self.assertIn("after compact", loop.history[-1]["content"])
             self.assertNotIn("old request", index.memory_text())
+
+
+    async def test_llm_sampling_error_yields_error_without_crashing_loop(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            index = SessionIndex(tmp)
+            registry = ToolRegistry([])
+            loop = AgentLoop(index, PromptBuilder(f"{tmp}/prompts", index, registry), registry, ToolExecutor(registry, index), FailingLLM())
+            events = [event async for event in loop.stream_events("start")]
+            self.assertTrue(any(event["type"] == "error" and event.get("metadata", {}).get("error_type") == "llm_sampling_failed" for event in events))
+            self.assertEqual(events[-2]["type"], "done")
+            self.assertEqual(events[-1]["type"], "session")
+            self.assertEqual(index.active()["recent_turn_records"][-1]["status"], "failed")
 
     async def test_tool_call_continues_then_finishes(self):
         with tempfile.TemporaryDirectory() as tmp:

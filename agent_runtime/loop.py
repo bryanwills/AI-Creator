@@ -70,12 +70,10 @@ class AgentLoop:
             try:
                 assistant = await self.llm.complete(runtime_messages, tools=tool_schemas)
             except Exception as exc:
-                # Without this boundary a single API failure propagated out of the
-                # generator: the turn record was never persisted and the CLI died.
                 status = "failed"
-                final_text = f"LLM call failed: {exc}"
-                transitions.append(_transition("sampling_assistant", "finalizing_answer", "llm_error"))
-                yield {"type": "error", "turn_id": control.turn_id, "message": final_text}
+                final_text = f"Agent LLM request failed: {exc}"
+                transitions.append(_transition("sampling_assistant", "finalizing_answer", "llm_sampling_failed"))
+                yield {"type": "error", "turn_id": control.turn_id, "message": final_text, "metadata": {"error_type": "llm_sampling_failed"}}
                 break
             assistant_turns.append({"phase": "initial" if tool_round == 0 else f"followup_{tool_round}", "text": assistant.text, "tool_calls": [call.as_dict() for call in assistant.tool_calls]})
             if not assistant.tool_calls:

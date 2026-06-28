@@ -58,6 +58,7 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 
 ### 📰 **News**
 
+- **2026-06-28** 🛠️ Agent Loop and TUI stability update: stronger LLM retries, persistent render status, landscape image guards, and Script2Video resume fixes.
 - **2026-06-09** 📄 Technical report released.
 - **2026-06-08** 🤖 Agents Loop + TUI workflow integrated for interactive planning, revision, rendering control, session reuse, and context compaction.
 - **2026-06-07** 📖 Novel2Video workflow released.

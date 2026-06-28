@@ -14,7 +14,7 @@ import type {MappingState, StreamEvent, WorkspaceLine} from './types.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..', '..');
 
-const THINKING_FRAMES = ['.  ', '.. ', '...', ' ..', '  .'];
+const THINKING_FRAMES = ['', '.', '..', '...'];
 
 const WORKSPACE_BORDER_COLORS = ['blue', 'blueBright', 'cyan', 'blueBright', 'blue'];
 
@@ -79,19 +79,32 @@ function useThinkingFrame(active: boolean): string {
 }
 
 function useTerminalWidth(stdout: NodeJS.WriteStream): number {
-  const [width, setWidth] = useState(stdout.columns || 100);
+  const [terminal, setTerminal] = useState({width: Math.max(20, stdout.columns || 100), revision: 0});
   useEffect(() => {
-    const update = () => {
-      setWidth(stdout.columns || 100);
+    let resizeTimer: NodeJS.Timeout | null = null;
+    const redraw = (clear: boolean) => {
+      if (clear) {
+        // Ink does not always erase cells from the previous frame when the
+        // terminal is resized quickly. Clear only after resize, then force a
+        // render even when the new width equals the previous width.
+        stdout.write('\u001b[2J\u001b[3J\u001b[H');
+      }
+      setTerminal((current) => ({width: Math.max(20, stdout.columns || 100), revision: current.revision + 1}));
     };
-    update();
+    const update = () => {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => redraw(true), 60);
+    };
+    redraw(false);
     stdout.on('resize', update);
     return () => {
+      if (resizeTimer) clearTimeout(resizeTimer);
       stdout.off('resize', update);
     };
   }, [stdout]);
-  return width;
+  return terminal.width;
 }
+
 
 function baseAgentArgs(): string[] {
   return ['main_agent.py', '--jsonl', '--stdin-repl', ...cliOptions.agentArgs];
@@ -104,8 +117,8 @@ function agentCommand(): {command: string; args: string[]} {
   if (process.env.VIMAX_PYTHON_CMD) {
     return {command: process.env.VIMAX_PYTHON_CMD, args: baseAgentArgs()};
   }
-  const bundledUv = process.env.VIMAX_UV_CMD;
-  if (bundledUv && existsSync(bundledUv)) {
+  const bundledUv = process.env.VIMAX_UV_CMD ?? '/home/xavierhuang/.local/bin/uv';
+  if (existsSync(bundledUv)) {
     return {command: bundledUv, args: ['run', 'python', ...baseAgentArgs()]};
   }
   const venvPython = path.join(repoRoot, '.venv', 'bin', 'python3');
@@ -128,6 +141,7 @@ function App() {
   const [input, setInput] = useState('');
   const inputRef = useRef('');
   const [busy, setBusy] = useState(false);
+  const [activityText, setActivityText] = useState('ViMax thinking');
   const [workspaceMeta, setWorkspaceMeta] = useState<WorkspaceMeta>({
     workspacePath: '.working_dir',
     sessionId: '',
@@ -139,9 +153,8 @@ function App() {
   const childRef = useRef<ChildProcessWithoutNullStreams | null>(null);
   const bufferRef = useRef('');
 
-  const width = useMemo(() => Math.max(20, terminalWidth - 4), [terminalWidth]);
-  const hasThinkingLine = lines.some((line) => line.kind === 'thinking');
-  const thinkingFrame = useThinkingFrame(busy && hasThinkingLine);
+  const width = useMemo(() => Math.max(20, terminalWidth - 6), [terminalWidth]);
+  const thinkingFrame = useThinkingFrame(busy);
   const slashMatches = useMemo(() => matchingSlashCommands(input), [input]);
   const showSlashPopup = shouldShowSlashCommands(input, busy);
 
@@ -183,70 +196,44 @@ function App() {
   });
 
   useEffect(() => {
-    let unmounted = false;
-    let respawnCount = 0;
+    const {command, args} = agentCommand();
+    const child = spawn(command, args, {cwd: repoRoot, env: process.env});
+    childRef.current = child;
 
-    function startAgent() {
-      const {command, args} = agentCommand();
-      const child = spawn(command, args, {cwd: repoRoot, env: process.env});
-      childRef.current = child;
-      bufferRef.current = '';
+    child.stdout.setEncoding('utf8');
+    child.stdout.on('data', (chunk: string) => {
+      bufferRef.current += chunk;
+      const parts = bufferRef.current.split('\n');
+      bufferRef.current = parts.pop() ?? '';
+      for (const part of parts) {
+        consumeJsonLine(part);
+      }
+    });
 
-      // Without a listener, an EPIPE on stdin (child dying mid-write) is an
-      // uncaught exception that takes down the whole TUI.
-      child.stdin.on('error', (error: Error) => {
-        appendLine({kind: 'error', text: `agent stdin error: ${error.message}`});
-      });
+    child.stderr.setEncoding('utf8');
+    child.stderr.on('data', (chunk: string) => {
+      for (const line of chunk.split('\n')) {
+        if (!line.trim()) continue;
+        appendLine({kind: 'terminal', text: `[stderr]: ${line}`});
+      }
+    });
 
-      child.stdout.setEncoding('utf8');
-      child.stdout.on('data', (chunk: string) => {
-        respawnCount = 0;
-        bufferRef.current += chunk;
-        const parts = bufferRef.current.split('\n');
-        bufferRef.current = parts.pop() ?? '';
-        for (const part of parts) {
-          consumeJsonLine(part);
-        }
-      });
+    child.on('error', (error) => {
+      appendLine({kind: 'error', text: `agent process error: ${error.message}`});
+    });
 
-      child.stderr.setEncoding('utf8');
-      child.stderr.on('data', (chunk: string) => {
-        for (const line of chunk.split('\n')) {
-          if (!line.trim()) continue;
-          appendLine({kind: 'terminal', text: `[stderr]: ${line}`});
-        }
-      });
-
-      child.on('error', (error) => {
-        appendLine({kind: 'error', text: `agent process error: ${error.message}`});
-      });
-
-      child.on('exit', (code, signal) => {
-        childRef.current = null;
-        setBusy(false);
-        if (code && code !== 0) {
-          appendLine({kind: 'error', text: `agent process exited with code ${code}`});
-        } else if (signal) {
-          appendLine({kind: 'status', text: `agent process stopped by ${signal}`});
-        }
-        if (unmounted) return;
-        if (respawnCount >= 3) {
-          appendLine({kind: 'error', text: 'agent process keeps exiting; giving up on restarts (quit and relaunch)'});
-          return;
-        }
-        respawnCount += 1;
-        appendLine({kind: 'status', text: `restarting agent process (attempt ${respawnCount}/3)...`});
-        setTimeout(() => {
-          if (!unmounted) startAgent();
-        }, 1000);
-      });
-    }
-
-    startAgent();
+    child.on('exit', (code, signal) => {
+      childRef.current = null;
+      setBusy(false);
+      if (code && code !== 0) {
+        appendLine({kind: 'error', text: `agent process exited with code ${code}`});
+      } else if (signal) {
+        appendLine({kind: 'status', text: `agent process stopped by ${signal}`});
+      }
+    });
 
     return () => {
-      unmounted = true;
-      childRef.current?.kill();
+      child.kill();
     };
   }, []);
 
@@ -270,13 +257,40 @@ function App() {
       return;
     }
     updateWorkspaceMeta(event);
+    updateActivity(event);
     if (event.type === 'done' || event.type === 'error') setBusy(false);
     setLines((current) => {
-      const visibleCurrent = ['token', 'tool_start', 'tool_progress', 'tool_result', 'terminal', 'error', 'done'].includes(event.type ?? '') ? stripThinking(current) : current;
-      const mapped = applyStreamEvent(visibleCurrent, stateRef.current, event);
+      const mapped = applyStreamEvent(stripThinking(current), stateRef.current, event);
       stateRef.current = mapped.state;
       return mapped.lines;
     });
+  }
+
+  function updateActivity(event: StreamEvent) {
+    if (event.type === 'tool_start') {
+      setActivityText(`tool ${event.tool?.name ?? 'unknown'} running`);
+      return;
+    }
+    if (event.type === 'tool_progress') {
+      const stage = event.progress?.stage;
+      setActivityText(stage ? `tool ${event.tool?.name ?? 'unknown'}: ${stage}` : `tool ${event.tool?.name ?? 'unknown'} running`);
+      return;
+    }
+    if (event.type === 'tool_result') {
+      setActivityText('ViMax thinking');
+      return;
+    }
+    if (event.type === 'token') {
+      setActivityText('ViMax responding');
+      return;
+    }
+    if (event.type === 'status') {
+      setActivityText(statusActivityLabel(event.phase, event.message));
+      return;
+    }
+    if (event.type === 'turn') {
+      setActivityText('ViMax thinking');
+    }
   }
 
   function updateWorkspaceMeta(event: StreamEvent) {
@@ -313,7 +327,8 @@ function App() {
       appendLine({kind: 'error', text: 'agent process is not available'});
       return;
     }
-    setLines((current) => [...stripThinking(current), {kind: 'user', text: prompt}, {kind: 'thinking', text: 'ViMax thinking'}]);
+    setLines((current) => [...stripThinking(current), {kind: 'user', text: prompt}]);
+    setActivityText('ViMax thinking');
     stateRef.current = createMappingState();
     inputRef.current = '';
     setInput('');
@@ -322,8 +337,8 @@ function App() {
   }
 
   return (
-    <Box flexDirection="column" paddingX={1} width={Math.max(20, terminalWidth - 2)}>
-      <WorkspacePanel lines={lines} width={width} thinkingFrame={thinkingFrame} meta={workspaceMeta} />
+    <Box flexDirection="column" paddingX={1} width={Math.max(20, terminalWidth - 4)}>
+      <WorkspacePanel lines={lines} width={width} thinkingFrame={thinkingFrame} meta={workspaceMeta} busy={busy} activityText={activityText} />
       {showSlashPopup && <SlashCommandPopup matches={slashMatches} width={width} />}
       <Box borderStyle="round" borderColor="white" paddingX={1} marginTop={1} width={width}>
         <Text color={busy ? 'gray' : 'white'}>{busy ? '· ' : '› '}</Text>
@@ -354,7 +369,7 @@ function SlashCommandPopup({matches, width}: {matches: ReturnType<typeof matchin
   );
 }
 
-function WorkspacePanel({lines, width, thinkingFrame, meta}: {lines: WorkspaceLine[]; width: number; thinkingFrame: string; meta: WorkspaceMeta}) {
+function WorkspacePanel({lines, width, thinkingFrame, meta, busy, activityText}: {lines: WorkspaceLine[]; width: number; thinkingFrame: string; meta: WorkspaceMeta; busy: boolean; activityText: string}) {
   const panelWidth = Math.max(20, width);
   const contentWidth = Math.max(1, panelWidth - 4);
   return (
@@ -365,11 +380,14 @@ function WorkspacePanel({lines, width, thinkingFrame, meta}: {lines: WorkspaceLi
         <WorkspaceContentLine key={`header-${index}`} text={line.text} color={line.color} width={panelWidth} />
       ))}
       {lines.flatMap((line, index) => {
-        const rawText = `› ${line.kind === 'thinking' ? `${line.text} ${thinkingFrame}` : line.text}`;
+        const rawText = `› ${line.text}`;
         return wrapText(rawText, contentWidth).map((part, partIndex) => (
           <WorkspaceContentLine key={`${line.kind}-${index}-${partIndex}`} text={part} color={lineColor(line)} width={panelWidth} />
         ));
       })}
+      {busy && wrapText(`› ${activityText}${thinkingFrame}`, contentWidth).map((part, index) => (
+        <WorkspaceContentLine key={`activity-${index}`} text={part} color="cyanBright" width={panelWidth} />
+      ))}
       <GradientBorderLine left="╰" fill="─" right="╯" width={panelWidth} />
     </Box>
   );
@@ -390,6 +408,14 @@ function workspaceHeaderLines(meta: WorkspaceMeta, width: number): Array<{text: 
     rows.push({text: part, color: 'cyanBright'});
   }
   return rows;
+}
+
+function statusActivityLabel(phase: string | undefined, message: string | undefined): string {
+  if (phase === 'compact') return 'compacting context';
+  if (phase === 'sampling_assistant') return 'ViMax thinking';
+  if (phase === 'executing_tools') return 'running tools';
+  const normalized = String(message ?? '').trim();
+  return normalized || 'ViMax thinking';
 }
 
 function displayStage(stage: string): string {
@@ -467,4 +493,11 @@ function lineColor(line: WorkspaceLine): string {
   return 'gray';
 }
 
+function clearTerminalForTuiStart() {
+  if (process.env.VIMAX_TUI_NO_CLEAR === '1') return;
+  if (!process.stdout.isTTY) return;
+  process.stdout.write('\u001b[2J\u001b[3J\u001b[H');
+}
+
+clearTerminalForTuiStart();
 render(<App />);
