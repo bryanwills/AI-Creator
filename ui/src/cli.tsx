@@ -139,7 +139,9 @@ function App() {
   const terminalWidth = useTerminalWidth(stdout);
   const [lines, setLines] = useState<WorkspaceLine[]>([]);
   const [input, setInput] = useState('');
+  const [cursor, setCursor] = useState(0);
   const inputRef = useRef('');
+  const cursorRef = useRef(0);
   const [busy, setBusy] = useState(false);
   const [activityText, setActivityText] = useState('ViMax thinking');
   const [workspaceMeta, setWorkspaceMeta] = useState<WorkspaceMeta>({
@@ -160,7 +162,25 @@ function App() {
 
   useEffect(() => {
     inputRef.current = input;
+    const length = Array.from(input).length;
+    if (cursorRef.current > length) {
+      cursorRef.current = length;
+      setCursor(length);
+    }
   }, [input]);
+
+  useEffect(() => {
+    cursorRef.current = cursor;
+  }, [cursor]);
+
+  function updateInput(next: string, nextCursor: number) {
+    const length = Array.from(next).length;
+    const boundedCursor = Math.max(0, Math.min(nextCursor, length));
+    inputRef.current = next;
+    cursorRef.current = boundedCursor;
+    setInput(next);
+    setCursor(boundedCursor);
+  }
 
   useInput((value, key) => {
     if (key.ctrl && value === 'c') {
@@ -169,29 +189,51 @@ function App() {
       return;
     }
     if (busy) return;
+    const currentChars = Array.from(inputRef.current);
+    const currentCursor = Math.max(0, Math.min(cursorRef.current, currentChars.length));
+    if (key.leftArrow) {
+      updateInput(inputRef.current, currentCursor - 1);
+      return;
+    }
+    if (key.rightArrow) {
+      updateInput(inputRef.current, currentCursor + 1);
+      return;
+    }
+    if ((key as {home?: boolean}).home) {
+      updateInput(inputRef.current, 0);
+      return;
+    }
+    if ((key as {end?: boolean}).end) {
+      updateInput(inputRef.current, currentChars.length);
+      return;
+    }
     if (value.includes('\r') || value.includes('\n')) {
       const [beforeBreak] = value.split(/[\r\n]/, 1);
-      submit(`${inputRef.current}${beforeBreak ?? ''}`);
+      const pasted = Array.from(beforeBreak ?? '');
+      const next = [...currentChars.slice(0, currentCursor), ...pasted, ...currentChars.slice(currentCursor)].join('');
+      submit(next);
       return;
     }
     if (key.return) {
       submit(inputRef.current);
       return;
     }
-    if (key.backspace || key.delete) {
-      setInput((current) => {
-        const next = Array.from(current).slice(0, -1).join('');
-        inputRef.current = next;
-        return next;
-      });
+    if (key.backspace) {
+      if (currentCursor === 0) return;
+      const next = [...currentChars.slice(0, currentCursor - 1), ...currentChars.slice(currentCursor)].join('');
+      updateInput(next, currentCursor - 1);
+      return;
+    }
+    if (key.delete) {
+      if (currentCursor >= currentChars.length) return;
+      const next = [...currentChars.slice(0, currentCursor), ...currentChars.slice(currentCursor + 1)].join('');
+      updateInput(next, currentCursor);
       return;
     }
     if (!key.ctrl && !key.meta && value) {
-      setInput((current) => {
-        const next = `${current}${value}`;
-        inputRef.current = next;
-        return next;
-      });
+      const inserted = Array.from(value);
+      const next = [...currentChars.slice(0, currentCursor), ...inserted, ...currentChars.slice(currentCursor)].join('');
+      updateInput(next, currentCursor + inserted.length);
     }
   });
 
@@ -330,8 +372,7 @@ function App() {
     setLines((current) => [...stripThinking(current), {kind: 'user', text: prompt}]);
     setActivityText('ViMax thinking');
     stateRef.current = createMappingState();
-    inputRef.current = '';
-    setInput('');
+    updateInput('', 0);
     setBusy(true);
     child.stdin.write(`${prompt}\n`);
   }
@@ -342,10 +383,28 @@ function App() {
       {showSlashPopup && <SlashCommandPopup matches={slashMatches} width={width} />}
       <Box borderStyle="round" borderColor="white" paddingX={1} marginTop={1} width={width}>
         <Text color={busy ? 'gray' : 'white'}>{busy ? '· ' : '› '}</Text>
-        <Text color={busy ? 'gray' : 'white'}>{input}</Text>
-        {!busy && <Text color="gray">▌</Text>}
+        <InputText value={input} cursor={cursor} busy={busy} />
       </Box>
     </Box>
+  );
+}
+
+
+function InputText({value, cursor, busy}: {value: string; cursor: number; busy: boolean}) {
+  const chars = Array.from(value);
+  const boundedCursor = Math.max(0, Math.min(cursor, chars.length));
+  const before = chars.slice(0, boundedCursor).join('');
+  const current = chars[boundedCursor] ?? ' ';
+  const after = chars.slice(boundedCursor + 1).join('');
+  if (busy) {
+    return <Text color="gray">{value}</Text>;
+  }
+  return (
+    <Text>
+      <Text color="white">{before}</Text>
+      <Text color="black" backgroundColor="white">{current}</Text>
+      <Text color="white">{after}</Text>
+    </Text>
   );
 }
 
