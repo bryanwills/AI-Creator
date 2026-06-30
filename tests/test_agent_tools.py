@@ -85,6 +85,40 @@ class ToolRegistryTests(unittest.IsolatedAsyncioTestCase):
             bad_status = await executor.execute(ToolCall(name="todo_write", arguments={"items": [{"content": "x", "status": "blocked"}]}), TurnControl())
             self.assertFalse(bad_status.result.ok)
 
+    async def test_read_json_supports_virtual_session_json_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            index = SessionIndex(tmp)
+            record = index.create(session_id="20260630-125442-vimax", idea="surfing")
+            registry = build_builtin_registry(tmp, index)
+            executor = ToolExecutor(registry, index)
+            result = await executor.execute(
+                ToolCall(name="read_json", arguments={"path": f"{record['working_dir']}/session.json"}),
+                TurnControl(),
+            )
+            self.assertTrue(result.result.ok)
+            payload = json.loads(result.result.content)
+            self.assertEqual(payload["session"]["session_id"], "20260630-125442-vimax")
+            self.assertEqual(payload["source"], ".vimax/sessions.json")
+            self.assertTrue(result.result.metadata["virtual_path"])
+
+    async def test_read_file_supports_virtual_session_log_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            index = SessionIndex(tmp)
+            record = index.create(session_id="20260630-125442-vimax", idea="surfing")
+            index.append_turn_record(record["session_id"], {"turn_id": "turn-1", "status": "completed", "final_assistant_text": "done"})
+            registry = build_builtin_registry(tmp, index)
+            executor = ToolExecutor(registry, index)
+            result = await executor.execute(
+                ToolCall(name="read_file", arguments={"path": ".vimax/logs/20260630-125442-vimax.log"}),
+                TurnControl(),
+            )
+            self.assertTrue(result.result.ok)
+            payload = json.loads(result.result.content)
+            self.assertEqual(payload["session_id"], "20260630-125442-vimax")
+            self.assertEqual(payload["source"], ".vimax/logs/*.jsonl")
+            self.assertEqual(payload["records"][0]["turn_id"], "turn-1")
+            self.assertTrue(result.result.metadata["virtual_path"])
+
     def test_concurrency_partition_groups_read_tools(self):
         with tempfile.TemporaryDirectory() as tmp:
             registry = build_builtin_registry(tmp, SessionIndex(tmp))

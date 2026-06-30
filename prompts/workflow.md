@@ -15,7 +15,7 @@ input_idea
 ```
 
 `.working_dir/<session_id-or-run_id>/` is the artifact authority. `.vimax/sessions.json` is only a session index. `.vimax/memory.md` stores user preferences only.
-
+There is no physical `.working_dir/<session_id>/session.json` file and no physical `.vimax/logs/<session_id>.log` file; use `.vimax/sessions.json` and `.vimax/logs/*.jsonl` as the real state/log sources.\n
 Idea mode writes scene-level planning artifacts under `idea2video/scene_<idx>/`. Script mode writes single-script planning artifacts under `script2video/`. Use `vimax_narrative_planning` to create or revise structured text artifacts. Use `vimax_render_video` only when narrative planning dependencies exist.
 
 When the user asks to continue an existing project or fill missing text planning nodes, call `vimax_narrative_planning` for the active session. You may omit `idea` and `script`; the tool will reuse the active session source and existing cached artifacts. Do not use fake `revision_target` values such as `missing_structured_text_artifacts`; revision targets must be real relative file paths.
