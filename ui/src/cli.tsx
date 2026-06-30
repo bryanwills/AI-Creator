@@ -154,6 +154,7 @@ function App() {
   const stateRef = useRef<MappingState>(createMappingState());
   const childRef = useRef<ChildProcessWithoutNullStreams | null>(null);
   const bufferRef = useRef('');
+  const responseIdleTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const width = useMemo(() => Math.max(20, terminalWidth - 6), [terminalWidth]);
   const thinkingFrame = useThinkingFrame(busy);
@@ -218,16 +219,24 @@ function App() {
       submit(inputRef.current);
       return;
     }
-    if (key.backspace) {
+    const isBackspace = key.backspace || value === '\u007f' || value === '\b' || value === '\u001b\u007f';
+    const isDelete = key.delete || value === '\u001b[3~' || value === '\u001b[P';
+    if (isBackspace) {
       if (currentCursor === 0) return;
       const next = [...currentChars.slice(0, currentCursor - 1), ...currentChars.slice(currentCursor)].join('');
       updateInput(next, currentCursor - 1);
       return;
     }
-    if (key.delete) {
-      if (currentCursor >= currentChars.length) return;
-      const next = [...currentChars.slice(0, currentCursor), ...currentChars.slice(currentCursor + 1)].join('');
-      updateInput(next, currentCursor);
+    if (isDelete) {
+      if (currentCursor < currentChars.length) {
+        const next = [...currentChars.slice(0, currentCursor), ...currentChars.slice(currentCursor + 1)].join('');
+        updateInput(next, currentCursor);
+        return;
+      }
+      if (currentCursor > 0) {
+        const next = [...currentChars.slice(0, currentCursor - 1), ...currentChars.slice(currentCursor)].join('');
+        updateInput(next, currentCursor - 1);
+      }
       return;
     }
     if (!key.ctrl && !key.meta && value) {
@@ -275,6 +284,7 @@ function App() {
     });
 
     return () => {
+      if (responseIdleTimerRef.current) clearTimeout(responseIdleTimerRef.current);
       child.kill();
     };
   }, []);
@@ -300,7 +310,10 @@ function App() {
     }
     updateWorkspaceMeta(event);
     updateActivity(event);
-    if (event.type === 'done' || event.type === 'error') setBusy(false);
+    if (event.type === 'done' || event.type === 'error' || event.type === 'session') {
+      clearResponseIdleTimer();
+      setBusy(false);
+    }
     setLines((current) => {
       const mapped = applyStreamEvent(stripThinking(current), stateRef.current, event);
       stateRef.current = mapped.state;
@@ -308,29 +321,54 @@ function App() {
     });
   }
 
+  function clearResponseIdleTimer() {
+    if (!responseIdleTimerRef.current) return;
+    clearTimeout(responseIdleTimerRef.current);
+    responseIdleTimerRef.current = null;
+  }
+
+  function scheduleResponseIdleClear() {
+    clearResponseIdleTimer();
+    responseIdleTimerRef.current = setTimeout(() => {
+      responseIdleTimerRef.current = null;
+      setBusy(false);
+    }, 1500);
+  }
+
   function updateActivity(event: StreamEvent) {
     if (event.type === 'tool_start') {
+      clearResponseIdleTimer();
       setActivityText(`tool ${event.tool?.name ?? 'unknown'} running`);
       return;
     }
     if (event.type === 'tool_progress') {
+      clearResponseIdleTimer();
       const stage = event.progress?.stage;
       setActivityText(stage ? `tool ${event.tool?.name ?? 'unknown'}: ${stage}` : `tool ${event.tool?.name ?? 'unknown'} running`);
       return;
     }
     if (event.type === 'tool_result') {
+      clearResponseIdleTimer();
       setActivityText('ViMax thinking');
       return;
     }
     if (event.type === 'token') {
       setActivityText('ViMax responding');
+      scheduleResponseIdleClear();
       return;
     }
     if (event.type === 'status') {
+      clearResponseIdleTimer();
       setActivityText(statusActivityLabel(event.phase, event.message));
       return;
     }
+    if (event.type === 'done' || event.type === 'error' || event.type === 'session') {
+      clearResponseIdleTimer();
+      setActivityText('ViMax thinking');
+      return;
+    }
     if (event.type === 'turn') {
+      clearResponseIdleTimer();
       setActivityText('ViMax thinking');
     }
   }
@@ -370,6 +408,7 @@ function App() {
       return;
     }
     setLines((current) => [...stripThinking(current), {kind: 'user', text: prompt}]);
+    clearResponseIdleTimer();
     setActivityText('ViMax thinking');
     stateRef.current = createMappingState();
     updateInput('', 0);

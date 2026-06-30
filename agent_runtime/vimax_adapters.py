@@ -182,6 +182,7 @@ class ViMaxAdapters:
                         {"session_id": session_id, "scene_index": idx},
                     )
             else:
+                (script_dir / "script.txt").write_text(script, encoding="utf-8")
                 script_pipeline = Script2VideoPipeline(chat_model=chat_model, image_generator=dummy, video_generator=dummy, working_dir=str(script_dir))
                 if runtime:
                     runtime.emit_progress("Script pipeline initialized", stage="script_pipeline_ready", metadata={"session_id": session_id})
@@ -710,6 +711,9 @@ def _load_characters(path: Path) -> list[CharacterInScene]:
 
 
 def _load_script_text(working_dir: Path) -> str:
+    script_text = working_dir / "script2video" / "script.txt"
+    if script_text.exists():
+        return script_text.read_text(encoding="utf-8")
     idea_script = working_dir / "idea2video" / "script.json"
     if idea_script.exists():
         payload = json.loads(idea_script.read_text(encoding="utf-8"))
@@ -785,7 +789,7 @@ def _missing_render_dependencies(checklist: dict[str, bool]) -> list[str]:
     if _ready_for_render(checklist):
         return []
     idea_required = ["idea2video/story.txt", "idea2video/characters.json", "idea2video/script.json", "idea2video/scene_*/storyboard.json", "idea2video/scene_*/shots/*/shot_description.json", "idea2video/scene_*/camera_tree.json"]
-    script_required = ["script2video/characters.json", "script2video/storyboard.json", "script2video/shots/*/shot_description.json", "script2video/camera_tree.json"]
+    script_required = ["script2video/script.txt", "script2video/characters.json", "script2video/storyboard.json", "script2video/shots/*/shot_description.json", "script2video/camera_tree.json"]
     novel_required = ["novel2video/novel/novel_compressed.txt", "novel2video/events/event_*.json", "novel2video/relevant_chunks/event_*", "novel2video/scenes/event_*/scene_*.json", "novel2video/global_information/characters/event_level/*.json", "novel2video/global_information/characters/novel_level/*.json"]
     return [f"idea mode: {path}" for path in idea_required if not checklist.get(path)] + [f"script mode: {path}" for path in script_required if not checklist.get(path)] + [f"novel mode: {path}" for path in novel_required if not checklist.get(path)]
 
@@ -803,4 +807,4 @@ def _novel_mode_ready(checklist: dict[str, bool]) -> bool:
 
 
 def _script_mode_ready(checklist: dict[str, bool]) -> bool:
-    return bool(checklist.get("script2video/characters.json") and checklist.get("script2video/storyboard.json") and checklist.get("script2video/shots/*/shot_description.json") and checklist.get("script2video/camera_tree.json"))
+    return bool(checklist.get("script2video/script.txt") and checklist.get("script2video/characters.json") and checklist.get("script2video/storyboard.json") and checklist.get("script2video/shots/*/shot_description.json") and checklist.get("script2video/camera_tree.json"))

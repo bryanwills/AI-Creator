@@ -6,6 +6,13 @@ from agent_runtime.session_index import SessionIndex
 
 
 class SessionIndexTests(unittest.TestCase):
+    def test_generated_session_id_round_trips_after_slug_truncation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            index = SessionIndex(tmp)
+            record = index.create(idea="A red ball rolls across a white table.")
+            self.assertIsNotNone(index.get(record["session_id"]))
+            self.assertEqual(index.working_dir(record["session_id"]).name, record["session_id"])
+
     def test_create_session_and_checklist(self):
         with tempfile.TemporaryDirectory() as tmp:
             index = SessionIndex(tmp)

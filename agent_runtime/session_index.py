@@ -263,6 +263,7 @@ class SessionIndex:
             "idea2video/scene_*/shots/*/shot_description.json": bool(idea_scene_shot_desc_groups) and all(idea_scene_shot_desc_groups),
             "idea2video/scene_*/shots/*/*_selector_output.json": bool(idea_scene_selector_outputs),
             "idea2video/final_video.mp4": (idea_dir / "final_video.mp4").exists(),
+            "script2video/script.txt": (root / "script2video" / "script.txt").exists(),
             "script2video/characters.json": (root / "script2video" / "characters.json").exists(),
             "script2video/storyboard.json": (root / "script2video" / "storyboard.json").exists(),
             "script2video/shots/*/shot_description.json": bool(script_shot_descs),
@@ -308,7 +309,7 @@ class SessionIndex:
 
     def _new_session_id(self, source: str, sessions: dict[str, Any]) -> str:
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        slug = re.sub(r"[^a-zA-Z0-9]+", "-", source.lower()).strip("-")[:32] or "vimax"
+        slug = (re.sub(r"[^a-zA-Z0-9]+", "-", source.lower()).strip("-")[:32].strip("-") or "vimax")
         return self._dedupe_session_id(f"{stamp}-{slug}", sessions)
 
     def _dedupe_session_id(self, base: str, sessions: dict[str, Any]) -> str:

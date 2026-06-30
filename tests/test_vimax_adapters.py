@@ -188,6 +188,23 @@ class ViMaxAdapterTests(unittest.IsolatedAsyncioTestCase):
             self.assertFalse((root / "script2video" / "final_video.mp4").exists())
 
 
+    async def test_script_mode_persists_source_script_for_render(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            index = SessionIndex(tmp)
+            adapter = ViMaxAdapters(Path(tmp), index)
+            script = "A red ball rolls across a white table."
+            with patch("agent_runtime.vimax_adapters._build_chat_model", return_value=object()), \
+                 patch("agent_runtime.vimax_adapters.Script2VideoPipeline", FakeScriptPipeline):
+                result = await adapter.vimax_narrative_planning({"script": script, "user_requirement": "one shot"})
+            self.assertTrue(result.ok)
+            payload = json.loads(result.content)
+            root = Path(tmp) / payload["working_dir"]
+            self.assertEqual((root / "script2video" / "script.txt").read_text(encoding="utf-8"), script)
+            self.assertEqual(index.artifact_checklist(payload["session_id"])["script2video/script.txt"], True)
+            from agent_runtime.vimax_adapters import _load_script_text
+            self.assertEqual(_load_script_text(root), script)
+
+
     async def test_narrative_planning_forwards_pipeline_progress(self):
         with tempfile.TemporaryDirectory() as tmp:
             index = SessionIndex(tmp)
