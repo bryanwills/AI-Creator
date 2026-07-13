@@ -43,7 +43,7 @@ class CharacterPortraitsGenerator:
         character: CharacterInScene,
         style: str,
     ) -> ImageOutput:
-        features = "(static) " + character.static_features + "; (dynamic) " + character.dynamic_features
+        features = "(static) " + (character.static_features or "") + "; (dynamic) " + (character.dynamic_features or "")
         prompt = prompt_template_front.format(
             identifier=character.identifier_in_scene,
             features=features,
