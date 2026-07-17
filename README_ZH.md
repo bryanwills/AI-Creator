@@ -8,31 +8,20 @@
   </div>
 
   <p align="center">
-    <img src="https://img.shields.io/badge/🐍Python-3.12-00d9ff?style=for-the-badge&logo=python&logoColor=white&labelColor=1a1a2e">
-	<a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/badge/⚡uv-Ready-ff6b6b?style=for-the-badge&logo=python&logoColor=white&labelColor=1a1a2e"></a>
-	<img src="https://img.shields.io/badge/License-MIT-4ecdc4?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="MIT License">
+    <img src="https://img.shields.io/badge/Python-3.12-00d9ff?style=flat-square&logo=python&logoColor=white&labelColor=1a1a2e">
+	<a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/badge/uv-Ready-ff6b6b?style=flat-square&logo=uv&logoColor=white&labelColor=1a1a2e"></a>
+	<img src="https://img.shields.io/badge/License-MIT-4ecdc4?style=flat-square&logo=opensourceinitiative&logoColor=white" alt="MIT License">
+    <a href='https://www.youtube.com/@AI-Creator-is-here'><img src='https://img.shields.io/badge/YouTube-ff0000?style=flat-square&logo=youtube&logoColor=white&labelColor=1a1a2e' /></a>
+    <a href='https://arxiv.org/abs/2606.07649'><img src='https://img.shields.io/badge/arXiv-2606.07649-b31b1b?style=flat-square&logo=arxiv&logoColor=white&labelColor=1a1a2e' /></a>
   </p>
 
   <p align="center">
-    <a href="./Communication.md"><img src="https://img.shields.io/badge/💬Feishu-Group-07c160?style=for-the-badge&logoColor=white&labelColor=1a1a2e"></a>
-    <a href="./Communication.md"><img src="https://img.shields.io/badge/WeChat-Group-07c160?style=for-the-badge&logo=wechat&logoColor=white&labelColor=1a1a2e"></a>
+    <a href="./Communication.md"><img src="https://img.shields.io/badge/Feishu-Group-07c160?style=flat-square&logo=lark&logoColor=white&labelColor=1a1a2e"></a>
+    <a href="./Communication.md"><img src="https://img.shields.io/badge/WeChat-Group-07c160?style=flat-square&logo=wechat&logoColor=white&labelColor=1a1a2e"></a>
+	<a href="readme.md"><img src="https://img.shields.io/badge/English-1a1a2e?style=flat-square"></a>
+    <a href="README_ZH.md"><img src="https://img.shields.io/badge/中文版-1a1a2e?style=flat-square"></a>
+    <a href="#quick-start"><img src="https://img.shields.io/badge/Quick%20Start-Get%20Started%20Now-FFC107?style=flat-square&logo=rocket&logoColor=white&labelColor=1a1a2e"></a>
   </p>
-
-  <p align="center">
-    <a href='https://www.youtube.com/@AI-Creator-is-here'><img src='https://img.shields.io/badge/YouTube-ff0000?style=for-the-badge&logo=youtube&logoColor=white&labelColor=1a1a2e' /></a>
-    <a href='https://arxiv.org/abs/2606.07649'><img src='https://img.shields.io/badge/arXiv-2606.07649-b31b1b?style=for-the-badge&logo=arxiv&logoColor=white&labelColor=1a1a2e' /></a>
-  </p>
-
-</div>
-<div align="center">
-	
-<p>
-	<a href="readme.md"><img src="https://img.shields.io/badge/English-1a1a2e?style=for-the-badge"></a>
-    <a href="README_ZH.md"><img src="https://img.shields.io/badge/中文版-1a1a2e?style=for-the-badge"></a>
-</p>
-    <a href="#quick-start" style="text-decoration: none;">
-      <img src="https://img.shields.io/badge/Quick%20Start-Get%20Started%20Now-FFC107?style=for-the-badge&logo=rocket&logoColor=white&labelColor=1a1a2e">
-    </a>
 
 </div>
 
@@ -62,8 +51,8 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 
 - [💡 核心特性](#核心特性)
 - [🔮 演示示例](#演示示例)
-- [🏗️ 系统架构](#️-系统架构)
-- [🚀 快速开始](#快速开始)
+- [🏗️ 系统架构](#系统架构)
+- [🚀 快速开始](#quick-start)
 
 ---
 ## 💡核心特性
@@ -272,7 +261,9 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 ---
 
 
-## 🏗️ 系统架构
+<details>
+<summary><h2 id="系统架构">🏗️ 系统架构</h2></summary>
+
 
 ### 📊 **系统概览**
 
@@ -301,11 +292,11 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 ⚡ **高效并行镜头生成**  
 对同一机位拍摄的连续镜头进行并行处理，极大提升视频生产效率。
 
+</details>
 
+<details>
+<summary><h3>🤖 <strong>多智能体视频生成流水线</strong></h3></summary>
 
-
-
-### 🤖 <strong>多智能体视频生成流水线</strong>
 
 <div align="center">
   <table align="center" width="100%" style="border: none; border-collapse: collapse;">
@@ -372,6 +363,7 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
   </table>
 </div>
 
+</details>
 
 
 ## 🚀Quick Start
@@ -391,7 +383,9 @@ uv sync
 ```
 
 
-### 🧠 **Agent TUI / Agents Loop**
+<details>
+<summary><h3>🧠 <strong>Agent TUI / Agents Loop</strong></h3></summary>
+
 ViMax also provides a minimal TUI for interactive agent-based video creation. Configure `configs/agent.local.yaml` for the LLM, image, and video providers, then start the TUI from the ViMax root directory.
 ```bash
 vimax tui
@@ -403,6 +397,8 @@ vimax tui new
 vimax tui resume
 vimax tui resume <session_id>
 ```
+
+</details>
 
 ### 🎯 **Usage**
 main_idea2video.py is used to convert your ideas into videos.
