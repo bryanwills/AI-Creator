@@ -49,109 +49,22 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 
 ## 📑 目录
 
-- [💡 核心特性](#核心特性)
+- [✨ 核心特性](#核心特性)
 - [🔮 演示示例](#演示示例)
 - [🚀 快速开始](#quick-start)
 
 ---
-## 💡核心特性
+## ✨ 核心特性
 
-<br/>
+ViMax 是一个智能体驱动的视频创作框架，在统一且可扩展的工作流中串联叙事规划、视觉一致性、图像生成、视频生成与成片组装。
 
-<table align="center" width="100%" style="border: none; table-layout: fixed;">
-<tr>
-<td width="25%" align="center" style="vertical-align: top; padding: 20px;">
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<h3 style="margin: 0; padding: 0;">🌟 <strong>创意到视频</strong></h3>
-</div>
-
-<div align="center" style="margin: 15px 0;">
-  <img src="https://img.shields.io/badge/创意-生成-ff6b6b?style=for-the-badge&logo=algorithm&logoColor=white" alt="算法徽章" />
-</div>
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<p align="center"><strong>从灵感到银幕</strong></p>
-</div>
-
-<div style="height: 60px; display: flex; align-items: center; justify-content: center;">
-<p align="center">通过智能多智能体工作流，将<strong>原始创意</strong>自动转化为完整视频故事，涵盖<strong>叙事构建、角色设计与视频制作</strong>全流程。
-</p>
-</div>
-
-
-
-</td>
-<td width="25%" align="center" style="vertical-align: top; padding: 20px;">
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<h3 style="margin: 0; padding: 0;">🎨 <strong>小说到视频</strong></h3>
-</div>
-
-<div align="center" style="margin: 15px 0;">
-  <img src="https://img.shields.io/badge/小说-改编-4ecdc4?style=for-the-badge&logo=book&logoColor=white" alt="前端徽章" />
-</div>
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<p align="center"><strong>智能文学改编引擎</strong></p>
-</div>
-
-<div style="height: 60px; display: flex; align-items: center; justify-content: center;">
-<p align="center">将<strong>完整小说</strong>智能压缩并转化为<strong>分集视频内容</strong>，实现角色追踪、叙事压缩与逐场景视觉化改编。</p>
-</div>
-
-
-
-</td>
-<td width="25%" align="center" style="vertical-align: top; padding: 20px;">
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<h3 style="margin: 0; padding: 0;">⚙️ <strong>剧本到视频</strong></h3>
-</div>
-
-<div align="center" style="margin: 15px 0;">
-  <img src="https://img.shields.io/badge/剧本-改编-9b59b6?style=for-the-badge&logo=server&logoColor=white" alt="后端徽章" />
-</div>
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<p align="center"><strong>无限剧本视频创作</strong></p>
-</div>
-
-<div style="height: 60px; display: flex; align-items: center; justify-content: center;">
-<p align="center">自由创作<strong>任意剧本</strong>——从个人故事到史诗冒险，全面掌控视觉叙事的每个细节。</p>
-</div>
-
-
-
-
-
-</td>
-<td width="25%" align="center" style="vertical-align: top; padding: 20px;">
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<h3 style="margin: 0; padding: 0;">🤳 <strong>智能客串</strong></h3>
-</div>
-
-<div align="center" style="margin: 15px 0;">
-  <img src="https://img.shields.io/badge/互动-生成-FFC107?style=for-the-badge&logo=server&logoColor=white" alt="后端徽章" />
-</div>
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<p align="center"><strong>用你的照片生成视频</strong></p>
-</div>
-
-<div style="height: 60px; display: flex; align-items: center; justify-content: center;">
-<p align="center"><strong>创建属于你的客串视频</strong>，将自己融入无限创意剧本、电影级镜头与互动剧情中，成为故事中的明星角色。</p>
-</div>
-
-
-
-</td>
-</tr>
-</table>
-
-<br/>
-
+- **Idea2Video** — 将简短创意扩展为结构化故事、角色、剧本、分镜、镜头设计与最终视频。
+- **Script2Video** — 将明确剧本转化为可控的多场景、多镜头视频，同时保留原有创作意图。
+- **Novel2Video** — 通过叙事压缩、角色追踪与场景规划，将长篇小说改编为分集视觉内容。
+- **AutoCameo** — 根据参考照片将人物或宠物融入生成故事，并保持外观一致性。
+- **Agent Loop 与 TUI** — 在统一交互工作区中讨论创意、修改规划、恢复 session、检查文本产物并控制渲染。
+- **一致性制作流程** — 端到端协调参考图、首帧、机位连续性与最终组装。
+- **并行加速生成** — 并发生成可并行处理的镜头与媒体资产，缩短多镜头视频制作时间。
 
 ---
 <table>
