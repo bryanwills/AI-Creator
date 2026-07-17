@@ -1,9 +1,12 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ArrowUp,
-  Check,
+  Brain,
+  Braces,
   CircleStop,
+  Clock3,
   FileJson,
+  FilePenLine,
   FileText,
   Film,
   Folder,
@@ -14,9 +17,13 @@ import {
   PanelLeftOpen,
   PanelRight,
   Save,
+  Search,
   Settings,
+  ListChecks,
+  Terminal,
   Trash2,
   Video,
+  Wrench,
   X,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
@@ -335,7 +342,7 @@ export default function App() {
               <button onClick={() => setLoadError('')} aria-label="Dismiss error"><X size={15} /></button>
             </div>
           )}
-          {showSlashCommands && <SlashCommandMenu matches={slashMatches} onSelect={(command) => {
+          {showSlashCommands && <SlashCommandMenu matches={slashMatches} contextPercent={contextPercent} onSelect={(command) => {
             setDraft(command);
             textareaRef.current?.focus();
           }} />}
@@ -361,11 +368,6 @@ export default function App() {
               rows={1}
             />
             <div className="composer-controls">
-              <div className="context-meter composer-context" title={`${chat.promptTokens.toLocaleString()} / ${CONTEXT_TARGET.toLocaleString()} context tokens`}>
-                <span>Context</span>
-                <i><b style={{width: `${Math.max(2, contextPercent)}%`}} /></i>
-                <span>{contextPercent}%</span>
-              </div>
               <div className="composer-spacer" />
               {chat.busy ? (
                 <button className="send-button stop" onClick={() => void stop()} aria-label="Stop generation"><CircleStop size={18} /></button>
@@ -497,15 +499,45 @@ function MessageRow({message}: {message: Message}) {
 function ActivityRow({message}: {message: Message}) {
   const stage = message.stage ? humanize(message.stage) : '';
   const detail = stage.toLowerCase() === message.text.toLowerCase() ? message.text : [stage, message.text].filter(Boolean).join(' · ');
+  const toolKind = activityToolKind(message.tool);
   return (
     <div className={`activity-row status-${message.status || 'done'}`}>
-      <span className="activity-indicator">{message.status === 'running' ? <i /> : message.status === 'error' ? <X size={13} /> : <Check size={13} />}</span>
+      <span className={`activity-indicator tool-${toolKind}`}><ActivityToolIcon tool={message.tool} /></span>
       <div>
         <strong>{humanize(message.tool || 'Workflow')}</strong>
         <span>{detail}</span>
       </div>
     </div>
   );
+}
+
+function ActivityToolIcon({tool}: {tool?: string}) {
+  const name = (tool || '').toLowerCase();
+  const props = {size: 13, strokeWidth: 1.8};
+  if (name.includes('narrative_planning') || name.includes('novel_planning')) return <FilePenLine {...props} />;
+  if (name.includes('render_video')) return <Film {...props} />;
+  if (name === 'view_image' || name.includes('image')) return <ImageIcon {...props} />;
+  if (name === 'read_json' || name === 'write_json') return <Braces {...props} />;
+  if (name === 'read_file' || name === 'write_file') return <FileText {...props} />;
+  if (name === 'list_files' || name === 'glob_files') return <Folder {...props} />;
+  if (name === 'search_text') return <Search {...props} />;
+  if (name.startsWith('memory_')) return <Brain {...props} />;
+  if (name.startsWith('todo_')) return <ListChecks {...props} />;
+  if (name === 'run_shell') return <Terminal {...props} />;
+  if (name === 'sleep') return <Clock3 {...props} />;
+  return <Wrench {...props} />;
+}
+
+function activityToolKind(tool?: string) {
+  const name = (tool || '').toLowerCase();
+  if (name.includes('narrative_planning') || name.includes('novel_planning')) return 'planning';
+  if (name.includes('render_video')) return 'render';
+  if (name === 'view_image' || name.includes('image')) return 'image';
+  if (name.startsWith('memory_')) return 'memory';
+  if (name.startsWith('todo_')) return 'todo';
+  if (name === 'run_shell') return 'shell';
+  if (name === 'sleep') return 'time';
+  return 'file';
 }
 
 function ThinkingRow({messages}: {messages: Message[]}) {
@@ -518,12 +550,12 @@ function ThinkingRow({messages}: {messages: Message[]}) {
   );
 }
 
-function SlashCommandMenu({matches, onSelect}: {matches: SlashCommandMatch[]; onSelect: (command: string) => void}) {
+function SlashCommandMenu({matches, contextPercent, onSelect}: {matches: SlashCommandMatch[]; contextPercent: number; onSelect: (command: string) => void}) {
   return (
     <div className="slash-command-menu" role="listbox" aria-label="Slash commands">
       {matches.length > 0 ? matches.map((command) => (
         <button key={command.name} role="option" aria-selected="false" onMouseDown={(event) => event.preventDefault()} onClick={() => onSelect(command.name)}>
-          <code><b>{command.matchedPrefix}</b><span>{command.unmatchedSuffix}</span></code>
+          <code><span><b>{command.matchedPrefix}</b><span>{command.unmatchedSuffix}</span></span>{command.name === '/compact' && <em>{contextPercent}%</em>}</code>
           <small>{command.description}</small>
         </button>
       )) : <span className="slash-command-empty">No matching commands</span>}
