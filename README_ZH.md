@@ -51,7 +51,6 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 
 - [💡 核心特性](#核心特性)
 - [🔮 演示示例](#演示示例)
-- [🏗️ 系统架构](#系统架构)
 - [🚀 快速开始](#quick-start)
 
 ---
@@ -261,38 +260,6 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 ---
 
 
-<details>
-<summary><h2 id="系统架构">🏗️ 系统架构</h2></summary>
-
-
-### 📊 **系统概览**
-
-**ViMax** 是一个多智能体视频生成框架，支持自动化多镜头视频生成，并确保角色与场景的一致性。系统能将你的创意无缝转化为对应视频，让你专注于讲故事，而非技术实现。
-
-🎯 **技术能力**：
-
-🧬 **智能长剧本生成**  
-基于 RAG 的长剧本引擎，可智能分析小说级长文本，并自动切分为多场景剧本格式，精准保留关键情节与角色对话。
-
-🪄 **表现力分镜设计**  
-基于用户需求与目标受众，运用电影语言生成富有表现力的镜头级分镜，为后续视频生成奠定叙事节奏。
-
-🔮 **多机位拍摄模拟**  
-模拟多机位拍摄，提供沉浸式观看体验，同时确保同一场景内角色位置与背景的一致性。
-
-🧸 **智能参考图选择**  
-智能选取当前视频首帧所需的参考图（包括前序时间线中的分镜），确保视频越长，多角色与环境元素越准确。
-
-⚙️ **自动化图像生成**  
-基于所选参考图与前序时间线的视觉逻辑，自动生成图像生成器提示词，合理安排角色与环境的空间交互位置。
-
-✅ **图像生成一致性校验**  
-并行生成多张图像，并通过 MLLM/VLM 选择最一致的图像作为首帧，模拟人类创作者的工作流程。
-
-⚡ **高效并行镜头生成**  
-对同一机位拍摄的连续镜头进行并行处理，极大提升视频生产效率。
-
-</details>
 
 ## 🚀Quick Start
 
@@ -312,7 +279,7 @@ uv sync
 
 
 <details>
-<summary><h3>🧠 <strong>Agent TUI / Agents Loop</strong></h3></summary>
+<summary>🧠 <strong>Agent TUI / Agents Loop</strong></summary>
 
 ViMax also provides a minimal TUI for interactive agent-based video creation. Configure `configs/agent.local.yaml` for the LLM, image, and video providers, then start the TUI from the ViMax root directory.
 ```bash
@@ -329,7 +296,7 @@ vimax tui resume <session_id>
 </details>
 
 <details>
-<summary><h3>🎯 <strong>Usage</strong></h3></summary>
+<summary>🎯 <strong>Usage</strong></summary>
 
 main_idea2video.py is used to convert your ideas into videos.
 You need to configure the model and API key information in the configs/idea2video.yaml file, including three parts—the chat model, the image generator, and the video generator, as shown below

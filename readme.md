@@ -63,7 +63,6 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 
 - [💡 Key Features](#key-features)
 - [🔮 Demos](#Video-Demos-Generated-from-Scratch)
-- [🏗️ Architecture](#architecture)
 - [🚀 Quick Start](#quick-start)
 
 ---
@@ -277,45 +276,6 @@ ViMax now also includes an **Agents Loop + TUI** workflow for interactive planni
 
 
 
-<details>
-<summary><h2 id="architecture">🏗️ Architecture</h2></summary>
-
-
-### 📊 **System Overview**
-
-**ViMax** is a multi-agent video framework that enables automated multi-shot video generation while ensuring character and scene consistency. Our system seamlessly translates your ideas into corresponding videos, allowing you to focus on storytelling rather than technical implementation.
-
-🎯 **Technical Capabilities**:
-
-🧬 **Intelligent Long Script Generation**
-
-RAG-based long script design engine that intelligently analyzes lengthy, novel-like stories and automatically segments them into a multi-scene script format. The process meticulously ensures that all key plot developments and character dialogues are accurately retained within the new structure.
-
-🪄 **Expressive Storyboard Design**
-
-Shot-level storyboard design system that create expressive storyboards through cinematography language based on user requirements and target audiences, which establishs the narrative rhythm for subsequent video generation.
-
-🔮 **Multi-camera Filming Simulation**
-
-Simulates multi-camera filming to deliver an immersive viewing experience while maintaining consistent character positioning and backgrounds within the same scene.
-
-🧸 **Intelligent Reference Images Selection**
-
-Intelligently select the reference image required for the first frame of the current video, including the storyboards that occurred in the previous timeline, to ensure the accuracy of multiple characters and environmental elements as the video becomes longer.
-
-⚙️ **Automated Images Generation**
-
-Based on the selected reference image and the visual logical order on the previous timeline, the prompt of the image generator is automatically generated to reasonably arrange the spatial interaction position between the character and the environment.
-
-✅ **Automated Image Generation Consistency Check**
-
-Generate multiple images in parallel and select the best consistent image as the first frame through MLLM/VLM to imitate the workflow of human creators.
-
-⚡ **High-efficiency Parallel Shot Generation**
-
-Parallel processing for sequential shots captured from the same camera enables highly efficient video production.
-
-</details>
 
 ## 🚀Quick Start
 
@@ -335,7 +295,7 @@ uv sync
 
 
 <details>
-<summary><h3>🧠 <strong>Agent TUI</strong></h3></summary>
+<summary>🧠 <strong>Agent TUI</strong></summary>
 
 ViMax also provides a minimal TUI for interactive agent-based video creation. Configure the model and API key information in `configs/agent.local.yaml`, including the LLM, image generator, and video generator, as shown below.
 ```yaml
@@ -373,7 +333,7 @@ You can also keep `configs/agent.local.yaml` empty and provide the same values t
 </details>
 
 <details>
-<summary><h3>🎯 <strong>Usage</strong></h3></summary>
+<summary>🎯 <strong>Usage</strong></summary>
 
 main_idea2video.py is used to convert your ideas into videos.
 You need to configure the model and API key information in the configs/idea2video.yaml file, including three parts—the chat model, the image generator, and the video generator, as shown below
