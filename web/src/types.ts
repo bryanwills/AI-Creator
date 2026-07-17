@@ -7,7 +7,6 @@ export type SessionSummary = {
   updatedAt: string;
   createdAt: string;
   compactionTurns: number;
-  checkpoints: boolean[];
 };
 
 export type ConfigSection = {

@@ -416,9 +416,6 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onT
                     <small>{relativeTime(session.updatedAt)} · {stageLabel(session.stage)}</small>
                   </span>
                 </button>
-                <span className="session-progress" aria-label={`${(session.checkpoints || []).filter(Boolean).length} of 5 checkpoints complete`}>
-                  {(session.checkpoints?.length ? session.checkpoints : [false, false, false, false, false]).map((complete, index) => <i key={index} className={complete ? 'is-complete' : ''} />)}
-                </span>
                 <button className="session-delete" onClick={() => onDelete(session)} aria-label={`Delete ${sessionTitle(session)}`} title="Delete project">
                   <Trash2 size={14} />
                 </button>

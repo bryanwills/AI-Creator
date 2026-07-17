@@ -9,9 +9,9 @@ export async function readSessionState(repoRoot) {
   const fallback = {activeSessionId: '', sessions: []};
   try {
     const payload = JSON.parse(await readFile(path.join(repoRoot, '.vimax', 'sessions.json'), 'utf8'));
-    const records = await Promise.all(Object.values(payload.sessions ?? {})
+    const records = Object.values(payload.sessions ?? {})
       .filter((record) => record && typeof record === 'object')
-      .map((record) => sanitizeSession(repoRoot, record)));
+      .map(sanitizeSession);
     records.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
     return {
       activeSessionId: String(payload.active_session_id ?? ''),
@@ -219,10 +219,9 @@ async function removeSessionLogRecords(repoRoot, sessionId) {
   }
 }
 
-async function sanitizeSession(repoRoot, record) {
-  const sessionId = String(record.session_id ?? '');
+function sanitizeSession(record) {
   return {
-    sessionId,
+    sessionId: String(record.session_id ?? ''),
     workingDir: String(record.working_dir ?? ''),
     stage: String(record.stage ?? 'created'),
     summary: String(record.summary ?? ''),
@@ -230,36 +229,5 @@ async function sanitizeSession(repoRoot, record) {
     updatedAt: String(record.updated_at ?? record.created_at ?? ''),
     createdAt: String(record.created_at ?? ''),
     compactionTurns: Number(record.compacted_turns ?? 0),
-    checkpoints: await sessionCheckpoints(repoRoot, sessionId, String(record.stage ?? 'created')),
   };
-}
-
-async function sessionCheckpoints(repoRoot, sessionId, stage) {
-  const files = [];
-  const root = resolveSessionRoot(repoRoot, sessionId);
-  async function walk(directory) {
-    let entries;
-    try {
-      entries = await readdir(directory, {withFileTypes: true});
-    } catch {
-      return;
-    }
-    for (const entry of entries) {
-      if (files.length >= 2_000 || entry.name.startsWith('.')) continue;
-      const absolute = path.join(directory, entry.name);
-      if (entry.isDirectory()) await walk(absolute);
-      else if (entry.isFile()) files.push(path.relative(root, absolute).split(path.sep).join('/').toLowerCase());
-    }
-  }
-  await walk(root);
-  const hasName = (...names) => files.some((file) => names.some((name) => file.endsWith(name)));
-  const hasExtension = (...extensions) => files.some((file) => extensions.some((extension) => file.endsWith(extension)));
-  const planned = ['narrative_planned', 'novel_planned', 'rendering', 'rendered'].includes(stage);
-  const rendered = stage === 'rendered';
-  const source = hasName('/story.txt', '/script.txt', '/script.json', '/novel.txt', '/novel_compressed.txt');
-  const narrative = planned || (source && hasName('/characters.json', '/script.json', '/storyboard.json', '/novel_compressed.txt'));
-  const shots = planned || hasName('/storyboard.json', '/camera_tree.json', '/shot_description.json');
-  const frames = rendered || hasExtension('.png', '.jpg', '.jpeg', '.webp') || hasName('_selector_output.json');
-  const video = rendered || hasName('/final_video.mp4') || hasExtension('.mp4', '.webm', '.mov');
-  return [source, narrative, shots, frames, video];
 }
