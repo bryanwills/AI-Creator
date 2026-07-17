@@ -182,7 +182,7 @@ ViMax now also includes an **Agents Loop + TUI** workflow for interactive planni
 
 ### ☄️ **RoadMap**
 
-- 🚧 🖥️ **Web frontend interface**
+- ✅ 🖥️ **Web frontend interface**
 - ✅ 🎬 **Seedance 2.0 Fast video generator support**
 - ✅ 🖼️ **GPT Image 2 image generator support**
 
@@ -243,6 +243,35 @@ vimax tui resume <session_id>
 ```
 
 You can also keep `configs/agent.local.yaml` empty and provide the same values through environment variables, such as `VIMAX_LLM_API_KEY`, `VIMAX_IMAGE_API_KEY`, and `VIMAX_VIDEO_API_KEY`.
+
+</details>
+
+<details>
+<summary><strong>Web UI</strong></summary>
+
+The Web UI uses the same ViMax agent runtime, sessions, tools, and `configs/agent.local.yaml` configuration as the TUI. Node.js 18 or newer is required.
+
+From the ViMax root directory, install the frontend dependencies once and start the local server:
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+Open [http://127.0.0.1:4173](http://127.0.0.1:4173) in your browser. The Web UI lets you create named projects, chat with the ViMax agent, run slash commands, inspect generated artifacts and renders, and update provider settings.
+
+The server binds to `127.0.0.1` by default. When ViMax runs on a remote machine, forward the port from your local computer:
+
+```bash
+ssh -N -L 4173:127.0.0.1:4173 <user>@<server>
+```
+
+If port `4173` is already in use, the Web UI may already be running. You can also choose another port:
+
+```bash
+VIMAX_WEB_PORT=4174 npm run dev
+```
 
 </details>
 
