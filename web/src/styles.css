@@ -671,7 +671,7 @@ a:focus-visible {
 .thinking-mark i {
   width: 4px;
   height: 4px;
-  background: var(--cyan);
+  background: #b9bec6;
   border-radius: 50%;
   animation: thinking 1.1s ease-in-out infinite;
 }
