@@ -192,7 +192,7 @@ uv sync
 
 
 <details>
-<summary>🧠 <strong>Agent TUI / Agents Loop</strong></summary>
+<summary><strong>Agent TUI / Agents Loop</strong></summary>
 
 ViMax also provides a minimal TUI for interactive agent-based video creation. Configure `configs/agent.local.yaml` for the LLM, image, and video providers, then start the TUI from the ViMax root directory.
 ```bash
@@ -209,7 +209,7 @@ vimax tui resume <session_id>
 </details>
 
 <details>
-<summary>🎯 <strong>Usage</strong></summary>
+<summary><strong>Usage</strong></summary>
 
 main_idea2video.py is used to convert your ideas into videos.
 You need to configure the model and API key information in the configs/idea2video.yaml file, including three parts—the chat model, the image generator, and the video generator, as shown below
