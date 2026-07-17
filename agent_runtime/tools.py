@@ -11,6 +11,7 @@ from pathlib import Path
 from threading import Event
 from typing import Any, Awaitable, Callable
 
+from .image_tools import ViewImageHandler
 from .models import ToolCall, ToolResult
 
 ToolHandler = Callable[..., Awaitable[ToolResult] | ToolResult]
@@ -186,6 +187,7 @@ def _type_to_json_schema(tp: type | tuple[type, ...]) -> dict[str, Any]:
 
 def build_builtin_registry(workspace_root: str | Path, session_index: Any, adapter_specs: list[ToolSpec] | None = None) -> ToolRegistry:
     root = Path(workspace_root).resolve()
+    view_image = ViewImageHandler(root, session_index)
 
     def safe_path(raw: Any) -> Path:
         path = (root / str(raw)).resolve()
@@ -392,6 +394,7 @@ def build_builtin_registry(workspace_root: str | Path, session_index: Any, adapt
         ToolSpec("list_files", "List direct children of a workspace path.", list_files, schema={"path": ToolArgumentSchema(str, False, ".")}, concurrency_safe=True),
         ToolSpec("glob_files", "Find workspace files with a glob pattern.", glob_files, schema={"pattern": ToolArgumentSchema(str, True)}, concurrency_safe=True),
         ToolSpec("search_text", "Search text in workspace files.", search_text, schema={"query": ToolArgumentSchema(str, True), "path": ToolArgumentSchema(str, False, "."), "max_results": ToolArgumentSchema(int, False, 100)}, concurrency_safe=True),
+        ToolSpec("view_image", "Load a PNG, JPEG, WebP, or GIF from the active session and present its pixels to the multimodal model. Accepts a session-relative path or a path prefixed by the active .working_dir session.", view_image, permission_mode="read-only", schema={"path": ToolArgumentSchema(str, True)}, concurrency_safe=True),
         ToolSpec("memory_read", "Read .vimax/memory.md user preferences.", memory_read, schema={}, concurrency_safe=True),
         ToolSpec("memory_write", "Replace .vimax/memory.md with user preference notes only.", memory_write, schema={"content": ToolArgumentSchema(str, True)}),
         ToolSpec("todo_read", "Read short-term todo items from .vimax/todo.json. This is not a task or team system.", todo_read, schema={}, concurrency_safe=True),

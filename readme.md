@@ -58,6 +58,7 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 
 ### 📰 **News**
 
+- **2026-07-17** 🎬 OpenRouter GPT Image 2 image generation and Seedance 2.0 Fast video generation support added.
 - **2026-06-28** 🛠️ Agent Loop and TUI stability update: stronger LLM retries, persistent render status, landscape image guards, and Script2Video resume fixes.
 - **2026-06-09** 📄 Technical report released.
 - **2026-06-08** 🤖 Agents Loop + TUI workflow integrated for interactive planning, revision, rendering control, session reuse, and context compaction.
@@ -280,8 +281,8 @@ ViMax now also includes an **Agents Loop + TUI** workflow for interactive planni
 ### ☄️ **RoadMap**
 
 - 🚧 🖥️ **Web frontend interface**
-- 🚧 🎬 **Seedance 2.0 video generator support**
-- 🚧 🖼️ **GPT-Image 2 image generator support**
+- ✅ 🎬 **Seedance 2.0 Fast video generator support**
+- ✅ 🖼️ **GPT Image 2 image generator support**
 
 ---
 
@@ -514,4 +515,3 @@ style = "Animate Style"
 <p align="center">
   <em> ❤️ Thanks for visiting ✨ ViMax!</em><br><br>
 </p>
-

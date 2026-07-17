@@ -51,6 +51,12 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 
 ---
 
+### 📰 **动态**
+
+- **2026-07-17** 🎬 新增 OpenRouter GPT Image 2 图像生成与 Seedance 2.0 Fast 视频生成支持。
+
+---
+
 
 ## 📑 目录
 
@@ -257,6 +263,14 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 
 ---
 
+### ☄️ **路线图**
+
+- 🚧 🖥️ **Web 前端界面**
+- ✅ 🎬 **Seedance 2.0 Fast 视频生成支持**
+- ✅ 🖼️ **GPT Image 2 图像生成支持**
+
+---
+
 
 ## 🏗️ 系统架构
 
@@ -448,4 +462,3 @@ style = "Animate Style"
 
 
 ---
-

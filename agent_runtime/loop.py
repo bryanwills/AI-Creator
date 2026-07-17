@@ -93,6 +93,7 @@ class AgentLoop:
             yield {"type": "status", "turn_id": control.turn_id, "phase": "executing_tools", "message": f"Running tools (round {tool_round})"}
             runtime_messages.append({"role": "assistant", "content": assistant.text or "", "tool_calls": [_openai_tool_call(call) for call in assistant.tool_calls]})
             round_results: list[ToolResult] = []
+            round_model_content: list[dict[str, Any]] = []
 
             for call in assistant.tool_calls:
                 yield {"type": "tool_start", "turn_id": control.turn_id, "tool": call.as_dict()}
@@ -115,6 +116,21 @@ class AgentLoop:
                 all_tool_results.append(result)
                 yield {"type": "tool_result", "turn_id": control.turn_id, "tool_result": result.as_dict()}
                 runtime_messages.append({"role": "tool", "tool_call_id": call.id, "name": result.name, "content": json.dumps(result.as_dict(), ensure_ascii=False)})
+                if result.model_content:
+                    round_model_content.extend(result.model_content)
+            if round_model_content:
+                runtime_messages.append(
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Tool-provided image observation(s). Inspect these pixels as evidence for the active task; this is not a new user request.",
+                            },
+                            *round_model_content,
+                        ],
+                    }
+                )
             tool_rounds.append({"tool_round": tool_round, "requested_tools": [call.as_dict() for call in assistant.tool_calls], "tool_results": [result.as_dict() for result in round_results]})
             transitions.append(_transition("executing_tools", "post_tool_decision", "tool_round_completed"))
             transitions.append(_transition("post_tool_decision", "sampling_assistant", "runtime_continuation_after_tools"))
