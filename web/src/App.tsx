@@ -478,6 +478,14 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onT
 function EmptyState() {
   return (
     <section className="empty-state">
+      <pre className="ascii-infinity" role="img" aria-label="ViMax infinity mark">{`    ######          ######
+  ###    ###      ###    ###
+ ##        ##    ##        ##
+##          ##  ##          ##
+##           ####           ##
+ ##         ##  ##         ##
+  ###     ###    ###     ###
+    #######        #######`}</pre>
       <h1>What should we create?</h1>
     </section>
   );
