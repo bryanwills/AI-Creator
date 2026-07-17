@@ -467,17 +467,6 @@ a:focus-visible {
   letter-spacing: 0;
 }
 
-.ascii-infinity {
-  margin: 0 0 20px;
-  color: #15191f;
-  font-family: ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
-  font-size: 10px;
-  font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: 0;
-  white-space: pre;
-}
-
 .message-stream {
   width: min(860px, calc(100% - 40px));
   margin: 0 auto;
@@ -1689,11 +1678,6 @@ a:focus-visible {
 
   .empty-state h1 {
     font-size: 23px;
-  }
-
-  .ascii-infinity {
-    margin-bottom: 16px;
-    font-size: 8px;
   }
 
   .composer-zone {
