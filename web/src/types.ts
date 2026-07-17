@@ -7,6 +7,19 @@ export type SessionSummary = {
   updatedAt: string;
   createdAt: string;
   compactionTurns: number;
+  checkpoints: boolean[];
+};
+
+export type ConfigSection = {
+  model_provider?: string;
+  model: string;
+  base_url: string;
+  api_key: string;
+  has_api_key: boolean;
+};
+
+export type AgentConfig = {
+  sections: Record<'llm' | 'image' | 'video' | 'embedding' | 'reranker', ConfigSection>;
 };
 
 export type Artifact = {

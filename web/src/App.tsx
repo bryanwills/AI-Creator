@@ -13,6 +13,8 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   PanelRight,
+  Save,
+  Settings,
   Sparkles,
   Trash2,
   Video,
@@ -20,13 +22,14 @@ import {
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import {deleteSession, getArtifacts, getHistory, getSessions, sendMessage, startAgent, stopAgent, subscribeToEvents} from './api';
+import {deleteSession, getAgentConfig, getArtifacts, getHistory, getSessions, saveAgentConfig, sendMessage, startAgent, stopAgent, subscribeToEvents} from './api';
 import {applyAgentEvent, appendLocalUser, composeAgentPrompt, createChatState, humanize} from './events';
-import type {AgentEvent, Artifact, ChatState, Message, SessionSummary} from './types';
+import {matchingSlashCommands, shouldShowSlashCommands, type SlashCommandMatch} from './slashCommands';
+import type {AgentConfig, AgentEvent, Artifact, ChatState, ConfigSection, Message, SessionSummary} from './types';
 
 const CONTEXT_TARGET = 160_000;
 
-type WorkspaceView = 'workspace' | 'renders';
+type WorkspaceView = 'workspace' | 'renders' | 'settings';
 
 export default function App() {
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
@@ -50,6 +53,8 @@ export default function App() {
 
   const selectedSession = sessions.find((session) => session.sessionId === selectedSessionId);
   const selectedArtifact = artifacts.find((artifact) => artifact.path === selectedArtifactPath) || artifacts[0];
+  const slashMatches = useMemo(() => matchingSlashCommands(draft), [draft]);
+  const showSlashCommands = shouldShowSlashCommands(draft, chat.busy);
 
   const refreshSessions = useCallback(async () => {
     const state = await getSessions();
@@ -237,6 +242,7 @@ export default function App() {
         onSelect={(sessionId) => void openSession(sessionId)}
         onWorkspace={() => setWorkspaceView('workspace')}
         onRenders={() => setWorkspaceView('renders')}
+        onSettings={() => setWorkspaceView('settings')}
         onDelete={setPendingDelete}
       />
 
@@ -252,10 +258,10 @@ export default function App() {
               </button>
             )}
             <div className="workspace-title-copy">
-              <strong>{sessionTitle(selectedSession)}</strong>
-              <span>{selectedSession?.workingDir || '.working_dir / new session'}</span>
+              <strong>{workspaceView === 'settings' ? 'Settings' : sessionTitle(selectedSession)}</strong>
+              <span>{workspaceView === 'settings' ? 'configs/agent.local.yaml' : selectedSession?.workingDir || '.working_dir / new session'}</span>
             </div>
-            {selectedSession && <StageBadge stage={selectedSession.stage} />}
+            {selectedSession && workspaceView !== 'settings' && <StageBadge stage={selectedSession.stage} />}
           </div>
           <div className="workspace-actions">
             <div className="context-meter" title={`${chat.promptTokens.toLocaleString()} / ${CONTEXT_TARGET.toLocaleString()} context tokens`}>
@@ -263,10 +269,12 @@ export default function App() {
               <i><b style={{width: `${Math.max(2, contextPercent)}%`}} /></i>
               <span>{contextPercent}%</span>
             </div>
-            <button className="icon-button artifact-toggle" onClick={() => setArtifactPanelOpen((value) => !value)} aria-label="Toggle artifacts">
-              <PanelRight size={18} />
-              {artifacts.length > 0 && <span className="count-badge">{artifacts.length}</span>}
-            </button>
+            {workspaceView !== 'settings' && (
+              <button className="icon-button artifact-toggle" onClick={() => setArtifactPanelOpen((value) => !value)} aria-label="Toggle artifacts">
+                <PanelRight size={18} />
+                {artifacts.length > 0 && <span className="count-badge">{artifacts.length}</span>}
+              </button>
+            )}
           </div>
         </header>
 
@@ -281,7 +289,7 @@ export default function App() {
               </div>
             )}
           </div>
-        ) : (
+        ) : workspaceView === 'renders' ? (
           <RendersView
             session={selectedSession}
             artifacts={artifacts}
@@ -290,15 +298,21 @@ export default function App() {
               setArtifactPanelOpen(true);
             }}
           />
+        ) : (
+          <SettingsView />
         )}
 
-        <div className="composer-zone">
+        {workspaceView !== 'settings' && <div className="composer-zone">
           {loadError && (
             <div className="inline-error" role="alert">
               <span>{loadError}</span>
               <button onClick={() => setLoadError('')} aria-label="Dismiss error"><X size={15} /></button>
             </div>
           )}
+          {showSlashCommands && <SlashCommandMenu matches={slashMatches} onSelect={(command) => {
+            setDraft(command);
+            textareaRef.current?.focus();
+          }} />}
           <div className={`composer ${chat.busy ? 'is-busy' : ''}`}>
             <div className="composer-project-strip">
               <Folder size={15} />
@@ -311,6 +325,11 @@ export default function App() {
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => {
+                if (event.key === 'Tab' && slashMatches[0]) {
+                  event.preventDefault();
+                  setDraft(slashMatches[0].name);
+                  return;
+                }
                 if (event.key === 'Enter' && !event.shiftKey) {
                   event.preventDefault();
                   void submit();
@@ -330,7 +349,7 @@ export default function App() {
               )}
             </div>
           </div>
-        </div>
+        </div>}
       </main>
 
       <ArtifactPanel
@@ -350,7 +369,7 @@ export default function App() {
   );
 }
 
-function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onToggle, onMobileClose, onNew, onSelect, onWorkspace, onRenders, onDelete}: {
+function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onToggle, onMobileClose, onNew, onSelect, onWorkspace, onRenders, onSettings, onDelete}: {
   open: boolean;
   mobileOpen: boolean;
   sessions: SessionSummary[];
@@ -362,6 +381,7 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onT
   onSelect: (sessionId: string) => void;
   onWorkspace: () => void;
   onRenders: () => void;
+  onSettings: () => void;
   onDelete: (session: SessionSummary) => void;
 }) {
   return (
@@ -369,7 +389,6 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onT
       {mobileOpen && <button className="sidebar-scrim" onClick={onMobileClose} aria-label="Close navigation" />}
       <aside className={`sidebar ${open ? 'is-open' : 'is-collapsed'} ${mobileOpen ? 'is-mobile-open' : ''}`}>
         <div className="sidebar-brand">
-          <div className="brand-mark"><Film size={17} /></div>
           <strong>ViMax</strong>
           <button className="icon-button sidebar-collapse desktop-only" onClick={onToggle} aria-label="Collapse navigation">
             <PanelLeftClose size={17} />
@@ -380,6 +399,7 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onT
           <button onClick={onNew}><MessageSquarePlus size={17} /><span>New project</span></button>
           <button className={activeView === 'workspace' ? 'is-active' : ''} onClick={onWorkspace}><Sparkles size={17} /><span>Workspace</span></button>
           <button className={activeView === 'renders' ? 'is-active' : ''} onClick={onRenders}><Video size={17} /><span>Renders</span></button>
+          <button className={activeView === 'settings' ? 'is-active' : ''} onClick={onSettings}><Settings size={17} /><span>Settings</span></button>
         </nav>
         <div className="session-section">
           <div className="section-label"><span>Projects</span><span>{sessions.length}</span></div>
@@ -396,6 +416,9 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onT
                     <small>{relativeTime(session.updatedAt)} · {stageLabel(session.stage)}</small>
                   </span>
                 </button>
+                <span className="session-progress" aria-label={`${(session.checkpoints || []).filter(Boolean).length} of 5 checkpoints complete`}>
+                  {(session.checkpoints?.length ? session.checkpoints : [false, false, false, false, false]).map((complete, index) => <i key={index} className={complete ? 'is-complete' : ''} />)}
+                </span>
                 <button className="session-delete" onClick={() => onDelete(session)} aria-label={`Delete ${sessionTitle(session)}`} title="Delete project">
                   <Trash2 size={14} />
                 </button>
@@ -425,9 +448,7 @@ function MessageRow({message}: {message: Message}) {
   if (message.role === 'activity') return <ActivityRow message={message} />;
   return (
     <article className={`message-row role-${message.role}`}>
-      <div className="message-avatar">{message.role === 'user' ? 'You' : message.role === 'error' ? '!' : 'V'}</div>
       <div className="message-body">
-        <div className="message-author">{message.role === 'user' ? 'You' : message.role === 'error' ? 'Runtime' : 'ViMax'}</div>
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={{a: (props) => <a {...props} target="_blank" rel="noreferrer" />}}>
           {message.text}
         </ReactMarkdown>
@@ -457,6 +478,116 @@ function ThinkingRow({messages}: {messages: Message[]}) {
       <span className="thinking-mark"><i /><i /><i /></span>
       <span>{running ? `${humanize(running.tool || 'ViMax')} · ${running.text}` : 'ViMax is thinking'}</span>
     </div>
+  );
+}
+
+function SlashCommandMenu({matches, onSelect}: {matches: SlashCommandMatch[]; onSelect: (command: string) => void}) {
+  return (
+    <div className="slash-command-menu" role="listbox" aria-label="Slash commands">
+      {matches.length > 0 ? matches.map((command) => (
+        <button key={command.name} role="option" aria-selected="false" onMouseDown={(event) => event.preventDefault()} onClick={() => onSelect(command.name)}>
+          <code><b>{command.matchedPrefix}</b><span>{command.unmatchedSuffix}</span></code>
+          <small>{command.description}</small>
+        </button>
+      )) : <span className="slash-command-empty">No matching commands</span>}
+    </div>
+  );
+}
+
+const CONFIG_SECTIONS: Array<{key: keyof AgentConfig['sections']; title: string; description: string}> = [
+  {key: 'llm', title: 'Agent LLM', description: 'Planning, tool selection, and conversation'},
+  {key: 'image', title: 'Image generation', description: 'Characters, keyframes, and shot frames'},
+  {key: 'video', title: 'Video generation', description: 'Shot clips and final video'},
+  {key: 'embedding', title: 'Embedding', description: 'Optional novel retrieval'},
+  {key: 'reranker', title: 'Reranker', description: 'Optional novel retrieval ranking'},
+];
+
+function SettingsView() {
+  const [config, setConfig] = useState<AgentConfig>();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    void getAgentConfig()
+      .then((payload) => !cancelled && setConfig(payload))
+      .catch((error) => !cancelled && setStatus(error instanceof Error ? error.message : String(error)))
+      .finally(() => !cancelled && setLoading(false));
+    return () => { cancelled = true; };
+  }, []);
+
+  function update(section: keyof AgentConfig['sections'], field: keyof ConfigSection, value: string) {
+    setStatus('');
+    setConfig((current) => current ? {
+      sections: {
+        ...current.sections,
+        [section]: {...current.sections[section], [field]: value},
+      },
+    } : current);
+  }
+
+  async function save() {
+    if (!config || saving) return;
+    setSaving(true);
+    setStatus('');
+    try {
+      setConfig(await saveAgentConfig(config));
+      setStatus('Saved');
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading) return <div className="settings-loading">Loading configuration…</div>;
+  if (!config) return <div className="settings-loading is-error">{status || 'Configuration unavailable'}</div>;
+  return (
+    <section className="settings-view">
+      <header>
+        <div><span>Local configuration</span><h1>Settings</h1></div>
+        <div className="settings-save-group">
+          {status && <span className={status === 'Saved' ? 'is-saved' : 'is-error'}>{status}</span>}
+          <button className="settings-save" onClick={() => void save()} disabled={saving}>
+            <Save size={15} />{saving ? 'Saving…' : 'Save'}
+          </button>
+        </div>
+      </header>
+      <div className="settings-sections">
+        {CONFIG_SECTIONS.map((definition) => (
+          <ConfigSectionEditor
+            key={definition.key}
+            definition={definition}
+            value={config.sections[definition.key]}
+            onChange={(field, value) => update(definition.key, field, value)}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ConfigSectionEditor({definition, value, onChange}: {
+  definition: {title: string; description: string};
+  value: ConfigSection;
+  onChange: (field: keyof ConfigSection, value: string) => void;
+}) {
+  return (
+    <section className="config-section">
+      <header><h2>{definition.title}</h2><p>{definition.description}</p></header>
+      <div className="config-fields">
+        {value.model_provider !== undefined && (
+          <label><span>Model provider</span><input value={value.model_provider} onChange={(event) => onChange('model_provider', event.target.value)} /></label>
+        )}
+        <label><span>Model</span><input value={value.model} onChange={(event) => onChange('model', event.target.value)} /></label>
+        <label className="config-field-wide"><span>Base URL</span><input value={value.base_url} onChange={(event) => onChange('base_url', event.target.value)} inputMode="url" /></label>
+        <label className="config-field-wide">
+          <span>API key <i className={value.has_api_key ? 'is-configured' : ''}>{value.has_api_key ? 'Configured' : 'Not configured'}</i></span>
+          <input type="password" value={value.api_key} onChange={(event) => onChange('api_key', event.target.value)} placeholder={value.has_api_key ? 'Leave blank to keep current key' : 'Enter API key'} autoComplete="off" />
+        </label>
+      </div>
+    </section>
   );
 }
 

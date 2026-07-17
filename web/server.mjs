@@ -4,6 +4,7 @@ import {createServer} from 'node:http';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
+import {readAgentConfig, saveAgentConfig} from './config-store.mjs';
 import {
   artifactContentType,
   deleteSession,
@@ -32,6 +33,14 @@ const server = createServer(async (request, response) => {
     }
     if (url.pathname === '/api/sessions' && request.method === 'GET') {
       return sendJson(response, 200, await readSessionState(repoRoot));
+    }
+    if (url.pathname === '/api/config' && request.method === 'GET') {
+      return sendJson(response, 200, await readAgentConfig(repoRoot));
+    }
+    if (url.pathname === '/api/config' && request.method === 'PUT') {
+      const config = await saveAgentConfig(repoRoot, await readJsonBody(request));
+      stopAgent('config');
+      return sendJson(response, 200, config);
     }
     if (url.pathname === '/api/sessions' && request.method === 'DELETE') {
       const sessionId = url.searchParams.get('session') || '';
@@ -196,7 +205,12 @@ function stopAgent(reason) {
   const child = agentProcess;
   agentProcess = null;
   child.kill('SIGTERM');
-  broadcast({type: 'bridge_status', status: 'stopped', message: reason === 'switch' ? 'Switching workspace' : 'Generation stopped'});
+  const message = reason === 'switch'
+    ? 'Switching workspace'
+    : reason === 'config'
+      ? 'Configuration updated'
+      : 'Generation stopped';
+  broadcast({type: 'bridge_status', status: 'stopped', message});
 }
 
 function agentCommand() {

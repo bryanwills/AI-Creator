@@ -1,4 +1,4 @@
-import type {AgentEvent, Artifact, Message, SessionSummary} from './types';
+import type {AgentConfig, AgentEvent, Artifact, Message, SessionSummary} from './types';
 
 export async function getSessions() {
   return request<{activeSessionId: string; sessions: SessionSummary[]}>('/api/sessions');
@@ -6,6 +6,14 @@ export async function getSessions() {
 
 export async function deleteSession(sessionId: string) {
   return request<{activeSessionId: string; sessions: SessionSummary[]}>(`/api/sessions?session=${encodeURIComponent(sessionId)}`, {method: 'DELETE'});
+}
+
+export async function getAgentConfig() {
+  return request<AgentConfig>('/api/config');
+}
+
+export async function saveAgentConfig(config: AgentConfig) {
+  return request<AgentConfig>('/api/config', {method: 'PUT', body: JSON.stringify(config)});
 }
 
 export async function getHistory(sessionId: string) {

@@ -30,7 +30,7 @@ describe('web bridge state', () => {
     const root = await fixture();
     const state = await readSessionState(root);
     expect(state.activeSessionId).toBe('session-1');
-    expect(state.sessions[0]).toMatchObject({sessionId: 'session-1', stage: 'rendering'});
+    expect(state.sessions[0]).toMatchObject({sessionId: 'session-1', stage: 'rendering', checkpoints: [false, true, true, false, false]});
   });
 
   it('restores persisted turn history', async () => {
