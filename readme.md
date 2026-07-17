@@ -9,31 +9,20 @@
   </div>
 
   <p align="center">
-    <img src="https://img.shields.io/badge/🐍Python-3.12-00d9ff?style=for-the-badge&logo=python&logoColor=white&labelColor=1a1a2e">
-	<a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/badge/⚡uv-Ready-ff6b6b?style=for-the-badge&logo=python&logoColor=white&labelColor=1a1a2e"></a>
-	<img src="https://img.shields.io/badge/License-MIT-4ecdc4?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="MIT License">
+    <img src="https://img.shields.io/badge/Python-3.12-00d9ff?style=flat-square&logo=python&logoColor=white&labelColor=1a1a2e">
+	<a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/badge/uv-Ready-ff6b6b?style=flat-square&logo=uv&logoColor=white&labelColor=1a1a2e"></a>
+	<img src="https://img.shields.io/badge/License-MIT-4ecdc4?style=flat-square&logo=opensourceinitiative&logoColor=white" alt="MIT License">
+    <a href='https://www.youtube.com/@AI-Creator-is-here'><img src='https://img.shields.io/badge/YouTube-ff0000?style=flat-square&logo=youtube&logoColor=white&labelColor=1a1a2e' /></a>
+    <a href='https://arxiv.org/abs/2606.07649'><img src='https://img.shields.io/badge/arXiv-2606.07649-b31b1b?style=flat-square&logo=arxiv&logoColor=white&labelColor=1a1a2e' /></a>
   </p>
 
   <p align="center">
-    <a href="./Communication.md"><img src="https://img.shields.io/badge/💬Feishu-Group-07c160?style=for-the-badge&logoColor=white&labelColor=1a1a2e"></a>
-    <a href="./Communication.md"><img src="https://img.shields.io/badge/WeChat-Group-07c160?style=for-the-badge&logo=wechat&logoColor=white&labelColor=1a1a2e"></a>
+    <a href="./Communication.md"><img src="https://img.shields.io/badge/Feishu-Group-07c160?style=flat-square&logo=lark&logoColor=white&labelColor=1a1a2e"></a>
+    <a href="./Communication.md"><img src="https://img.shields.io/badge/WeChat-Group-07c160?style=flat-square&logo=wechat&logoColor=white&labelColor=1a1a2e"></a>
+	<a href="readme.md"><img src="https://img.shields.io/badge/English-1a1a2e?style=flat-square"></a>
+    <a href="README_ZH.md"><img src="https://img.shields.io/badge/中文版-1a1a2e?style=flat-square"></a>
+    <a href="#quick-start"><img src="https://img.shields.io/badge/Quick%20Start-Get%20Started%20Now-FFC107?style=flat-square&logo=rocket&logoColor=white&labelColor=1a1a2e"></a>
   </p>
-
-  <p align="center">
-    <a href='https://www.youtube.com/@AI-Creator-is-here'><img src='https://img.shields.io/badge/YouTube-ff0000?style=for-the-badge&logo=youtube&logoColor=white&labelColor=1a1a2e' /></a>
-    <a href='https://arxiv.org/abs/2606.07649'><img src='https://img.shields.io/badge/arXiv-2606.07649-b31b1b?style=for-the-badge&logo=arxiv&logoColor=white&labelColor=1a1a2e' /></a>
-  </p>
-
-</div>
-<div align="center">
-	
-<p>
-	<a href="readme.md"><img src="https://img.shields.io/badge/English-1a1a2e?style=for-the-badge"></a>
-    <a href="README_ZH.md"><img src="https://img.shields.io/badge/中文版-1a1a2e?style=for-the-badge"></a>
-</p>
-    <a href="#quick-start" style="text-decoration: none;">
-      <img src="https://img.shields.io/badge/Quick%20Start-Get%20Started%20Now-FFC107?style=for-the-badge&logo=rocket&logoColor=white&labelColor=1a1a2e">
-    </a>
 
 </div>
 
@@ -72,109 +61,22 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 
 ## 📑 Table of Contents
 
-- [💡 Key Features](#key-features)
+- [✨ Key Features](#key-features)
 - [🔮 Demos](#Video-Demos-Generated-from-Scratch)
-- [🏗️ Architecture](#️-architecture)
 - [🚀 Quick Start](#quick-start)
 
 ---
-## 💡 Key Features
+## ✨ Key Features
 
-<br/>
+ViMax is an agentic video creation framework that connects narrative planning, visual consistency, image generation, video generation, and final assembly in one extensible workflow.
 
-<table align="center" width="100%" style="border: none; table-layout: fixed;">
-<tr>
-<td width="25%" align="center" style="vertical-align: top; padding: 20px;">
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<h3 style="margin: 0; padding: 0;">🌟 <strong>Idea2Video</strong></h3>
-</div>
-
-<div align="center" style="margin: 15px 0;">
-  <img src="https://img.shields.io/badge/IDEA-GENERATION-ff6b6b?style=for-the-badge&logo=algorithm&logoColor=white" alt="Algorithm Badge" />
-</div>
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<p align="center"><strong>From Spark to Screen</strong></p>
-</div>
-
-<div style="height: 60px; display: flex; align-items: center; justify-content: center;">
-<p align="center">Transform <strong> raw ideas </strong> into complete video stories through intelligent multi-agent workflows automating <strong> storytelling, character design, and production </strong>.
-</p>
-</div>
-
-
-
-</td>
-<td width="25%" align="center" style="vertical-align: top; padding: 20px;">
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<h3 style="margin: 0; padding: 0;">🎨 <strong>Novel2Video</strong></h3>
-</div>
-
-<div align="center" style="margin: 15px 0;">
-  <img src="https://img.shields.io/badge/NOVEL-ADAPTATION-4ecdc4?style=for-the-badge&logo=book&logoColor=white" alt="Frontend Badge" />
-</div>
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<p align="center"><strong>Smart Literary Adaptation Engine</strong></p>
-</div>
-
-<div style="height: 60px; display: flex; align-items: center; justify-content: center;">
-<p align="center">Transform <strong>complete novels</strong> into <strong>episodic video content</strong> with intelligent narrative compression, character tracking, and scene-by-scene visual adaptation</p>
-</div>
-
-
-
-</td>
-<td width="25%" align="center" style="vertical-align: top; padding: 20px;">
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<h3 style="margin: 0; padding: 0;">⚙️ <strong>Script2Video</strong></h3>
-</div>
-
-<div align="center" style="margin: 15px 0;">
-  <img src="https://img.shields.io/badge/SCRIPT-ADAPTATION-9b59b6?style=for-the-badge&logo=server&logoColor=white" alt="Backend Badge" />
-</div>
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<p align="center"><strong>Unlimited Screenplay Video Creation</strong></p>
-</div>
-
-<div style="height: 60px; display: flex; align-items: center; justify-content: center;">
-<p align="center">Unleash your creativity by writing <strong>any screenplay</strong> from personal stories to epic adventures, giving you complete control over every aspect of your visual storytelling.</p>
-</div>
-
-
-
-
-
-</td>
-<td width="25%" align="center" style="vertical-align: top; padding: 20px;">
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<h3 style="margin: 0; padding: 0;">🤳 <strong>AutoCameo</strong></h3>
-</div>
-
-<div align="center" style="margin: 15px 0;">
-  <img src="https://img.shields.io/badge/INTERACTIVE-GENERATION-FFC107?style=for-the-badge&logo=server&logoColor=white" alt="Backend Badge" />
-</div>
-
-<div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-<p align="center"><strong>Generate Video from Your Photo</strong></p>
-</div>
-
-<div style="height: 60px; display: flex; align-items: center; justify-content: center;">
-<p align="center"> <strong>Create your own cameo</strong> video, transforming yourself/pet into a guest star who appears across limitless creative scripts, cinematic sequences, and interactive storylines.</p>
-</div>
-
-
-
-</td>
-</tr>
-</table>
-
-<br/>
+- **Idea2Video** — turn a short concept into structured stories, characters, scripts, storyboards, shots, and a finished video.
+- **Script2Video** — convert an explicit screenplay into controllable multi-scene, multi-shot video while preserving its creative intent.
+- **Novel2Video** — adapt long-form fiction into episodic visual narratives with narrative compression, character tracking, and scene planning.
+- **AutoCameo** — place a person or pet from a reference photo into generated stories while maintaining a consistent appearance.
+- **Agent Loop and TUI** — discuss ideas, revise plans, resume sessions, review text artifacts, and control rendering from one interactive workspace.
+- **Consistent production pipeline** — coordinate references, first frames, camera continuity, and final assembly end to end.
+- **Parallelized generation** — generate compatible shots and media assets concurrently to accelerate multi-shot video production.
 
 ---
 
@@ -288,117 +190,6 @@ ViMax now also includes an **Agents Loop + TUI** workflow for interactive planni
 
 
 
-## 🏗️ Architecture
-
-### 📊 **System Overview**
-
-**ViMax** is a multi-agent video framework that enables automated multi-shot video generation while ensuring character and scene consistency. Our system seamlessly translates your ideas into corresponding videos, allowing you to focus on storytelling rather than technical implementation.
-
-🎯 **Technical Capabilities**:
-
-🧬 **Intelligent Long Script Generation**
-
-RAG-based long script design engine that intelligently analyzes lengthy, novel-like stories and automatically segments them into a multi-scene script format. The process meticulously ensures that all key plot developments and character dialogues are accurately retained within the new structure.
-
-🪄 **Expressive Storyboard Design**
-
-Shot-level storyboard design system that create expressive storyboards through cinematography language based on user requirements and target audiences, which establishs the narrative rhythm for subsequent video generation.
-
-🔮 **Multi-camera Filming Simulation**
-
-Simulates multi-camera filming to deliver an immersive viewing experience while maintaining consistent character positioning and backgrounds within the same scene.
-
-🧸 **Intelligent Reference Images Selection**
-
-Intelligently select the reference image required for the first frame of the current video, including the storyboards that occurred in the previous timeline, to ensure the accuracy of multiple characters and environmental elements as the video becomes longer.
-
-⚙️ **Automated Images Generation**
-
-Based on the selected reference image and the visual logical order on the previous timeline, the prompt of the image generator is automatically generated to reasonably arrange the spatial interaction position between the character and the environment.
-
-✅ **Automated Image Generation Consistency Check**
-
-Generate multiple images in parallel and select the best consistent image as the first frame through MLLM/VLM to imitate the workflow of human creators.
-
-⚡ **High-efficiency Parallel Shot Generation**
-
-Parallel processing for sequential shots captured from the same camera enables highly efficient video production.
-
-
-
-
-
-### 🤖 <strong>Multi-Agent Video Generation Pipeline</strong>
-
-<div align="center">
-  <table align="center" width="100%" style="border: none; border-collapse: collapse;">
-    <tr>
-      <td colspan="3" align="center" style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white; font-weight: bold;">
-        🧠 <strong>INPUT LAYER</strong><br/>
-        📝 Idea & Scripts & Novels • 💭 Natural Language Prompts • 🖼️ Reference Images • 🎨 Style Directives • 🧩 Configs
-      </td>
-    </tr>
-    <tr><td colspan="3" height="20"></td></tr>
-    <tr>
-      <td colspan="3" align="center" style="padding: 15px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); border-radius: 12px; color: white; font-weight: bold;">
-        🧭 <strong>CENTRAL ORCHESTRATION</strong><br/>
-        Agent Scheduling • Stage Transitions • Resource Management • Retry/Fallback Logic
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #3742fa 0%, #2f3542 100%); border-radius: 10px; color: white; width: 50%;">
-        🧾 <strong>SCRIPT UNDERSTANDING</strong><br/>
-        <small>Character/Environment Extraction • Scene Boundaries • Style Intent</small>
-      </td>
-      <td width="10"></td>
-      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #8c7ae6 0%, #9c88ff 100%); border-radius: 10px; color: white; width: 50%;">
-        🎥 <strong>SCENE & SHOT PLANNING</strong><br/>
-        <small>Storyboard Steps • Shot List • Key Frames & Beats</small>
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <td colspan="3" align="center" style="padding: 15px; background: linear-gradient(135deg, #00d2d3 0%, #54a0ff 100%); border-radius: 12px; color: white; font-weight: bold;">
-        🧪 <strong>VISUAL ASSET PLANNING</strong><br/>
-        Reference Image Selection • Look/Style Guidance • Prompt Conditioning
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <!-- Swapped: ASSET INDEXING is now on the left -->
-      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #e056fd 0%, #f368e0 100%); border-radius: 10px; color: white; width: 50%;">
-        🗂️ <strong>ASSET INDEXING</strong><br/>
-        <small>Frames/Refs Catalog • Embeddings • Retrieval for Reuse</small>
-      </td>
-      <td width="10"></td>
-      <!-- Swapped: CONSISTENCY & CONTINUITY is now on the right -->
-      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #ffa726 0%, #ff7043 100%); border-radius: 10px; color: white; width: 50%;">
-        ♻️ <strong>CONSISTENCY & CONTINUITY</strong><br/>
-        <small>Character/Environment Tracking • Ref Matching • Temporal Coherence</small>
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <td colspan="3" align="center" style="padding: 15px; background: linear-gradient(135deg, #26de81 0%, #20bf6b 100%); border-radius: 12px; color: white; font-weight: bold;">
-        ✂️ <strong>VISUAL SYNTHESIS & ASSEMBLY</strong><br/>
-        Image Generation • Best-Frame Selection • First/Last-Frame→Video • Cut & Timeline Assembly
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <td colspan="3" align="center" style="padding: 20px; background: linear-gradient(135deg, #045de9 0%, #09c6f9 100%); border-radius: 15px; color: white; font-weight: bold;">
-        🚀 <strong>OUTPUT LAYER</strong><br/>
-        🖼️ Frames • 🎞️ Clips & Final Videos • 📜 Logs • 📦 Working Directory Artifacts
-      </td>
-    </tr>
-  </table>
-</div>
-
-
-
-
-
 
 ## 🚀Quick Start
 
@@ -417,7 +208,9 @@ uv sync
 ```
 
 
-### 🧠 **Agent TUI**
+<details>
+<summary><strong>Agent TUI</strong></summary>
+
 ViMax also provides a minimal TUI for interactive agent-based video creation. Configure the model and API key information in `configs/agent.local.yaml`, including the LLM, image generator, and video generator, as shown below.
 ```yaml
 llm:
@@ -451,7 +244,11 @@ vimax tui resume <session_id>
 
 You can also keep `configs/agent.local.yaml` empty and provide the same values through environment variables, such as `VIMAX_LLM_API_KEY`, `VIMAX_IMAGE_API_KEY`, and `VIMAX_VIDEO_API_KEY`.
 
-### 🎯 **Usage**
+</details>
+
+<details>
+<summary><strong>Usage</strong></summary>
+
 main_idea2video.py is used to convert your ideas into videos.
 You need to configure the model and API key information in the configs/idea2video.yaml file, including three parts—the chat model, the image generator, and the video generator, as shown below
 ```yaml
@@ -507,11 +304,4 @@ Fast-paced with no more than 20 shots.
 style = "Animate Style"
 ```
 
-
----
-
-**🌟 If this project helps you, please give us a Star!**
-
-<p align="center">
-  <em> ❤️ Thanks for visiting ✨ ViMax!</em><br><br>
-</p>
+</details>
