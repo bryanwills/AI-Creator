@@ -37,9 +37,7 @@ export default function App() {
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [selectedArtifactPath, setSelectedArtifactPath] = useState('');
   const [workspaceView, setWorkspaceView] = useState<WorkspaceView>('workspace');
-  const [connected, setConnected] = useState(false);
   const [agentReady, setAgentReady] = useState(false);
-  const [bridgeLabel, setBridgeLabel] = useState('Local agent idle');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [artifactPanelOpen, setArtifactPanelOpen] = useState(false);
@@ -79,7 +77,6 @@ export default function App() {
       return;
     }
     if (event.type === 'bridge_status') {
-      setBridgeLabel(event.message || 'Local agent');
       if (event.status === 'ready' || event.status === 'starting') setAgentReady(true);
       if (event.status === 'stopped' || event.status === 'error') setAgentReady(false);
     }
@@ -92,7 +89,7 @@ export default function App() {
       }
     }
     setChat((current) => applyAgentEvent(current, event));
-  }, setConnected), [refreshArtifacts, refreshSessions]);
+  }, () => undefined), [refreshArtifacts, refreshSessions]);
 
   useEffect(() => {
     let cancelled = false;
@@ -313,12 +310,6 @@ export default function App() {
             textareaRef.current?.focus();
           }} />}
           <div className={`composer ${chat.busy ? 'is-busy' : ''}`}>
-            <div className="composer-project-strip">
-              <Folder size={15} />
-              <span>{sessionTitle(selectedSession)}</span>
-              <span className={`connection-dot ${connected ? 'is-connected' : ''}`} />
-              <small>{connected ? bridgeLabel : 'Reconnecting'}</small>
-            </div>
             <textarea
               ref={textareaRef}
               value={draft}
