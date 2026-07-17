@@ -260,8 +260,8 @@ export default function App() {
       />
 
       <main className="workspace-main">
-        <header className="workspace-header">
-          <div className="workspace-title-row">
+        {workspaceView === 'workspace' ? (
+          <div className="workspace-utility-bar">
             <button className="icon-button mobile-only" onClick={() => setMobileSidebarOpen(true)} aria-label="Open navigation">
               <Menu size={19} />
             </button>
@@ -270,26 +270,39 @@ export default function App() {
                 <PanelLeftOpen size={18} />
               </button>
             )}
-            <div className="workspace-title-copy">
-              <strong>{workspaceView === 'settings' ? 'Settings' : sessionTitle(selectedSession)}</strong>
-              <span>{workspaceView === 'settings' ? 'configs/agent.local.yaml' : selectedSession?.workingDir || '.working_dir / new session'}</span>
-            </div>
-            {selectedSession && workspaceView !== 'settings' && <StageBadge stage={selectedSession.stage} />}
+            <span className="workspace-utility-spacer" />
+            <button className="icon-button artifact-toggle" onClick={() => setArtifactPanelOpen((value) => !value)} aria-label="Toggle artifacts">
+              <PanelRight size={18} />
+              {artifacts.length > 0 && <span className="count-badge">{artifacts.length}</span>}
+            </button>
           </div>
-          <div className="workspace-actions">
-            <div className="context-meter" title={`${chat.promptTokens.toLocaleString()} / ${CONTEXT_TARGET.toLocaleString()} context tokens`}>
-              <span>Context</span>
-              <i><b style={{width: `${Math.max(2, contextPercent)}%`}} /></i>
-              <span>{contextPercent}%</span>
-            </div>
-            {workspaceView !== 'settings' && (
-              <button className="icon-button artifact-toggle" onClick={() => setArtifactPanelOpen((value) => !value)} aria-label="Toggle artifacts">
-                <PanelRight size={18} />
-                {artifacts.length > 0 && <span className="count-badge">{artifacts.length}</span>}
+        ) : (
+          <header className="workspace-header">
+            <div className="workspace-title-row">
+              <button className="icon-button mobile-only" onClick={() => setMobileSidebarOpen(true)} aria-label="Open navigation">
+                <Menu size={19} />
               </button>
-            )}
-          </div>
-        </header>
+              {!sidebarOpen && (
+                <button className="icon-button desktop-only" onClick={() => setSidebarOpen(true)} aria-label="Open navigation">
+                  <PanelLeftOpen size={18} />
+                </button>
+              )}
+              <div className="workspace-title-copy">
+                <strong>{workspaceView === 'settings' ? 'Settings' : sessionTitle(selectedSession)}</strong>
+                <span>{workspaceView === 'settings' ? 'configs/agent.local.yaml' : selectedSession?.workingDir || '.working_dir / new session'}</span>
+              </div>
+              {selectedSession && workspaceView === 'renders' && <StageBadge stage={selectedSession.stage} />}
+            </div>
+            <div className="workspace-actions">
+              {workspaceView === 'renders' && (
+                <button className="icon-button artifact-toggle" onClick={() => setArtifactPanelOpen((value) => !value)} aria-label="Toggle artifacts">
+                  <PanelRight size={18} />
+                  {artifacts.length > 0 && <span className="count-badge">{artifacts.length}</span>}
+                </button>
+              )}
+            </div>
+          </header>
+        )}
 
         {workspaceView === 'workspace' ? (
           <div className="conversation" ref={scrollRef}>
@@ -348,6 +361,11 @@ export default function App() {
               rows={1}
             />
             <div className="composer-controls">
+              <div className="context-meter composer-context" title={`${chat.promptTokens.toLocaleString()} / ${CONTEXT_TARGET.toLocaleString()} context tokens`}>
+                <span>Context</span>
+                <i><b style={{width: `${Math.max(2, contextPercent)}%`}} /></i>
+                <span>{contextPercent}%</span>
+              </div>
               <div className="composer-spacer" />
               {chat.busy ? (
                 <button className="send-button stop" onClick={() => void stop()} aria-label="Stop generation"><CircleStop size={18} /></button>
@@ -458,8 +476,19 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onT
 function EmptyState() {
   return (
     <section className="empty-state">
+      <MobiusMark />
       <h1>What should we create?</h1>
     </section>
+  );
+}
+
+function MobiusMark() {
+  return (
+    <svg className="mobius-mark" viewBox="0 0 96 54" role="img" aria-label="ViMax Möbius mark">
+      <path d="M10 27C20 7 36 7 48 27C60 47 76 47 86 27C76 7 60 7 48 27C36 47 20 47 10 27Z" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M38.5 39.5C42.3 36.3 45.4 31.5 48 27C50.7 22.4 53.8 17.7 57.6 14.5" fill="none" stroke="white" strokeWidth="12" strokeLinecap="round" />
+      <path d="M38.5 39.5C42.3 36.3 45.4 31.5 48 27C50.7 22.4 53.8 17.7 57.6 14.5" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
+    </svg>
   );
 }
 
