@@ -15,7 +15,6 @@ import {
   PanelRight,
   Save,
   Settings,
-  Sparkles,
   Trash2,
   Video,
   X,
@@ -397,7 +396,7 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onT
         </div>
         <nav className="primary-nav" aria-label="Primary navigation">
           <button onClick={onNew}><MessageSquarePlus size={17} /><span>New project</span></button>
-          <button className={activeView === 'workspace' ? 'is-active' : ''} onClick={onWorkspace}><Sparkles size={17} /><span>Workspace</span></button>
+          <button className={activeView === 'workspace' ? 'is-active' : ''} onClick={onWorkspace}><Folder size={17} /><span>Workspace</span></button>
           <button className={activeView === 'renders' ? 'is-active' : ''} onClick={onRenders}><Video size={17} /><span>Renders</span></button>
           <button className={activeView === 'settings' ? 'is-active' : ''} onClick={onSettings}><Settings size={17} /><span>Settings</span></button>
         </nav>

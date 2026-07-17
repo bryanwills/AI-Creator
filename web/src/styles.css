@@ -101,6 +101,10 @@ a:focus-visible {
   letter-spacing: 0;
 }
 
+.sidebar svg {
+  stroke-width: 1.55;
+}
+
 .sidebar-collapse {
   margin-left: auto;
 }
@@ -514,10 +518,12 @@ a:focus-visible {
   width: fit-content;
   max-width: min(76%, 680px);
   min-width: 42px;
-  padding: 1px 0;
+  padding: 12px 15px;
   color: #292d2a;
   font-size: 14px;
   line-height: 1.72;
+  background: #f6f6f5;
+  border-radius: 22px;
 }
 
 .role-user {
@@ -525,10 +531,7 @@ a:focus-visible {
 }
 
 .role-user .message-body {
-  padding: 10px 13px;
-  background: #ededeb;
-  border: 1px solid #e1e2df;
-  border-radius: 8px 8px 3px 8px;
+  background: #f0f0ef;
 }
 
 .role-assistant,
@@ -590,11 +593,10 @@ a:focus-visible {
 }
 
 .role-error .message-body {
-  padding: 10px 13px;
   color: #8f2d2d;
   background: #fff0ef;
   border: 1px solid #efcfcc;
-  border-radius: 3px 8px 8px;
+  border-radius: 22px;
 }
 
 .activity-row {
