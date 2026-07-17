@@ -476,19 +476,8 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onT
 function EmptyState() {
   return (
     <section className="empty-state">
-      <MobiusMark />
       <h1>What should we create?</h1>
     </section>
-  );
-}
-
-function MobiusMark() {
-  return (
-    <svg className="mobius-mark" viewBox="0 0 96 54" role="img" aria-label="ViMax Möbius mark">
-      <path d="M10 27C20 7 36 7 48 27C60 47 76 47 86 27C76 7 60 7 48 27C36 47 20 47 10 27Z" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M38.5 39.5C42.3 36.3 45.4 31.5 48 27C50.7 22.4 53.8 17.7 57.6 14.5" fill="none" stroke="white" strokeWidth="12" strokeLinecap="round" />
-      <path d="M38.5 39.5C42.3 36.3 45.4 31.5 48 27C50.7 22.4 53.8 17.7 57.6 14.5" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
-    </svg>
   );
 }
 

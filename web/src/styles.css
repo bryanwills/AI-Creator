@@ -493,13 +493,6 @@ a:focus-visible {
   letter-spacing: 0;
 }
 
-.mobius-mark {
-  width: 78px;
-  height: 46px;
-  margin-bottom: 18px;
-  color: #171a1f;
-}
-
 .message-stream {
   width: min(860px, calc(100% - 40px));
   margin: 0 auto;
