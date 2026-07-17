@@ -463,14 +463,6 @@ a:focus-visible {
   animation: empty-in 420ms ease both;
 }
 
-.empty-state img {
-  width: 248px;
-  height: 64px;
-  object-fit: contain;
-  margin-bottom: 22px;
-  filter: saturate(0.78) contrast(1.02);
-}
-
 .empty-state h1 {
   margin: 0;
   font-size: 28px;
@@ -1213,11 +1205,6 @@ a:focus-visible {
   .empty-state {
     width: calc(100% - 32px);
     padding-bottom: 148px;
-  }
-
-  .empty-state img {
-    width: 200px;
-    height: 52px;
   }
 
   .empty-state h1 {

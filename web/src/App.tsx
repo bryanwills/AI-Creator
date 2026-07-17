@@ -377,7 +377,6 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, onToggle, onMob
 function EmptyState({workflow, onWorkflow}: {workflow: Workflow; onWorkflow: (workflow: Workflow) => void}) {
   return (
     <section className="empty-state">
-      <img src="/assets/vimax.png" alt="ViMax" />
       <h1>What should we create?</h1>
       <div className="workflow-quick-picks" role="group" aria-label="Workflow preference">
         {(['idea2video', 'script2video', 'novel2video'] as Workflow[]).map((value) => (
