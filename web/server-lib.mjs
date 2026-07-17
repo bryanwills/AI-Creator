@@ -222,6 +222,7 @@ async function removeSessionLogRecords(repoRoot, sessionId) {
 function sanitizeSession(record) {
   return {
     sessionId: String(record.session_id ?? ''),
+    projectName: String(record.project_name ?? ''),
     workingDir: String(record.working_dir ?? ''),
     stage: String(record.stage ?? 'created'),
     summary: String(record.summary ?? ''),

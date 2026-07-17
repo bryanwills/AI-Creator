@@ -1,5 +1,6 @@
 export type SessionSummary = {
   sessionId: string;
+  projectName: string;
   workingDir: string;
   stage: string;
   summary: string;

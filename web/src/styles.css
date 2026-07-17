@@ -203,18 +203,15 @@ a:focus-visible {
 
 .session-item.is-selected {
   background: #e2e6eb;
-  box-shadow: inset 2px 0 0 var(--blue);
 }
 
 .session-open {
-  display: grid;
+  display: flex;
   min-width: 0;
   min-height: 52px;
   flex: 1;
-  grid-template-columns: 8px minmax(0, 1fr);
   align-items: center;
-  gap: 10px;
-  padding: 7px 34px 7px 10px;
+  padding: 7px 34px 7px 12px;
   text-align: left;
   background: transparent;
   border: 0;
@@ -246,30 +243,6 @@ a:focus-visible {
 .session-delete:hover {
   color: var(--red);
   background: #f5dfdc;
-}
-
-.stage-dot {
-  width: 7px;
-  height: 7px;
-  background: #a7adb6;
-  border-radius: 50%;
-}
-
-.stage-dot.stage-rendering,
-.stage-dot.stage-narrative_planning,
-.stage-dot.stage-novel_planning {
-  background: var(--magenta);
-  box-shadow: 0 0 0 3px rgba(163, 59, 150, 0.1);
-}
-
-.stage-dot.stage-rendered,
-.stage-dot.stage-narrative_planned,
-.stage-dot.stage-novel_planned {
-  background: var(--green);
-}
-
-.stage-dot.stage-error {
-  background: var(--red);
 }
 
 .session-copy {
@@ -1170,7 +1143,8 @@ a:focus-visible {
   animation: dialog-backdrop-in 140ms ease both;
 }
 
-.delete-dialog {
+.delete-dialog,
+.project-dialog {
   display: grid;
   width: min(410px, 100%);
   grid-template-columns: 38px minmax(0, 1fr);
@@ -1193,6 +1167,11 @@ a:focus-visible {
   border-radius: 6px;
 }
 
+.dialog-icon.is-create {
+  color: var(--blue);
+  background: #eaf2fc;
+}
+
 .dialog-copy h2 {
   margin: 1px 0 6px;
   font-size: 15px;
@@ -1209,6 +1188,46 @@ a:focus-visible {
 
 .dialog-copy p strong {
   color: var(--ink);
+}
+
+.project-name-field {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 5px;
+}
+
+.project-name-field > span {
+  color: #626a74;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.project-name-field input {
+  width: 100%;
+  height: 38px;
+  padding: 0 11px;
+  color: var(--ink);
+  font-size: 12px;
+  background: white;
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+  outline: none;
+}
+
+.project-name-field input:focus {
+  border-color: #9eb7cf;
+  box-shadow: 0 0 0 2px rgba(23, 105, 210, 0.08);
+}
+
+.project-name-field input::placeholder {
+  color: var(--faint);
+}
+
+.project-name-field small {
+  color: var(--red);
+  font-size: 10px;
 }
 
 .dialog-actions {
@@ -1239,6 +1258,17 @@ a:focus-visible {
   color: white;
   background: var(--red);
   border-color: var(--red);
+}
+
+.dialog-actions button.primary {
+  color: white;
+  background: #2b323a;
+  border-color: #2b323a;
+}
+
+.dialog-actions button.primary:hover:not(:disabled) {
+  background: var(--blue);
+  border-color: var(--blue);
 }
 
 .dialog-actions button.danger:hover:not(:disabled) {

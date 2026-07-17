@@ -66,7 +66,11 @@ const server = createServer(async (request, response) => {
     if (url.pathname === '/api/agent/start' && request.method === 'POST') {
       const body = await readJsonBody(request);
       const sessionId = typeof body.sessionId === 'string' ? body.sessionId : '';
-      await startAgent({newSession: body.newSession === true, sessionId});
+      const projectName = typeof body.projectName === 'string' ? body.projectName.trim() : '';
+      if (projectName.length > 64) {
+        return sendJson(response, 400, {error: 'Project name must be 64 characters or fewer'});
+      }
+      await startAgent({newSession: body.newSession === true, sessionId, projectName});
       return sendJson(response, 200, {ok: true});
     }
     if (url.pathname === '/api/messages' && request.method === 'POST') {
@@ -114,11 +118,15 @@ server.listen(port, host, () => {
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
-async function startAgent({newSession, sessionId}) {
+async function startAgent({newSession, sessionId, projectName = ''}) {
   if (newSession && sessionId) throw new Error('Choose either a new or existing session');
   stopAgent('switch');
   const {command, args} = agentCommand();
-  const sessionArgs = newSession ? ['--new-session'] : sessionId ? ['--session', sessionId] : [];
+  const sessionArgs = newSession
+    ? ['--new-session', ...(projectName ? ['--new-session-name', projectName] : [])]
+    : sessionId
+      ? ['--session', sessionId]
+      : [];
   activeSessionId = sessionId;
   const child = spawn(command, [...args, 'main_agent.py', '--jsonl', '--stdin-repl', ...sessionArgs], {
     cwd: repoRoot,

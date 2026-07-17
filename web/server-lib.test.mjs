@@ -19,7 +19,7 @@ async function fixture() {
   await writeFile(path.join(root, '.vimax', 'sessions.json'), JSON.stringify({
     active_session_id: 'session-1',
     sessions: {
-      'session-1': {session_id: 'session-1', working_dir: '.working_dir/session-1', stage: 'rendering', updated_at: '2026-07-17T10:00:00'},
+      'session-1': {session_id: 'session-1', project_name: 'Ocean campaign', working_dir: '.working_dir/session-1', stage: 'rendering', updated_at: '2026-07-17T10:00:00'},
     },
   }));
   return root;
@@ -30,7 +30,7 @@ describe('web bridge state', () => {
     const root = await fixture();
     const state = await readSessionState(root);
     expect(state.activeSessionId).toBe('session-1');
-    expect(state.sessions[0]).toMatchObject({sessionId: 'session-1', stage: 'rendering'});
+    expect(state.sessions[0]).toMatchObject({sessionId: 'session-1', projectName: 'Ocean campaign', stage: 'rendering'});
   });
 
   it('restores persisted turn history', async () => {

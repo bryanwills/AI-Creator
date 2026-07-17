@@ -24,7 +24,7 @@ export async function getArtifacts(sessionId: string) {
   return request<{artifacts: Artifact[]}>(`/api/artifacts?session=${encodeURIComponent(sessionId)}`);
 }
 
-export async function startAgent(options: {sessionId?: string; newSession?: boolean}) {
+export async function startAgent(options: {sessionId?: string; newSession?: boolean; projectName?: string}) {
   return request<{ok: boolean}>('/api/agent/start', {method: 'POST', body: JSON.stringify(options)});
 }
 

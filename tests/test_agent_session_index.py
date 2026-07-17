@@ -27,6 +27,14 @@ class SessionIndexTests(unittest.TestCase):
             self.assertEqual(record["compacted_summary"], "")
             self.assertEqual(record["compaction_snapshots"], [])
 
+    def test_create_session_preserves_project_name(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            index = SessionIndex(tmp)
+            record = index.create(project_name="Ocean campaign")
+            self.assertEqual(record["project_name"], "Ocean campaign")
+            self.assertIn("ocean-campaign", record["session_id"])
+            self.assertEqual(index.get(record["session_id"])["project_name"], "Ocean campaign")
+
 
     def test_session_id_is_sanitized_and_stays_under_working_dir(self):
         with tempfile.TemporaryDirectory() as tmp:

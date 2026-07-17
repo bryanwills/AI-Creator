@@ -7,9 +7,9 @@ import {
   FileText,
   Film,
   Folder,
+  FolderPlus,
   Image as ImageIcon,
   Menu,
-  MessageSquarePlus,
   PanelLeftClose,
   PanelLeftOpen,
   PanelRight,
@@ -43,6 +43,10 @@ export default function App() {
   const [artifactPanelOpen, setArtifactPanelOpen] = useState(false);
   const [draft, setDraft] = useState('');
   const [loadError, setLoadError] = useState('');
+  const [newProjectOpen, setNewProjectOpen] = useState(false);
+  const [newProjectName, setNewProjectName] = useState('');
+  const [newProjectError, setNewProjectError] = useState('');
+  const [creatingProject, setCreatingProject] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<SessionSummary>();
   const [deleting, setDeleting] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -151,23 +155,36 @@ export default function App() {
     }
   }
 
+  function openNewProjectDialog() {
+    setNewProjectName('');
+    setNewProjectError('');
+    setNewProjectOpen(true);
+  }
+
   async function newProject() {
+    const projectName = newProjectName.trim();
+    if (!projectName || creatingProject) return;
+    setCreatingProject(true);
+    setNewProjectError('');
     setLoadError('');
     setMobileSidebarOpen(false);
-    setSelectedSessionId('');
-    setChat(createChatState());
-    setArtifacts([]);
-    setSelectedArtifactPath('');
-    setWorkspaceView('workspace');
     try {
-      await startAgent({newSession: true});
+      await startAgent({newSession: true, projectName});
       setAgentReady(true);
-      window.setTimeout(() => void refreshSessions().then((state) => {
-        if (state.activeSessionId) setSelectedSessionId(state.activeSessionId);
-      }), 450);
+      await new Promise((resolve) => window.setTimeout(resolve, 450));
+      const state = await refreshSessions();
+      setSelectedSessionId(state.activeSessionId);
+      setChat(createChatState());
+      setArtifacts([]);
+      setSelectedArtifactPath('');
+      setWorkspaceView('workspace');
+      setNewProjectOpen(false);
+      setNewProjectName('');
       textareaRef.current?.focus();
     } catch (error) {
-      setLoadError(error instanceof Error ? error.message : String(error));
+      setNewProjectError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setCreatingProject(false);
     }
   }
 
@@ -234,7 +251,7 @@ export default function App() {
         activeView={workspaceView}
         onToggle={() => setSidebarOpen((value) => !value)}
         onMobileClose={() => setMobileSidebarOpen(false)}
-        onNew={() => void newProject()}
+        onNew={openNewProjectDialog}
         onSelect={(sessionId) => void openSession(sessionId)}
         onWorkspace={() => setWorkspaceView('workspace')}
         onRenders={() => setWorkspaceView('renders')}
@@ -355,6 +372,22 @@ export default function App() {
         onCancel={() => !deleting && setPendingDelete(undefined)}
         onConfirm={() => void confirmDelete()}
       />
+      <NewProjectDialog
+        open={newProjectOpen}
+        name={newProjectName}
+        error={newProjectError}
+        creating={creatingProject}
+        onNameChange={(value) => {
+          setNewProjectName(value);
+          setNewProjectError('');
+        }}
+        onCancel={() => {
+          if (creatingProject) return;
+          setNewProjectOpen(false);
+          setNewProjectError('');
+        }}
+        onConfirm={() => void newProject()}
+      />
     </div>
   );
 }
@@ -386,7 +419,7 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onT
           <button className="icon-button mobile-only" onClick={onMobileClose} aria-label="Close navigation"><X size={18} /></button>
         </div>
         <nav className="primary-nav" aria-label="Primary navigation">
-          <button onClick={onNew}><MessageSquarePlus size={17} /><span>New project</span></button>
+          <button onClick={onNew}><FolderPlus size={17} /><span>New project</span></button>
           <button className={activeView === 'workspace' ? 'is-active' : ''} onClick={onWorkspace}><Folder size={17} /><span>Workspace</span></button>
           <button className={activeView === 'renders' ? 'is-active' : ''} onClick={onRenders}><Video size={17} /><span>Renders</span></button>
           <button className={activeView === 'settings' ? 'is-active' : ''} onClick={onSettings}><Settings size={17} /><span>Settings</span></button>
@@ -400,7 +433,6 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onT
                 className={`session-item ${session.sessionId === selectedSessionId ? 'is-selected' : ''}`}
               >
                 <button className="session-open" onClick={() => onSelect(session.sessionId)}>
-                  <span className={`stage-dot stage-${session.stage}`} />
                   <span className="session-copy">
                     <strong>{sessionTitle(session)}</strong>
                     <small>{relativeTime(session.updatedAt)} · {stageLabel(session.stage)}</small>
@@ -654,6 +686,57 @@ function DeleteProjectDialog({session, deleting, onCancel, onConfirm}: {
   );
 }
 
+function NewProjectDialog({open, name, error, creating, onNameChange, onCancel, onConfirm}: {
+  open: boolean;
+  name: string;
+  error: string;
+  creating: boolean;
+  onNameChange: (value: string) => void;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !creating) onCancel();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [creating, onCancel, open]);
+
+  if (!open) return null;
+  return (
+    <div className="dialog-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
+      <form className="project-dialog" role="dialog" aria-modal="true" aria-labelledby="new-project-title" onSubmit={(event) => {
+        event.preventDefault();
+        onConfirm();
+      }}>
+        <span className="dialog-icon is-create"><FolderPlus size={18} /></span>
+        <div className="dialog-copy">
+          <h2 id="new-project-title">Create a new project</h2>
+          <p>Name the workspace before creating it.</p>
+        </div>
+        <label className="project-name-field">
+          <span>Project name</span>
+          <input
+            value={name}
+            onChange={(event) => onNameChange(event.target.value)}
+            placeholder="Untitled video"
+            maxLength={64}
+            autoFocus
+            disabled={creating}
+          />
+          {error && <small role="alert">{error}</small>}
+        </label>
+        <div className="dialog-actions">
+          <button type="button" onClick={onCancel} disabled={creating}>Cancel</button>
+          <button type="submit" className="primary" disabled={creating || !name.trim()}>{creating ? 'Creating…' : 'Create'}</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
 function ArtifactPanel({open, artifacts, selected, onSelect, onClose}: {
   open: boolean;
   artifacts: Artifact[];
@@ -697,6 +780,7 @@ function StageBadge({stage}: {stage: string}) {
 
 function sessionTitle(session?: SessionSummary) {
   if (!session) return 'New video';
+  if (session.projectName) return session.projectName;
   const source = session.idea || session.summary;
   if (source) return source.length > 38 ? `${source.slice(0, 38).trim()}…` : source;
   return session.sessionId.replace(/^\d{8}-\d{6}-?/, '') || 'Untitled video';
