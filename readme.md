@@ -317,81 +317,6 @@ Parallel processing for sequential shots captured from the same camera enables h
 
 </details>
 
-<details>
-<summary><h3>🤖 <strong>Multi-Agent Video Generation Pipeline</strong></h3></summary>
-
-
-<div align="center">
-  <table align="center" width="100%" style="border: none; border-collapse: collapse;">
-    <tr>
-      <td colspan="3" align="center" style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white; font-weight: bold;">
-        🧠 <strong>INPUT LAYER</strong><br/>
-        📝 Idea & Scripts & Novels • 💭 Natural Language Prompts • 🖼️ Reference Images • 🎨 Style Directives • 🧩 Configs
-      </td>
-    </tr>
-    <tr><td colspan="3" height="20"></td></tr>
-    <tr>
-      <td colspan="3" align="center" style="padding: 15px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); border-radius: 12px; color: white; font-weight: bold;">
-        🧭 <strong>CENTRAL ORCHESTRATION</strong><br/>
-        Agent Scheduling • Stage Transitions • Resource Management • Retry/Fallback Logic
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #3742fa 0%, #2f3542 100%); border-radius: 10px; color: white; width: 50%;">
-        🧾 <strong>SCRIPT UNDERSTANDING</strong><br/>
-        <small>Character/Environment Extraction • Scene Boundaries • Style Intent</small>
-      </td>
-      <td width="10"></td>
-      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #8c7ae6 0%, #9c88ff 100%); border-radius: 10px; color: white; width: 50%;">
-        🎥 <strong>SCENE & SHOT PLANNING</strong><br/>
-        <small>Storyboard Steps • Shot List • Key Frames & Beats</small>
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <td colspan="3" align="center" style="padding: 15px; background: linear-gradient(135deg, #00d2d3 0%, #54a0ff 100%); border-radius: 12px; color: white; font-weight: bold;">
-        🧪 <strong>VISUAL ASSET PLANNING</strong><br/>
-        Reference Image Selection • Look/Style Guidance • Prompt Conditioning
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <!-- Swapped: ASSET INDEXING is now on the left -->
-      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #e056fd 0%, #f368e0 100%); border-radius: 10px; color: white; width: 50%;">
-        🗂️ <strong>ASSET INDEXING</strong><br/>
-        <small>Frames/Refs Catalog • Embeddings • Retrieval for Reuse</small>
-      </td>
-      <td width="10"></td>
-      <!-- Swapped: CONSISTENCY & CONTINUITY is now on the right -->
-      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #ffa726 0%, #ff7043 100%); border-radius: 10px; color: white; width: 50%;">
-        ♻️ <strong>CONSISTENCY & CONTINUITY</strong><br/>
-        <small>Character/Environment Tracking • Ref Matching • Temporal Coherence</small>
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <td colspan="3" align="center" style="padding: 15px; background: linear-gradient(135deg, #26de81 0%, #20bf6b 100%); border-radius: 12px; color: white; font-weight: bold;">
-        ✂️ <strong>VISUAL SYNTHESIS & ASSEMBLY</strong><br/>
-        Image Generation • Best-Frame Selection • First/Last-Frame→Video • Cut & Timeline Assembly
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <td colspan="3" align="center" style="padding: 20px; background: linear-gradient(135deg, #045de9 0%, #09c6f9 100%); border-radius: 15px; color: white; font-weight: bold;">
-        🚀 <strong>OUTPUT LAYER</strong><br/>
-        🖼️ Frames • 🎞️ Clips & Final Videos • 📜 Logs • 📦 Working Directory Artifacts
-      </td>
-    </tr>
-  </table>
-</div>
-
-</details>
-
-
-
-
-
 ## 🚀Quick Start
 
 ### 🖥️ **Environment**
@@ -447,7 +372,9 @@ You can also keep `configs/agent.local.yaml` empty and provide the same values t
 
 </details>
 
-### 🎯 **Usage**
+<details>
+<summary><h3>🎯 <strong>Usage</strong></h3></summary>
+
 main_idea2video.py is used to convert your ideas into videos.
 You need to configure the model and API key information in the configs/idea2video.yaml file, including three parts—the chat model, the image generator, and the video generator, as shown below
 ```yaml
@@ -503,6 +430,7 @@ Fast-paced with no more than 20 shots.
 style = "Animate Style"
 ```
 
+</details>
 
 ---
 

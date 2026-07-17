@@ -294,78 +294,6 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 
 </details>
 
-<details>
-<summary><h3>🤖 <strong>多智能体视频生成流水线</strong></h3></summary>
-
-
-<div align="center">
-  <table align="center" width="100%" style="border: none; border-collapse: collapse;">
-    <tr>
-      <td colspan="3" align="center" style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white; font-weight: bold;">
-        🧠 <strong>输入层</strong><br/>
-        📝 创意/剧本/小说 • 💭 自然语言提示 • 🖼️ 参考图像 • 🎨 风格指令 • 🧩 配置参数
-      </td>
-    </tr>
-    <tr><td colspan="3" height="20"></td></tr>
-    <tr>
-      <td colspan="3" align="center" style="padding: 15px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); border-radius: 12px; color: white; font-weight: bold;">
-        🧭 <strong>中央调度</strong><br/>
-        智能体调度 • 阶段切换 • 资源管理 • 重试/降级逻辑
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #3742fa 0%, #2f3542 100%); border-radius: 10px; color: white; width: 50%;">
-        🧾 <strong>剧本理解</strong><br/>
-        <small>角色/环境提取 • 场景边界识别 • 风格意图解析</small>
-      </td>
-      <td width="10"></td>
-      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #8c7ae6 0%, #9c88ff 100%); border-radius: 10px; color: white; width: 50%;">
-        🎥 <strong>场景与镜头规划</strong><br/>
-        <small>分镜步骤 • 镜头列表 • 关键帧与节奏点</small>
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <td colspan="3" align="center" style="padding: 15px; background: linear-gradient(135deg, #00d2d3 0%, #54a0ff 100%); border-radius: 12px; color: white; font-weight: bold;">
-        🧪 <strong>视觉资产规划</strong><br/>
-        参考图选择 • 外观/风格引导 • 提示词条件化
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <!-- 左：资产索引 -->
-      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #e056fd 0%, #f368e0 100%); border-radius: 10px; color: white; width: 50%;">
-        🗂️ <strong>资产索引</strong><br/>
-        <small>帧/参考图目录 • 嵌入向量 • 复用检索</small>
-      </td>
-      <td width="10"></td>
-      <!-- 右：一致性与连续性 -->
-      <td align="center" style="padding: 12px; background: linear-gradient(135deg, #ffa726 0%, #ff7043 100%); border-radius: 10px; color: white; width: 50%;">
-        ♻️ <strong>一致性与连续性</strong><br/>
-        <small>角色/环境追踪 • 参考匹配 • 时序连贯性</small>
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <td colspan="3" align="center" style="padding: 15px; background: linear-gradient(135deg, #26de81 0%, #20bf6b 100%); border-radius: 12px; color: white; font-weight: bold;">
-        ✂️ <strong>视觉合成与组装</strong><br/>
-        图像生成 • 最佳帧选择 • 首尾帧→视频 • 剪辑与时间线合成
-      </td>
-    </tr>
-    <tr><td colspan="3" height="15"></td></tr>
-    <tr>
-      <td colspan="3" align="center" style="padding: 20px; background: linear-gradient(135deg, #045de9 0%, #09c6f9 100%); border-radius: 15px; color: white; font-weight: bold;">
-        🚀 <strong>输出层</strong><br/>
-        🖼️ 帧图像 • 🎞️ 片段与最终视频 • 📜 日志 • 📦 工作目录产物
-      </td>
-    </tr>
-  </table>
-</div>
-
-</details>
-
-
 ## 🚀Quick Start
 
 ### 🖥️ **Environment**
@@ -400,7 +328,9 @@ vimax tui resume <session_id>
 
 </details>
 
-### 🎯 **Usage**
+<details>
+<summary><h3>🎯 <strong>Usage</strong></h3></summary>
+
 main_idea2video.py is used to convert your ideas into videos.
 You need to configure the model and API key information in the configs/idea2video.yaml file, including three parts—the chat model, the image generator, and the video generator, as shown below
 ```yaml
@@ -456,5 +386,6 @@ Fast-paced with no more than 20 shots.
 style = "Animate Style"
 ```
 
+</details>
 
 ---
