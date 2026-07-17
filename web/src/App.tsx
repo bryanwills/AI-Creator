@@ -2,9 +2,7 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ArrowUp,
   Check,
-  ChevronDown,
   CircleStop,
-  Clapperboard,
   FileJson,
   FileText,
   Film,
@@ -16,25 +14,19 @@ import {
   PanelLeftOpen,
   PanelRight,
   Sparkles,
+  Trash2,
   Video,
   X,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import {getArtifacts, getHistory, getSessions, sendMessage, startAgent, stopAgent, subscribeToEvents} from './api';
+import {deleteSession, getArtifacts, getHistory, getSessions, sendMessage, startAgent, stopAgent, subscribeToEvents} from './api';
 import {applyAgentEvent, appendLocalUser, composeAgentPrompt, createChatState, humanize} from './events';
 import type {AgentEvent, Artifact, ChatState, Message, SessionSummary} from './types';
 
 const CONTEXT_TARGET = 160_000;
 
-type Workflow = 'auto' | 'idea2video' | 'script2video' | 'novel2video';
-
-const workflowLabels: Record<Workflow, string> = {
-  auto: 'Auto workflow',
-  idea2video: 'Idea to video',
-  script2video: 'Script to video',
-  novel2video: 'Novel to video',
-};
+type WorkspaceView = 'workspace' | 'renders';
 
 export default function App() {
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
@@ -42,7 +34,7 @@ export default function App() {
   const [chat, setChat] = useState<ChatState>(() => createChatState());
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [selectedArtifactPath, setSelectedArtifactPath] = useState('');
-  const [workflow, setWorkflow] = useState<Workflow>('auto');
+  const [workspaceView, setWorkspaceView] = useState<WorkspaceView>('workspace');
   const [connected, setConnected] = useState(false);
   const [agentReady, setAgentReady] = useState(false);
   const [bridgeLabel, setBridgeLabel] = useState('Local agent idle');
@@ -51,6 +43,8 @@ export default function App() {
   const [artifactPanelOpen, setArtifactPanelOpen] = useState(false);
   const [draft, setDraft] = useState('');
   const [loadError, setLoadError] = useState('');
+  const [pendingDelete, setPendingDelete] = useState<SessionSummary>();
+  const [deleting, setDeleting] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -163,7 +157,7 @@ export default function App() {
     setChat(createChatState());
     setArtifacts([]);
     setSelectedArtifactPath('');
-    setWorkflow('auto');
+    setWorkspaceView('workspace');
     try {
       await startAgent({newSession: true});
       setAgentReady(true);
@@ -187,7 +181,7 @@ export default function App() {
         await startAgent(selectedSessionId ? {sessionId: selectedSessionId} : {newSession: true});
         setAgentReady(true);
       }
-      const outbound = composeAgentPrompt(text, workflow);
+      const outbound = composeAgentPrompt(text);
       await sendMessage(outbound);
     } catch (error) {
       const event: AgentEvent = {type: 'error', message: error instanceof Error ? error.message : String(error)};
@@ -201,6 +195,31 @@ export default function App() {
     setChat((current) => ({...current, busy: false}));
   }
 
+  async function confirmDelete() {
+    if (!pendingDelete || deleting) return;
+    const sessionId = pendingDelete.sessionId;
+    const deletingSelected = sessionId === selectedSessionId;
+    setDeleting(true);
+    setLoadError('');
+    try {
+      const state = await deleteSession(sessionId);
+      setSessions(state.sessions);
+      setPendingDelete(undefined);
+      if (deletingSelected) {
+        setSelectedSessionId('');
+        setChat(createChatState());
+        setArtifacts([]);
+        setSelectedArtifactPath('');
+        setAgentReady(false);
+        if (state.activeSessionId) await openSession(state.activeSessionId);
+      }
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   const contextPercent = Math.min(100, Math.round((chat.promptTokens / CONTEXT_TARGET) * 100));
   const hasConversation = chat.messages.length > 0;
 
@@ -211,11 +230,14 @@ export default function App() {
         mobileOpen={mobileSidebarOpen}
         sessions={sessions}
         selectedSessionId={selectedSessionId}
+        activeView={workspaceView}
         onToggle={() => setSidebarOpen((value) => !value)}
         onMobileClose={() => setMobileSidebarOpen(false)}
         onNew={() => void newProject()}
         onSelect={(sessionId) => void openSession(sessionId)}
-        onArtifacts={() => setArtifactPanelOpen(true)}
+        onWorkspace={() => setWorkspaceView('workspace')}
+        onRenders={() => setWorkspaceView('renders')}
+        onDelete={setPendingDelete}
       />
 
       <main className="workspace-main">
@@ -248,16 +270,27 @@ export default function App() {
           </div>
         </header>
 
-        <div className="conversation" ref={scrollRef}>
-          {!hasConversation ? (
-            <EmptyState workflow={workflow} onWorkflow={setWorkflow} />
-          ) : (
-            <div className="message-stream">
-              {chat.messages.map((message) => <MessageRow key={message.id} message={message} />)}
-              {chat.busy && <ThinkingRow messages={chat.messages} />}
-            </div>
-          )}
-        </div>
+        {workspaceView === 'workspace' ? (
+          <div className="conversation" ref={scrollRef}>
+            {!hasConversation ? (
+              <EmptyState />
+            ) : (
+              <div className="message-stream">
+                {chat.messages.map((message) => <MessageRow key={message.id} message={message} />)}
+                {chat.busy && <ThinkingRow messages={chat.messages} />}
+              </div>
+            )}
+          </div>
+        ) : (
+          <RendersView
+            session={selectedSession}
+            artifacts={artifacts}
+            onSelect={(path) => {
+              setSelectedArtifactPath(path);
+              setArtifactPanelOpen(true);
+            }}
+          />
+        )}
 
         <div className="composer-zone">
           {loadError && (
@@ -289,13 +322,6 @@ export default function App() {
               rows={1}
             />
             <div className="composer-controls">
-              <label className="workflow-select">
-                <Clapperboard size={15} />
-                <select value={workflow} onChange={(event) => setWorkflow(event.target.value as Workflow)} disabled={chat.busy}>
-                  {(Object.keys(workflowLabels) as Workflow[]).map((value) => <option key={value} value={value}>{workflowLabels[value]}</option>)}
-                </select>
-                <ChevronDown size={14} />
-              </label>
               <div className="composer-spacer" />
               {chat.busy ? (
                 <button className="send-button stop" onClick={() => void stop()} aria-label="Stop generation"><CircleStop size={18} /></button>
@@ -314,20 +340,29 @@ export default function App() {
         onSelect={setSelectedArtifactPath}
         onClose={() => setArtifactPanelOpen(false)}
       />
+      <DeleteProjectDialog
+        session={pendingDelete}
+        deleting={deleting}
+        onCancel={() => !deleting && setPendingDelete(undefined)}
+        onConfirm={() => void confirmDelete()}
+      />
     </div>
   );
 }
 
-function Sidebar({open, mobileOpen, sessions, selectedSessionId, onToggle, onMobileClose, onNew, onSelect, onArtifacts}: {
+function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onToggle, onMobileClose, onNew, onSelect, onWorkspace, onRenders, onDelete}: {
   open: boolean;
   mobileOpen: boolean;
   sessions: SessionSummary[];
   selectedSessionId: string;
+  activeView: WorkspaceView;
   onToggle: () => void;
   onMobileClose: () => void;
   onNew: () => void;
   onSelect: (sessionId: string) => void;
-  onArtifacts: () => void;
+  onWorkspace: () => void;
+  onRenders: () => void;
+  onDelete: (session: SessionSummary) => void;
 }) {
   return (
     <>
@@ -343,24 +378,28 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, onToggle, onMob
         </div>
         <nav className="primary-nav" aria-label="Primary navigation">
           <button onClick={onNew}><MessageSquarePlus size={17} /><span>New project</span></button>
-          <button className="is-active"><Sparkles size={17} /><span>Workspace</span></button>
-          <button onClick={onArtifacts}><Video size={17} /><span>Renders</span></button>
+          <button className={activeView === 'workspace' ? 'is-active' : ''} onClick={onWorkspace}><Sparkles size={17} /><span>Workspace</span></button>
+          <button className={activeView === 'renders' ? 'is-active' : ''} onClick={onRenders}><Video size={17} /><span>Renders</span></button>
         </nav>
         <div className="session-section">
           <div className="section-label"><span>Projects</span><span>{sessions.length}</span></div>
           <div className="session-list">
             {sessions.map((session) => (
-              <button
+              <div
                 key={session.sessionId}
-                className={session.sessionId === selectedSessionId ? 'is-selected' : ''}
-                onClick={() => onSelect(session.sessionId)}
+                className={`session-item ${session.sessionId === selectedSessionId ? 'is-selected' : ''}`}
               >
-                <span className={`stage-dot stage-${session.stage}`} />
-                <span className="session-copy">
-                  <strong>{sessionTitle(session)}</strong>
-                  <small>{relativeTime(session.updatedAt)} · {stageLabel(session.stage)}</small>
-                </span>
-              </button>
+                <button className="session-open" onClick={() => onSelect(session.sessionId)}>
+                  <span className={`stage-dot stage-${session.stage}`} />
+                  <span className="session-copy">
+                    <strong>{sessionTitle(session)}</strong>
+                    <small>{relativeTime(session.updatedAt)} · {stageLabel(session.stage)}</small>
+                  </span>
+                </button>
+                <button className="session-delete" onClick={() => onDelete(session)} aria-label={`Delete ${sessionTitle(session)}`} title="Delete project">
+                  <Trash2 size={14} />
+                </button>
+              </div>
             ))}
             {sessions.length === 0 && <span className="empty-list">No projects yet</span>}
           </div>
@@ -374,17 +413,10 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, onToggle, onMob
   );
 }
 
-function EmptyState({workflow, onWorkflow}: {workflow: Workflow; onWorkflow: (workflow: Workflow) => void}) {
+function EmptyState() {
   return (
     <section className="empty-state">
       <h1>What should we create?</h1>
-      <div className="workflow-quick-picks" role="group" aria-label="Workflow preference">
-        {(['idea2video', 'script2video', 'novel2video'] as Workflow[]).map((value) => (
-          <button key={value} className={workflow === value ? 'is-selected' : ''} onClick={() => onWorkflow(value)}>
-            {workflow === value && <Check size={14} />}{workflowLabels[value]}
-          </button>
-        ))}
-      </div>
     </section>
   );
 }
@@ -424,6 +456,82 @@ function ThinkingRow({messages}: {messages: Message[]}) {
     <div className="thinking-row">
       <span className="thinking-mark"><i /><i /><i /></span>
       <span>{running ? `${humanize(running.tool || 'ViMax')} · ${running.text}` : 'ViMax is thinking'}</span>
+    </div>
+  );
+}
+
+function RendersView({session, artifacts, onSelect}: {
+  session?: SessionSummary;
+  artifacts: Artifact[];
+  onSelect: (path: string) => void;
+}) {
+  const media = artifacts.filter((artifact) => artifact.kind === 'image' || artifact.kind === 'video');
+  return (
+    <section className="renders-view">
+      <header>
+        <div>
+          <span>Renders</span>
+          <h1>{session ? sessionTitle(session) : 'No project selected'}</h1>
+        </div>
+        {session && <StageBadge stage={session.stage} />}
+      </header>
+      {media.length > 0 ? (
+        <div className="render-grid">
+          {media.map((artifact) => (
+            <button key={artifact.path} className="render-item" onClick={() => onSelect(artifact.path)}>
+              <span className="render-media">
+                {artifact.kind === 'image'
+                  ? <img src={artifact.url} alt={artifact.name} />
+                  : <video src={artifact.url} muted preload="metadata" />}
+                <i>{artifact.kind === 'video' ? <Video size={15} /> : <ImageIcon size={15} />}</i>
+              </span>
+              <span className="render-copy">
+                <strong>{artifact.name}</strong>
+                <small>{formatBytes(artifact.size)} · {relativeTime(artifact.updatedAt)}</small>
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="renders-empty">
+          <Film size={24} />
+          <strong>{session ? 'No renders yet' : 'Select a project'}</strong>
+          <span>{session ? stageLabel(session.stage) : 'Projects appear in the sidebar'}</span>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function DeleteProjectDialog({session, deleting, onCancel, onConfirm}: {
+  session?: SessionSummary;
+  deleting: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  useEffect(() => {
+    if (!session) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !deleting) onCancel();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [deleting, onCancel, session]);
+
+  if (!session) return null;
+  return (
+    <div className="dialog-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
+      <section className="delete-dialog" role="dialog" aria-modal="true" aria-labelledby="delete-project-title">
+        <span className="dialog-icon"><Trash2 size={18} /></span>
+        <div className="dialog-copy">
+          <h2 id="delete-project-title">Delete project?</h2>
+          <p><strong>{sessionTitle(session)}</strong> and its generated files will be permanently removed.</p>
+        </div>
+        <div className="dialog-actions">
+          <button onClick={onCancel} disabled={deleting} autoFocus>Cancel</button>
+          <button className="danger" onClick={onConfirm} disabled={deleting}>{deleting ? 'Deleting…' : 'Delete'}</button>
+        </div>
+      </section>
     </div>
   );
 }

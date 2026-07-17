@@ -4,6 +4,10 @@ export async function getSessions() {
   return request<{activeSessionId: string; sessions: SessionSummary[]}>('/api/sessions');
 }
 
+export async function deleteSession(sessionId: string) {
+  return request<{activeSessionId: string; sessions: SessionSummary[]}>(`/api/sessions?session=${encodeURIComponent(sessionId)}`, {method: 'DELETE'});
+}
+
 export async function getHistory(sessionId: string) {
   return request<{messages: Message[]}>(`/api/history?session=${encodeURIComponent(sessionId)}`);
 }

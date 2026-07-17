@@ -22,9 +22,7 @@ describe('agent event mapping', () => {
   });
 
   it('keeps each composer submission on one stdin line', () => {
-    expect(composeAgentPrompt('first line\nsecond line', 'script2video')).toBe(
-      'I prefer the script2video workflow for this request. first line second line',
-    );
+    expect(composeAgentPrompt('first line\nsecond line')).toBe('first line second line');
     expect(humanize('vimax_narrative_planning')).toBe('ViMax Narrative Planning');
   });
 });

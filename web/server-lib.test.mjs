@@ -1,8 +1,8 @@
-import {mkdtemp, mkdir, writeFile} from 'node:fs/promises';
+import {mkdtemp, mkdir, readFile, stat, writeFile} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {afterEach, describe, expect, it} from 'vitest';
-import {listSessionArtifacts, readSessionHistory, readSessionState, resolveArtifactPath} from './server-lib.mjs';
+import {deleteSession, listSessionArtifacts, readSessionHistory, readSessionState, resolveArtifactPath} from './server-lib.mjs';
 
 const roots = [];
 
@@ -48,5 +48,21 @@ describe('web bridge state', () => {
     const artifacts = await listSessionArtifacts(root, 'session-1');
     expect(artifacts[0]).toMatchObject({kind: 'image', name: 'first_frame.png'});
     expect(() => resolveArtifactPath(root, 'session-1', '../../secrets')).toThrow(/escapes/);
+  });
+
+  it('deletes project state, artifacts, and matching log records', async () => {
+    const root = await fixture();
+    const logPath = path.join(root, '.vimax', 'logs', 'loop_history.jsonl');
+    await writeFile(logPath, [
+      JSON.stringify({session_id: 'session-1', raw_user_input: 'Delete me'}),
+      JSON.stringify({session_id: 'session-2', raw_user_input: 'Keep me'}),
+      '',
+    ].join('\n'));
+
+    const state = await deleteSession(root, 'session-1');
+    expect(state).toEqual({activeSessionId: '', sessions: []});
+    await expect(stat(path.join(root, '.working_dir', 'session-1'))).rejects.toThrow();
+    expect(await readFile(logPath, 'utf8')).toContain('session-2');
+    expect(await readFile(logPath, 'utf8')).not.toContain('session-1');
   });
 });

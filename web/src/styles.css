@@ -193,28 +193,65 @@ a:focus-visible {
   scrollbar-color: #d2d4d0 transparent;
 }
 
-.session-list button {
-  display: grid;
+.session-item {
+  position: relative;
+  display: flex;
   width: 100%;
   min-height: 52px;
-  grid-template-columns: 8px minmax(0, 1fr);
   align-items: center;
-  gap: 10px;
-  padding: 7px 10px;
-  text-align: left;
   background: transparent;
-  border: 0;
   border-radius: 6px;
-  cursor: pointer;
 }
 
-.session-list button:hover {
+.session-item:hover {
   background: #ebebe8;
 }
 
-.session-list button.is-selected {
+.session-item.is-selected {
   background: #e1e3df;
   box-shadow: inset 2px 0 0 var(--blue);
+}
+
+.session-open {
+  display: grid;
+  min-width: 0;
+  min-height: 52px;
+  flex: 1;
+  grid-template-columns: 8px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 7px 34px 7px 10px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.session-delete {
+  position: absolute;
+  right: 7px;
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  padding: 0;
+  color: #7d817d;
+  background: color-mix(in srgb, var(--sidebar) 86%, transparent);
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  opacity: 0;
+  transition: color 120ms ease, background 120ms ease, opacity 120ms ease;
+}
+
+.session-item:hover .session-delete,
+.session-delete:focus-visible {
+  opacity: 1;
+}
+
+.session-delete:hover {
+  color: var(--red);
+  background: #f5dfdc;
 }
 
 .stage-dot {
@@ -468,41 +505,6 @@ a:focus-visible {
   font-size: 28px;
   font-weight: 580;
   letter-spacing: 0;
-}
-
-.workflow-quick-picks {
-  display: inline-flex;
-  gap: 2px;
-  padding: 3px;
-  margin-top: 22px;
-  background: #efefec;
-  border: 1px solid #e4e5e1;
-  border-radius: 7px;
-}
-
-.workflow-quick-picks button {
-  display: inline-flex;
-  min-height: 31px;
-  align-items: center;
-  gap: 5px;
-  padding: 0 10px;
-  color: #6b706c;
-  font-size: 11px;
-  font-weight: 590;
-  background: transparent;
-  border: 0;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.workflow-quick-picks button:hover {
-  color: var(--ink);
-}
-
-.workflow-quick-picks button.is-selected {
-  color: #194f8f;
-  background: white;
-  box-shadow: 0 1px 3px rgba(26, 31, 28, 0.08);
 }
 
 .message-stream {
@@ -829,40 +831,243 @@ a:focus-visible {
   padding: 5px 8px 8px 10px;
 }
 
-.workflow-select {
+.composer-spacer {
+  flex: 1;
+}
+
+.renders-view {
+  min-height: 0;
+  flex: 1;
+  padding: 42px clamp(24px, 5vw, 72px) 158px;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d7d8d4 transparent;
+}
+
+.renders-view > header {
+  display: flex;
+  max-width: 1080px;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0 auto 26px;
+}
+
+.renders-view > header > div {
+  min-width: 0;
+}
+
+.renders-view > header span:first-child {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.renders-view h1 {
+  overflow: hidden;
+  margin: 5px 0 0;
+  font-size: 23px;
+  font-weight: 640;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.render-grid {
+  display: grid;
+  max-width: 1080px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+  margin: 0 auto;
+}
+
+.render-item {
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  box-shadow: 0 2px 8px rgba(32, 37, 34, 0.04);
+  cursor: pointer;
+  transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.render-item:hover {
+  border-color: #bdc9d4;
+  box-shadow: 0 8px 24px rgba(32, 37, 34, 0.08);
+  transform: translateY(-2px);
+}
+
+.render-media {
   position: relative;
-  display: inline-flex;
-  height: 30px;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #e9ebe7;
+  border-bottom: 1px solid var(--line);
+}
+
+.render-media img,
+.render-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.render-media i {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  color: white;
+  background: rgba(24, 28, 26, 0.72);
+  border-radius: 5px;
+  backdrop-filter: blur(6px);
+}
+
+.render-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 11px 11px;
+}
+
+.render-copy strong,
+.render-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.render-copy strong {
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.render-copy small {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.renders-empty {
+  display: flex;
+  min-height: 320px;
   align-items: center;
-  gap: 6px;
-  padding: 0 7px;
-  color: #626763;
-  background: #f5f5f2;
-  border: 1px solid #e4e5e1;
+  justify-content: center;
+  flex-direction: column;
+  gap: 7px;
+  color: #929692;
+}
+
+.renders-empty strong {
+  margin-top: 4px;
+  color: #5e635f;
+  font-size: 13px;
+}
+
+.renders-empty span {
+  font-size: 10px;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(24, 28, 26, 0.26);
+  backdrop-filter: blur(2px);
+  animation: dialog-backdrop-in 140ms ease both;
+}
+
+.delete-dialog {
+  display: grid;
+  width: min(410px, 100%);
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 12px;
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  box-shadow: 0 24px 70px rgba(25, 30, 27, 0.2);
+  animation: dialog-in 160ms ease both;
+}
+
+.dialog-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  color: var(--red);
+  background: #f8e8e6;
   border-radius: 6px;
 }
 
-.workflow-select select {
-  max-width: 132px;
-  appearance: none;
-  padding: 0 17px 0 0;
-  color: inherit;
-  font-size: 10px;
-  font-weight: 620;
-  background: transparent;
-  border: 0;
-  outline: none;
+.dialog-copy h2 {
+  margin: 1px 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.dialog-copy p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.dialog-copy p strong {
+  color: var(--ink);
+}
+
+.dialog-actions {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.dialog-actions button {
+  min-width: 72px;
+  height: 32px;
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 650;
+  background: #f3f3f0;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
   cursor: pointer;
 }
 
-.workflow-select > svg:last-child {
-  position: absolute;
-  right: 6px;
-  pointer-events: none;
+.dialog-actions button:hover:not(:disabled) {
+  background: #eaeae7;
 }
 
-.composer-spacer {
-  flex: 1;
+.dialog-actions button.danger {
+  color: white;
+  background: var(--red);
+  border-color: var(--red);
+}
+
+.dialog-actions button.danger:hover:not(:disabled) {
+  background: #aa3333;
+}
+
+.dialog-actions button:disabled {
+  cursor: wait;
+  opacity: 0.64;
 }
 
 .send-button {
@@ -1097,6 +1302,16 @@ a:focus-visible {
   30% {opacity: 1; transform: translateY(-2px);}
 }
 
+@keyframes dialog-backdrop-in {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes dialog-in {
+  from {opacity: 0; transform: translateY(5px) scale(0.99);}
+  to {opacity: 1; transform: translateY(0) scale(1);}
+}
+
 @media (max-width: 1040px) {
   .artifact-panel {
     position: absolute;
@@ -1211,15 +1426,6 @@ a:focus-visible {
     font-size: 23px;
   }
 
-  .workflow-quick-picks {
-    width: 100%;
-    flex-direction: column;
-  }
-
-  .workflow-quick-picks button {
-    justify-content: center;
-  }
-
   .composer-zone {
     padding: 24px 10px 10px;
   }
@@ -1231,6 +1437,22 @@ a:focus-visible {
   .artifact-panel,
   .artifact-panel.is-open {
     width: min(360px, calc(100vw - 24px));
+  }
+
+  .session-delete {
+    opacity: 1;
+  }
+
+  .renders-view {
+    padding: 28px 14px 148px;
+  }
+
+  .renders-view h1 {
+    font-size: 20px;
+  }
+
+  .render-grid {
+    grid-template-columns: 1fr;
   }
 }
 

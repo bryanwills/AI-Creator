@@ -6,6 +6,7 @@ import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {
   artifactContentType,
+  deleteSession,
   listSessionArtifacts,
   readSessionHistory,
   readSessionState,
@@ -31,6 +32,18 @@ const server = createServer(async (request, response) => {
     }
     if (url.pathname === '/api/sessions' && request.method === 'GET') {
       return sendJson(response, 200, await readSessionState(repoRoot));
+    }
+    if (url.pathname === '/api/sessions' && request.method === 'DELETE') {
+      const sessionId = url.searchParams.get('session') || '';
+      const current = await readSessionState(repoRoot);
+      if (!current.sessions.some((session) => session.sessionId === sessionId)) {
+        return sendJson(response, 404, {error: 'Project not found'});
+      }
+      if (sessionId === activeSessionId) stopAgent('delete');
+      const state = await deleteSession(repoRoot, sessionId);
+      activeSessionId = state.activeSessionId;
+      broadcast({type: 'sessions_changed', ...state});
+      return sendJson(response, 200, state);
     }
     if (url.pathname === '/api/history' && request.method === 'GET') {
       return sendJson(response, 200, {messages: await readSessionHistory(repoRoot, url.searchParams.get('session') || '')});

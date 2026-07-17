@@ -12,9 +12,8 @@ export function appendLocalUser(state: ChatState, text: string): ChatState {
   };
 }
 
-export function composeAgentPrompt(text: string, workflow: string) {
-  const normalized = text.replace(/\s+/g, ' ').trim();
-  return workflow === 'auto' ? normalized : `I prefer the ${workflow} workflow for this request. ${normalized}`;
+export function composeAgentPrompt(text: string) {
+  return text.replace(/\s+/g, ' ').trim();
 }
 
 export function applyAgentEvent(state: ChatState, event: AgentEvent): ChatState {
