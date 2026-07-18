@@ -1,10 +1,13 @@
 <div align="center">
-  <img src="./assets/vimax.png"> 
-	<br>
-  <br>
-<a href="https://trendshift.io/repositories/15299" target="_blank"><img src="https://trendshift.io/api/badge/repositories/15299" alt="HKUDS%2FViMax | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-  <h1 align="center">ViMax: Agentic Video Generation</h1>
 
+<picture>
+    <img src="assets/vimax.svg" width="130px" style="border: none; box-shadow: none;" alt="ViMax Logo">
+</picture>
+</div>
+<div align="center">
+  <h1 align="center">ViMax: Agentic Video Generation</h1>
+<a href="https://trendshift.io/repositories/15299" target="_blank"><img src="https://trendshift.io/api/badge/repositories/15299" alt="HKUDS%2FViMax | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+  </p>
   <div align="center">
   </div>
 
@@ -25,7 +28,6 @@
   </p>
 
 </div>
-
 ---
 
 ### 🚨 Current Video Generation Limitations:
