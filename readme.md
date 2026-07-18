@@ -28,6 +28,7 @@
   </p>
 
 </div>
+
 ---
 
 ### 🚨 Current Video Generation Limitations:
