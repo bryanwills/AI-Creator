@@ -12,8 +12,11 @@ export function appendLocalUser(state: ChatState, text: string): ChatState {
   };
 }
 
-export function composeAgentPrompt(text: string) {
-  return text.replace(/\s+/g, ' ').trim();
+export function composeAgentPrompt(text: string, workspaceUploads: string[] = []) {
+  const message = text.replace(/\s+/g, ' ').trim();
+  const paths = workspaceUploads.map((path) => path.trim()).filter(Boolean);
+  if (paths.length === 0) return message;
+  return `${message} <workspace_uploads>${JSON.stringify(paths)}</workspace_uploads>`;
 }
 
 export function applyAgentEvent(state: ChatState, event: AgentEvent): ChatState {
@@ -88,7 +91,14 @@ export function applyAgentEvent(state: ChatState, event: AgentEvent): ChatState 
       return {...state, messages, busy: false};
     }
     case 'bridge_status':
-      return event.status === 'error' ? {...state, busy: false} : state;
+      if (event.status !== 'error' && event.status !== 'stopped') return state;
+      return {
+        ...state,
+        busy: false,
+        messages: state.messages.map((message) => message.role === 'activity' && message.status === 'running'
+          ? {...message, status: 'error', stage: 'interrupted', text: event.message || 'Generation stopped'}
+          : message),
+      };
     default:
       return state;
   }

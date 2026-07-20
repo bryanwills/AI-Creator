@@ -1,4 +1,4 @@
-import type {AgentConfig, AgentEvent, Artifact, Message, SessionSummary} from './types';
+import type {AgentConfig, AgentEvent, Artifact, JsonValue, Message, SessionSummary, WorkspaceUpload} from './types';
 
 export async function getSessions() {
   return request<{activeSessionId: string; sessions: SessionSummary[]}>('/api/sessions');
@@ -22,6 +22,32 @@ export async function getHistory(sessionId: string) {
 
 export async function getArtifacts(sessionId: string) {
   return request<{artifacts: Artifact[]}>(`/api/artifacts?session=${encodeURIComponent(sessionId)}`);
+}
+
+export async function uploadWorkspaceFile(sessionId: string, file: File) {
+  const url = `/api/uploads?session=${encodeURIComponent(sessionId)}&name=${encodeURIComponent(file.name)}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': file.type || 'application/octet-stream'},
+    body: file,
+  });
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload.error || `Upload failed with HTTP ${response.status}`);
+  return payload as {file: WorkspaceUpload};
+}
+
+export async function getJsonArtifact(artifact: Artifact): Promise<JsonValue> {
+  const separator = artifact.url.includes('?') ? '&' : '?';
+  const response = await fetch(`${artifact.url}${separator}updated=${encodeURIComponent(artifact.updatedAt)}`, {
+    cache: 'no-store',
+    headers: {Accept: 'application/json'},
+  });
+  const payload = await response.json();
+  if (!response.ok) {
+    const message = payload && typeof payload === 'object' && 'error' in payload ? String(payload.error) : `Request failed with HTTP ${response.status}`;
+    throw new Error(message);
+  }
+  return payload as JsonValue;
 }
 
 export async function startAgent(options: {sessionId?: string; newSession?: boolean; projectName?: string}) {

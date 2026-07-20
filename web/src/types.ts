@@ -31,6 +31,16 @@ export type Artifact = {
   url: string;
 };
 
+export type WorkspaceUpload = {
+  name: string;
+  path: string;
+  size: number;
+};
+
+export type JsonPrimitive = string | number | boolean | null;
+
+export type JsonValue = JsonPrimitive | JsonValue[] | {[key: string]: JsonValue};
+
 export type Message = {
   id: string;
   role: 'user' | 'assistant' | 'activity' | 'error';

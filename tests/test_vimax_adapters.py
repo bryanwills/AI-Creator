@@ -291,6 +291,22 @@ class ViMaxAdapterTests(unittest.IsolatedAsyncioTestCase):
                 second = await adapter.vimax_narrative_planning({"idea": "ocean robot"})
             self.assertNotEqual(json.loads(first.content)["session_id"], json.loads(second.content)["session_id"])
 
+    async def test_new_idea_initializes_named_empty_active_session(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            index = SessionIndex(tmp)
+            empty = index.create(project_name="00")
+            adapter = ViMaxAdapters(Path(tmp), index)
+            with patch("agent_runtime.vimax_adapters._build_chat_model", return_value=object()), \
+                 patch("agent_runtime.vimax_adapters.Idea2VideoPipeline", FakeIdeaPipeline), \
+                 patch("agent_runtime.vimax_adapters.Script2VideoPipeline", FakeScriptPipeline):
+                result = await adapter.vimax_narrative_planning({"idea": "moon cat"})
+            self.assertTrue(result.ok)
+            payload = json.loads(result.content)
+            self.assertEqual(payload["session_id"], empty["session_id"])
+            self.assertEqual(index.active()["project_name"], "00")
+            self.assertEqual(index.active()["idea"], "moon cat")
+            self.assertEqual(len(index.load()["sessions"]), 1)
+
 
     async def test_explicit_session_with_different_idea_creates_new_session(self):
         with tempfile.TemporaryDirectory() as tmp:

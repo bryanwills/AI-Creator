@@ -5,50 +5,57 @@ import {
   Braces,
   CircleStop,
   Clock3,
-  FileJson,
   FilePenLine,
   FileText,
   Film,
   Folder,
   FolderPlus,
+  Files,
   Image as ImageIcon,
   Menu,
+  Moon,
   PanelLeftClose,
   PanelLeftOpen,
   PanelRight,
+  Plus,
   Save,
   Search,
   Settings,
   ListChecks,
   Terminal,
   Trash2,
-  Video,
+  Sun,
   Wrench,
   X,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import {deleteSession, getAgentConfig, getArtifacts, getHistory, getSessions, saveAgentConfig, sendMessage, startAgent, stopAgent, subscribeToEvents} from './api';
+import {deleteSession, getAgentConfig, getArtifacts, getHistory, getSessions, saveAgentConfig, sendMessage, startAgent, stopAgent, subscribeToEvents, uploadWorkspaceFile} from './api';
+import {ArtifactsView, StoryboardPanel} from './ArtifactViews';
 import {applyAgentEvent, appendLocalUser, composeAgentPrompt, createChatState, humanize} from './events';
 import {matchingSlashCommands, shouldShowSlashCommands, type SlashCommandMatch} from './slashCommands';
-import type {AgentConfig, AgentEvent, Artifact, ChatState, ConfigSection, Message, SessionSummary} from './types';
+import {applyTheme, resolveTheme, THEME_STORAGE_KEY, type Theme} from './theme';
+import type {AgentConfig, AgentEvent, Artifact, ChatState, ConfigSection, Message, SessionSummary, WorkspaceUpload} from './types';
 
 const CONTEXT_TARGET = 160_000;
 
-type WorkspaceView = 'workspace' | 'renders' | 'settings';
+type WorkspaceView = 'workspace' | 'artifacts' | 'settings';
 
 export default function App() {
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
   const [selectedSessionId, setSelectedSessionId] = useState('');
   const [chat, setChat] = useState<ChatState>(() => createChatState());
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
-  const [selectedArtifactPath, setSelectedArtifactPath] = useState('');
   const [workspaceView, setWorkspaceView] = useState<WorkspaceView>('workspace');
   const [agentReady, setAgentReady] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [artifactPanelOpen, setArtifactPanelOpen] = useState(false);
+  const [storyboardPanelOpen, setStoryboardPanelOpen] = useState(false);
+  const [storyboardCount, setStoryboardCount] = useState(0);
+  const [theme, setTheme] = useState<Theme>(() => resolveTheme(document.documentElement.dataset.theme, false));
   const [draft, setDraft] = useState('');
+  const [workspaceUploads, setWorkspaceUploads] = useState<WorkspaceUpload[]>([]);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [newProjectOpen, setNewProjectOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
@@ -58,11 +65,26 @@ export default function App() {
   const [deleting, setDeleting] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selectedSession = sessions.find((session) => session.sessionId === selectedSessionId);
-  const selectedArtifact = artifacts.find((artifact) => artifact.path === selectedArtifactPath) || artifacts[0];
   const slashMatches = useMemo(() => matchingSlashCommands(draft), [draft]);
   const showSlashCommands = shouldShowSlashCommands(draft, chat.busy);
+  const runningRender = useMemo(
+    () => [...chat.messages].reverse().find((message) => message.role === 'activity'
+      && message.status === 'running'
+      && (message.tool || '').toLowerCase().includes('render_video')),
+    [chat.messages],
+  );
+
+  useEffect(() => {
+    applyTheme(theme);
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {
+      // Theme still applies when persistence is unavailable.
+    }
+  }, [theme]);
 
   const refreshSessions = useCallback(async () => {
     const state = await getSessions();
@@ -73,12 +95,10 @@ export default function App() {
   const refreshArtifacts = useCallback(async (sessionId: string) => {
     if (!sessionId) {
       setArtifacts([]);
-      setSelectedArtifactPath('');
       return;
     }
     const payload = await getArtifacts(sessionId);
     setArtifacts(payload.artifacts);
-    setSelectedArtifactPath((current) => payload.artifacts.some((artifact) => artifact.path === current) ? current : payload.artifacts[0]?.path || '');
   }, []);
 
   useEffect(() => subscribeToEvents((event) => {
@@ -128,6 +148,16 @@ export default function App() {
   }, [refreshArtifacts, refreshSessions]);
 
   useEffect(() => {
+    if (!runningRender || !selectedSessionId) return;
+    void refreshArtifacts(selectedSessionId);
+    const interval = window.setInterval(() => void refreshArtifacts(selectedSessionId), 2_000);
+    return () => {
+      window.clearInterval(interval);
+      void refreshArtifacts(selectedSessionId);
+    };
+  }, [refreshArtifacts, runningRender, selectedSessionId]);
+
+  useEffect(() => {
     const element = scrollRef.current;
     if (!element) return;
     element.scrollTo({top: element.scrollHeight, behavior: chat.busy ? 'smooth' : 'auto'});
@@ -139,6 +169,11 @@ export default function App() {
     textarea.style.height = '0px';
     textarea.style.height = `${Math.min(168, Math.max(28, textarea.scrollHeight))}px`;
   }, [draft]);
+
+  useEffect(() => {
+    setWorkspaceUploads([]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }, [selectedSessionId]);
 
   async function openSession(sessionId: string) {
     if (!sessionId || sessionId === selectedSessionId) {
@@ -183,7 +218,6 @@ export default function App() {
       setSelectedSessionId(state.activeSessionId);
       setChat(createChatState());
       setArtifacts([]);
-      setSelectedArtifactPath('');
       setWorkspaceView('workspace');
       setNewProjectOpen(false);
       setNewProjectName('');
@@ -197,7 +231,7 @@ export default function App() {
 
   async function submit() {
     const text = draft.trim();
-    if (!text || chat.busy) return;
+    if (!text || chat.busy || uploadingFiles) return;
     setLoadError('');
     setDraft('');
     setChat((current) => appendLocalUser(current, text));
@@ -206,11 +240,41 @@ export default function App() {
         await startAgent(selectedSessionId ? {sessionId: selectedSessionId} : {newSession: true});
         setAgentReady(true);
       }
-      const outbound = composeAgentPrompt(text);
+      const outbound = composeAgentPrompt(text, workspaceUploads.map((file) => file.path));
       await sendMessage(outbound);
+      setWorkspaceUploads([]);
     } catch (error) {
       const event: AgentEvent = {type: 'error', message: error instanceof Error ? error.message : String(error)};
       setChat((current) => applyAgentEvent(current, event));
+    }
+  }
+
+  async function uploadFiles(files: FileList | null) {
+    const sessionId = selectedSessionId;
+    if (!files?.length) return;
+    if (!sessionId) {
+      setLoadError('Create or select a project before uploading files');
+      return;
+    }
+    setUploadingFiles(true);
+    setLoadError('');
+    let uploadedAny = false;
+    try {
+      for (const file of Array.from(files)) {
+        const result = await uploadWorkspaceFile(sessionId, file);
+        uploadedAny = true;
+        setWorkspaceUploads((current) => [
+          ...current.filter((item) => item.path !== result.file.path),
+          result.file,
+        ]);
+      }
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : String(error));
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (uploadedAny) await refreshArtifacts(sessionId);
+      setUploadingFiles(false);
+      textareaRef.current?.focus();
     }
   }
 
@@ -234,7 +298,6 @@ export default function App() {
         setSelectedSessionId('');
         setChat(createChatState());
         setArtifacts([]);
-        setSelectedArtifactPath('');
         setAgentReady(false);
         if (state.activeSessionId) await openSession(state.activeSessionId);
       }
@@ -260,9 +323,18 @@ export default function App() {
         onMobileClose={() => setMobileSidebarOpen(false)}
         onNew={openNewProjectDialog}
         onSelect={(sessionId) => void openSession(sessionId)}
-        onWorkspace={() => setWorkspaceView('workspace')}
-        onRenders={() => setWorkspaceView('renders')}
-        onSettings={() => setWorkspaceView('settings')}
+        onWorkspace={() => {
+          setWorkspaceView('workspace');
+          setMobileSidebarOpen(false);
+        }}
+        onArtifacts={() => {
+          setWorkspaceView('artifacts');
+          setMobileSidebarOpen(false);
+        }}
+        onSettings={() => {
+          setWorkspaceView('settings');
+          setMobileSidebarOpen(false);
+        }}
         onDelete={setPendingDelete}
       />
 
@@ -278,10 +350,13 @@ export default function App() {
               </button>
             )}
             <span className="workspace-utility-spacer" />
-            <button className="icon-button artifact-toggle" onClick={() => setArtifactPanelOpen((value) => !value)} aria-label="Toggle artifacts">
-              <PanelRight size={18} />
-              {artifacts.length > 0 && <span className="count-badge">{artifacts.length}</span>}
-            </button>
+            <div className="workspace-utility-actions">
+              <ThemeToggle theme={theme} onToggle={() => setTheme((current) => current === 'dark' ? 'light' : 'dark')} />
+              <button className="icon-button artifact-toggle" onClick={() => setStoryboardPanelOpen((value) => !value)} aria-label="Toggle storyboard preview">
+                <PanelRight size={18} />
+                {storyboardCount > 0 && <span className="count-badge">{storyboardCount}</span>}
+              </button>
+            </div>
           </div>
         ) : (
           <header className="workspace-header">
@@ -295,26 +370,18 @@ export default function App() {
                 </button>
               )}
               <div className="workspace-title-copy">
-                <strong>{workspaceView === 'settings' ? 'Settings' : sessionTitle(selectedSession)}</strong>
-                <span>{workspaceView === 'settings' ? 'configs/agent.local.yaml' : selectedSession?.workingDir || '.working_dir / new session'}</span>
+                <strong>{workspaceView === 'settings' ? 'Settings' : 'Artifacts'}</strong>
+                {workspaceView === 'settings' && <span>configs/agent.local.yaml</span>}
               </div>
-              {selectedSession && workspaceView === 'renders' && <StageBadge stage={selectedSession.stage} />}
             </div>
-            <div className="workspace-actions">
-              {workspaceView === 'renders' && (
-                <button className="icon-button artifact-toggle" onClick={() => setArtifactPanelOpen((value) => !value)} aria-label="Toggle artifacts">
-                  <PanelRight size={18} />
-                  {artifacts.length > 0 && <span className="count-badge">{artifacts.length}</span>}
-                </button>
-              )}
-            </div>
+            <ThemeToggle theme={theme} onToggle={() => setTheme((current) => current === 'dark' ? 'light' : 'dark')} />
           </header>
         )}
 
         {workspaceView === 'workspace' ? (
           <div className="conversation" ref={scrollRef}>
             {!hasConversation ? (
-              <EmptyState />
+              <EmptyState theme={theme} />
             ) : (
               <div className="message-stream">
                 {chat.messages.map((message) => <MessageRow key={message.id} message={message} />)}
@@ -322,20 +389,13 @@ export default function App() {
               </div>
             )}
           </div>
-        ) : workspaceView === 'renders' ? (
-          <RendersView
-            session={selectedSession}
-            artifacts={artifacts}
-            onSelect={(path) => {
-              setSelectedArtifactPath(path);
-              setArtifactPanelOpen(true);
-            }}
-          />
+        ) : workspaceView === 'artifacts' ? (
+          <ArtifactsView session={selectedSession} artifacts={artifacts} />
         ) : (
           <SettingsView />
         )}
 
-        {workspaceView !== 'settings' && <div className="composer-zone">
+        {workspaceView === 'workspace' && <div className="composer-zone">
           {loadError && (
             <div className="inline-error" role="alert">
               <span>{loadError}</span>
@@ -367,24 +427,61 @@ export default function App() {
               disabled={chat.busy}
               rows={1}
             />
+            {(workspaceUploads.length > 0 || uploadingFiles) && (
+              <div className="composer-attachments" aria-live="polite">
+                {workspaceUploads.map((file) => (
+                  <span className="composer-attachment" key={file.path} title={file.path}>
+                    <FileText size={13} />
+                    <span>{file.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => setWorkspaceUploads((current) => current.filter((item) => item.path !== file.path))}
+                      aria-label={`Remove ${file.name} from this message`}
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
+                {uploadingFiles && <span className="composer-uploading">Uploading…</span>}
+              </div>
+            )}
             <div className="composer-controls">
+              <input
+                ref={fileInputRef}
+                className="composer-file-input"
+                type="file"
+                multiple
+                onChange={(event) => void uploadFiles(event.currentTarget.files)}
+                tabIndex={-1}
+              />
+              <button
+                type="button"
+                className="composer-add"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={!selectedSessionId || uploadingFiles || chat.busy}
+                aria-label="Upload files to workspace"
+                aria-busy={uploadingFiles}
+                title={selectedSessionId ? 'Upload files to workspace' : 'Create or select a project first'}
+              >
+                <Plus size={20} />
+              </button>
               <div className="composer-spacer" />
               {chat.busy ? (
                 <button className="send-button stop" onClick={() => void stop()} aria-label="Stop generation"><CircleStop size={18} /></button>
               ) : (
-                <button className="send-button" onClick={() => void submit()} disabled={!draft.trim()} aria-label="Send message"><ArrowUp size={19} /></button>
+                <button className="send-button" onClick={() => void submit()} disabled={!draft.trim() || uploadingFiles} aria-label="Send message"><ArrowUp size={19} /></button>
               )}
             </div>
           </div>
         </div>}
       </main>
 
-      <ArtifactPanel
-        open={artifactPanelOpen}
+      <StoryboardPanel
+        open={storyboardPanelOpen && workspaceView === 'workspace'}
         artifacts={artifacts}
-        selected={selectedArtifact}
-        onSelect={setSelectedArtifactPath}
-        onClose={() => setArtifactPanelOpen(false)}
+        activeRenderStage={runningRender?.stage}
+        onClose={() => setStoryboardPanelOpen(false)}
+        onCountChange={setStoryboardCount}
       />
       <DeleteProjectDialog
         session={pendingDelete}
@@ -412,7 +509,7 @@ export default function App() {
   );
 }
 
-function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onToggle, onMobileClose, onNew, onSelect, onWorkspace, onRenders, onSettings, onDelete}: {
+function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onToggle, onMobileClose, onNew, onSelect, onWorkspace, onArtifacts, onSettings, onDelete}: {
   open: boolean;
   mobileOpen: boolean;
   sessions: SessionSummary[];
@@ -423,7 +520,7 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onT
   onNew: () => void;
   onSelect: (sessionId: string) => void;
   onWorkspace: () => void;
-  onRenders: () => void;
+  onArtifacts: () => void;
   onSettings: () => void;
   onDelete: (session: SessionSummary) => void;
 }) {
@@ -441,7 +538,7 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onT
         <nav className="primary-nav" aria-label="Primary navigation">
           <button onClick={onNew}><FolderPlus size={17} /><span>New project</span></button>
           <button className={activeView === 'workspace' ? 'is-active' : ''} onClick={onWorkspace}><Folder size={17} /><span>Workspace</span></button>
-          <button className={activeView === 'renders' ? 'is-active' : ''} onClick={onRenders}><Video size={17} /><span>Renders</span></button>
+          <button className={activeView === 'artifacts' ? 'is-active' : ''} onClick={onArtifacts}><Files size={17} /><span>Artifacts</span></button>
           <button className={activeView === 'settings' ? 'is-active' : ''} onClick={onSettings}><Settings size={17} /><span>Settings</span></button>
         </nav>
         <div className="session-section">
@@ -475,11 +572,28 @@ function Sidebar({open, mobileOpen, sessions, selectedSessionId, activeView, onT
   );
 }
 
-function EmptyState() {
+function EmptyState({theme}: {theme: Theme}) {
   return (
     <section className="empty-state">
+      <img className="empty-state-logo" src={theme === 'dark' ? '/vimax-light.svg' : '/vimax-dark.svg'} alt="ViMax" />
       <h1>What should we create?</h1>
     </section>
+  );
+}
+
+function ThemeToggle({theme, onToggle}: {theme: Theme; onToggle: () => void}) {
+  const dark = theme === 'dark';
+  return (
+    <button
+      type="button"
+      className="icon-button theme-toggle"
+      onClick={onToggle}
+      aria-label={dark ? 'Use light mode' : 'Use dark mode'}
+      aria-pressed={dark}
+      title={dark ? 'Light mode' : 'Dark mode'}
+    >
+      {dark ? <Sun size={18} /> : <Moon size={18} />}
+    </button>
   );
 }
 
@@ -660,49 +774,6 @@ function ConfigSectionEditor({definition, value, onChange}: {
   );
 }
 
-function RendersView({session, artifacts, onSelect}: {
-  session?: SessionSummary;
-  artifacts: Artifact[];
-  onSelect: (path: string) => void;
-}) {
-  const media = artifacts.filter((artifact) => artifact.kind === 'image' || artifact.kind === 'video');
-  return (
-    <section className="renders-view">
-      <header>
-        <div>
-          <span>Renders</span>
-          <h1>{session ? sessionTitle(session) : 'No project selected'}</h1>
-        </div>
-        {session && <StageBadge stage={session.stage} />}
-      </header>
-      {media.length > 0 ? (
-        <div className="render-grid">
-          {media.map((artifact) => (
-            <button key={artifact.path} className="render-item" onClick={() => onSelect(artifact.path)}>
-              <span className="render-media">
-                {artifact.kind === 'image'
-                  ? <img src={artifact.url} alt={artifact.name} />
-                  : <video src={artifact.url} muted preload="metadata" />}
-                <i>{artifact.kind === 'video' ? <Video size={15} /> : <ImageIcon size={15} />}</i>
-              </span>
-              <span className="render-copy">
-                <strong>{artifact.name}</strong>
-                <small>{formatBytes(artifact.size)} · {relativeTime(artifact.updatedAt)}</small>
-              </span>
-            </button>
-          ))}
-        </div>
-      ) : (
-        <div className="renders-empty">
-          <Film size={24} />
-          <strong>{session ? 'No renders yet' : 'Select a project'}</strong>
-          <span>{session ? stageLabel(session.stage) : 'Projects appear in the sidebar'}</span>
-        </div>
-      )}
-    </section>
-  );
-}
-
 function DeleteProjectDialog({session, deleting, onCancel, onConfirm}: {
   session?: SessionSummary;
   deleting: boolean;
@@ -787,47 +858,6 @@ function NewProjectDialog({open, name, error, creating, onNameChange, onCancel, 
   );
 }
 
-function ArtifactPanel({open, artifacts, selected, onSelect, onClose}: {
-  open: boolean;
-  artifacts: Artifact[];
-  selected?: Artifact;
-  onSelect: (path: string) => void;
-  onClose: () => void;
-}) {
-  return (
-    <aside className={`artifact-panel ${open ? 'is-open' : ''}`}>
-      <header>
-        <div><strong>Artifacts</strong><span>{artifacts.length} files</span></div>
-        <button className="icon-button" onClick={onClose} aria-label="Close artifacts"><X size={18} /></button>
-      </header>
-      {selected ? (
-        <div className="artifact-preview">
-          {selected.kind === 'image' && <img src={selected.url} alt={selected.name} />}
-          {selected.kind === 'video' && <video src={selected.url} controls preload="metadata" />}
-          {selected.kind === 'document' && <div className="document-preview"><FileJson size={28} /><span>{selected.name}</span></div>}
-          <div className="artifact-preview-meta"><strong>{selected.name}</strong><span>{selected.path}</span></div>
-        </div>
-      ) : (
-        <div className="artifact-empty"><ImageIcon size={25} /><span>No artifacts yet</span></div>
-      )}
-      <div className="artifact-list">
-        {artifacts.map((artifact) => (
-          <button key={artifact.path} className={artifact.path === selected?.path ? 'is-selected' : ''} onClick={() => onSelect(artifact.path)}>
-            <span className="artifact-thumb">
-              {artifact.kind === 'image' ? <img src={artifact.url} alt="" /> : artifact.kind === 'video' ? <Film size={18} /> : <FileText size={18} />}
-            </span>
-            <span><strong>{artifact.name}</strong><small>{artifact.path} · {formatBytes(artifact.size)}</small></span>
-          </button>
-        ))}
-      </div>
-    </aside>
-  );
-}
-
-function StageBadge({stage}: {stage: string}) {
-  return <span className={`stage-badge stage-${stage}`}><i />{stageLabel(stage)}</span>;
-}
-
 function sessionTitle(session?: SessionSummary) {
   if (!session) return 'New video';
   if (session.projectName) return session.projectName;
@@ -860,10 +890,4 @@ function relativeTime(value: string) {
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours}h`;
   return `${Math.floor(hours / 24)}d`;
-}
-
-function formatBytes(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }

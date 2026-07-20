@@ -2,6 +2,12 @@
 
 The Web workspace uses the existing ViMax agent loop and JSONL event stream. It does not implement workflow decisions in the browser.
 
+From the `ViMax` repository root, create the private local agent configuration once:
+
+```bash
+cp configs/agent.example.yaml configs/agent.local.yaml
+```
+
 ```bash
 cd web
 npm install

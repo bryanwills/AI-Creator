@@ -12,6 +12,7 @@ import {
   readSessionHistory,
   readSessionState,
   resolveArtifactPath,
+  storeWorkspaceUpload,
 } from './server-lib.mjs';
 
 const webRoot = path.dirname(fileURLToPath(import.meta.url));
@@ -19,6 +20,10 @@ const repoRoot = path.resolve(webRoot, '..');
 const isDev = process.argv.includes('--dev');
 const host = process.env.VIMAX_WEB_HOST || '127.0.0.1';
 const port = Number(process.env.VIMAX_WEB_PORT || 4173);
+const configuredUploadLimit = Number(process.env.VIMAX_WEB_UPLOAD_MAX_BYTES || 100 * 1024 * 1024);
+const uploadMaxBytes = Number.isFinite(configuredUploadLimit) && configuredUploadLimit > 0
+  ? configuredUploadLimit
+  : 100 * 1024 * 1024;
 const subscribers = new Set();
 let agentProcess = null;
 let activeSessionId = '';
@@ -63,6 +68,21 @@ const server = createServer(async (request, response) => {
     if (url.pathname === '/api/artifact' && request.method === 'GET') {
       return streamArtifact(response, url.searchParams.get('session') || '', url.searchParams.get('path') || '');
     }
+    if (url.pathname === '/api/uploads' && request.method === 'POST') {
+      const sessionId = url.searchParams.get('session') || '';
+      const fileName = url.searchParams.get('name') || '';
+      const current = await readSessionState(repoRoot);
+      if (!current.sessions.some((session) => session.sessionId === sessionId)) {
+        return sendJson(response, 404, {error: 'Project not found'});
+      }
+      const declaredSize = Number(request.headers['content-length'] || 0);
+      if (declaredSize > uploadMaxBytes) {
+        return sendJson(response, 413, {error: `File exceeds the ${formatByteLimit(uploadMaxBytes)} upload limit`});
+      }
+      const data = await readBinaryBody(request, uploadMaxBytes);
+      const file = await storeWorkspaceUpload(repoRoot, sessionId, fileName, data);
+      return sendJson(response, 201, {file});
+    }
     if (url.pathname === '/api/agent/start' && request.method === 'POST') {
       const body = await readJsonBody(request);
       const sessionId = typeof body.sessionId === 'string' ? body.sessionId : '';
@@ -99,7 +119,8 @@ const server = createServer(async (request, response) => {
     }
     return serveProductionApp(response, url.pathname);
   } catch (error) {
-    sendJson(response, 500, {error: error instanceof Error ? error.message : String(error)});
+    const status = Number(error?.statusCode) || 500;
+    sendJson(response, status, {error: error instanceof Error ? error.message : String(error)});
   }
 });
 
@@ -245,6 +266,25 @@ async function readJsonBody(request) {
   const text = Buffer.concat(chunks).toString('utf8');
   if (text.length > 1_000_000) throw new Error('Request body is too large');
   return JSON.parse(text);
+}
+
+async function readBinaryBody(request, maxBytes) {
+  const chunks = [];
+  let size = 0;
+  for await (const chunk of request) {
+    size += chunk.length;
+    if (size > maxBytes) {
+      const error = new Error(`File exceeds the ${formatByteLimit(maxBytes)} upload limit`);
+      error.statusCode = 413;
+      throw error;
+    }
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks, size);
+}
+
+function formatByteLimit(bytes) {
+  return `${Math.max(1, Math.round(bytes / (1024 * 1024)))} MB`;
 }
 
 function sendJson(response, status, payload) {

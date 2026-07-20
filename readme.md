@@ -15,6 +15,7 @@
     <img src="https://img.shields.io/badge/Python-3.12-00d9ff?style=flat-square&logo=python&logoColor=white&labelColor=1a1a2e">
 	<a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/badge/uv-Ready-ff6b6b?style=flat-square&logo=uv&logoColor=white&labelColor=1a1a2e"></a>
 	<img src="https://img.shields.io/badge/License-MIT-4ecdc4?style=flat-square&logo=opensourceinitiative&logoColor=white" alt="MIT License">
+    <a href="https://github.com/HKUDS/ViMax/releases/tag/v1.2.0"><img src="https://img.shields.io/badge/Version-v1.2.0-2563eb?style=flat-square&labelColor=1a1a2e" alt="ViMax v1.2.0"></a>
     <a href='https://www.youtube.com/@AI-Creator-is-here'><img src='https://img.shields.io/badge/YouTube-ff0000?style=flat-square&logo=youtube&logoColor=white&labelColor=1a1a2e' /></a>
     <a href='https://arxiv.org/abs/2606.07649'><img src='https://img.shields.io/badge/arXiv-2606.07649-b31b1b?style=flat-square&logo=arxiv&logoColor=white&labelColor=1a1a2e' /></a>
   </p>
@@ -50,6 +51,7 @@ https://github.com/user-attachments/assets/5bad46b2-8276-4e1d-9480-3522640744b2
 
 ### 📰 **News**
 
+- **2026-07-20** 🚀 **ViMax v1.2.0** introduces the Web UI with named projects, Agent Loop conversations, artifact and storyboard previews, render checkpoints, file uploads, provider settings, and dark mode.
 - **2026-07-17** 🎬 OpenRouter GPT Image 2 image generation and Seedance 2.0 Fast video generation support added.
 - **2026-06-28** 🛠️ Agent Loop and TUI stability update: stronger LLM retries, persistent render status, landscape image guards, and Script2Video resume fixes.
 - **2026-06-09** 📄 Technical report released.
@@ -78,6 +80,7 @@ ViMax is an agentic video creation framework that connects narrative planning, v
 - **Novel2Video** — adapt long-form fiction into episodic visual narratives with narrative compression, character tracking, and scene planning.
 - **AutoCameo** — place a person or pet from a reference photo into generated stories while maintaining a consistent appearance.
 - **Agent Loop and TUI** — discuss ideas, revise plans, resume sessions, review text artifacts, and control rendering from one interactive workspace.
+- **Web UI** — manage named projects, work with the ViMax Agent, upload source files, inspect artifacts and storyboard progress, preview renders, and configure providers from the browser.
 - **Consistent production pipeline** — coordinate references, first frames, camera continuity, and final assembly end to end.
 - **Parallelized generation** — generate compatible shots and media assets concurrently to accelerate multi-shot video production.
 
@@ -143,7 +146,15 @@ ViMax is an agentic video creation framework that connects narrative planning, v
 
 ---
 
+### 🖥️ **ViMax Web UI**
 
+<div align="center">
+  <img src="assets/vimax-web-ui.png" width="100%" alt="ViMax Web UI workspace">
+</div>
+
+The Web UI brings agent conversation, project artifacts, storyboard previews, and render progress into one visual workspace.
+
+---
 
 ### 🎯 **End-to-End Video Creation Engine**
 
@@ -183,9 +194,10 @@ ViMax now also includes an **Agents Loop + TUI** workflow for interactive planni
 
 ---
 
-### ☄️ **RoadMap**
+### ☄️ **Roadmap**
 
-- 🚧 🖥️ **Web frontend interface**
+- ✅ 🖥️ **Web frontend workspace with artifact, storyboard, and render previews**
+- ✅ 🤖 **Agent Loop + TUI interactive workflow**
 - ✅ 🎬 **Seedance 2.0 Fast video generator support**
 - ✅ 🖼️ **GPT Image 2 image generator support**
 
@@ -214,7 +226,13 @@ uv sync
 <details>
 <summary><strong>Agent TUI</strong></summary>
 
-ViMax also provides a minimal TUI for interactive agent-based video creation. Configure the model and API key information in `configs/agent.local.yaml`, including the LLM, image generator, and video generator, as shown below.
+ViMax also provides a minimal TUI for interactive agent-based video creation. Create a private local configuration from the tracked example first:
+
+```bash
+cp configs/agent.example.yaml configs/agent.local.yaml
+```
+
+Then configure the model and API key information in `configs/agent.local.yaml`, including the LLM, image generator, and video generator, as shown below.
 ```yaml
 llm:
   model_provider: openai
@@ -246,6 +264,35 @@ vimax tui resume <session_id>
 ```
 
 You can also keep `configs/agent.local.yaml` empty and provide the same values through environment variables, such as `VIMAX_LLM_API_KEY`, `VIMAX_IMAGE_API_KEY`, and `VIMAX_VIDEO_API_KEY`.
+
+</details>
+
+<details>
+<summary><strong>Web UI</strong></summary>
+
+The Web UI uses the same ViMax agent runtime, sessions, tools, and private `configs/agent.local.yaml` configuration as the TUI. Node.js 18 or newer is required.
+
+From the `ViMax` repository root, install the frontend dependencies once and start the local server:
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+Open [http://127.0.0.1:4173](http://127.0.0.1:4173) in your browser. The Web UI supports named projects, agent conversations, slash commands, artifact and render inspection, storyboard previews, file uploads, and provider settings.
+
+The server binds to `127.0.0.1` by default. When ViMax runs on a remote machine, forward the port from your local computer:
+
+```bash
+ssh -N -L 4173:127.0.0.1:4173 <user>@<server>
+```
+
+Use `VIMAX_WEB_PORT` when another local port is required:
+
+```bash
+VIMAX_WEB_PORT=4174 npm run dev
+```
 
 </details>
 

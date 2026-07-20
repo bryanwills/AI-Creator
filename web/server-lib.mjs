@@ -1,4 +1,4 @@
-import {readFile, readdir, rename, rm, stat, writeFile} from 'node:fs/promises';
+import {lstat, mkdir, readFile, readdir, rename, rm, stat, writeFile} from 'node:fs/promises';
 import path from 'node:path';
 
 const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif']);
@@ -64,7 +64,7 @@ export async function readSessionHistory(repoRoot, sessionId) {
       messages.push({
         id: `${turnId}-user`,
         role: 'user',
-        text: String(record.raw_user_input),
+        text: displayUserInput(record.raw_user_input),
         createdAt: String(record.created_at || record.timestamp || ''),
       });
       for (const round of Array.isArray(record.tool_rounds) ? record.tool_rounds : []) {
@@ -72,9 +72,10 @@ export async function readSessionHistory(repoRoot, sessionId) {
           messages.push({
             id: `${turnId}-tool-${messages.length}`,
             role: 'activity',
-            text: String(result.content || result.name || 'Tool completed'),
+            text: historyToolResultText(result),
             tool: String(result.name || 'tool'),
             status: result.ok === false ? 'error' : 'done',
+            stage: result.ok === false ? 'failed' : 'completed',
             createdAt: String(record.created_at || record.timestamp || ''),
           });
         }
@@ -92,6 +93,64 @@ export async function readSessionHistory(repoRoot, sessionId) {
   } catch {
     return [];
   }
+}
+
+export async function storeWorkspaceUpload(repoRoot, sessionId, fileName, data) {
+  const sessionRoot = resolveSessionRoot(repoRoot, sessionId);
+  const sessionInfo = await stat(sessionRoot);
+  if (!sessionInfo.isDirectory()) throw new Error('Session workspace is not a directory');
+
+  const safeName = validateUploadName(fileName);
+  const uploadRoot = path.join(sessionRoot, 'uploads');
+  await mkdir(uploadRoot, {recursive: true, mode: 0o700});
+  const uploadRootInfo = await lstat(uploadRoot);
+  if (!uploadRootInfo.isDirectory() || uploadRootInfo.isSymbolicLink()) {
+    throw new Error('Workspace upload directory is not safe');
+  }
+
+  const extension = path.extname(safeName);
+  const stem = safeName.slice(0, safeName.length - extension.length);
+  const payload = Buffer.isBuffer(data) ? data : Buffer.from(data);
+  for (let attempt = 1; attempt <= 1_000; attempt += 1) {
+    const storedName = attempt === 1 ? safeName : `${stem} (${attempt})${extension}`;
+    const destination = path.join(uploadRoot, storedName);
+    try {
+      await writeFile(destination, payload, {flag: 'wx', mode: 0o600});
+      return {
+        name: storedName,
+        path: path.relative(sessionRoot, destination).split(path.sep).join('/'),
+        size: payload.byteLength,
+      };
+    } catch (error) {
+      if (error?.code === 'EEXIST') continue;
+      throw error;
+    }
+  }
+  throw new Error('Could not allocate a unique upload filename');
+}
+
+function historyToolResultText(result) {
+  if (result.ok !== false) return 'Completed';
+  const content = String(result.content || 'Tool failed').trim();
+  try {
+    const payload = JSON.parse(content);
+    const detail = payload?.error ?? payload?.message;
+    if (detail) return conciseText(detail);
+  } catch {
+    // The provider may return a plain-text error.
+  }
+  return conciseText(content);
+}
+
+function conciseText(value) {
+  const text = String(value || 'Tool failed').replace(/\s+/g, ' ').trim();
+  return text.length > 280 ? `${text.slice(0, 277)}…` : text;
+}
+
+function displayUserInput(value) {
+  return String(value || '')
+    .replace(/\s*<workspace_uploads>.*<\/workspace_uploads>\s*$/s, '')
+    .trim();
 }
 
 export async function listSessionArtifacts(repoRoot, sessionId) {
@@ -185,6 +244,14 @@ function assertSessionId(sessionId) {
   if (!/^[A-Za-z0-9][A-Za-z0-9-]{0,95}$/.test(String(sessionId || ''))) {
     throw new Error('Invalid session id');
   }
+}
+
+function validateUploadName(fileName) {
+  const value = String(fileName || '').normalize('NFC').trim();
+  if (!value || value === '.' || value === '..') throw new Error('A valid filename is required');
+  if (value.length > 180) throw new Error('Filename must be 180 characters or fewer');
+  if (/[\\/\u0000-\u001f\u007f]/.test(value)) throw new Error('Filename contains unsupported characters');
+  return value;
 }
 
 async function removeSessionLogRecords(repoRoot, sessionId) {

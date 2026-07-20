@@ -49,7 +49,7 @@ def build_vimax_adapter_specs(workspace_root: str | Path, session_index: Any) ->
                 "Create or revise ViMax structured text artifacts for the active session. "
                 "Idea mode writes story, characters, script, and scene-level storyboard/shot_decomposition/camera_tree under idea2video/scene_<idx>/. "
                 "Script mode writes characters, storyboard, shot_decomposition, and camera_tree under script2video/. "
-                "For a new video idea or new script, omit session_id or pass the new idea/script; the adapter will create a new session instead of reusing mismatched artifacts. If idea/script/revision_target are omitted and the active session has an idea, continue that session and fill missing structured text artifacts. "
+                "Pass the active session_id from prompt context when the user is working in the selected project. An empty active session is initialized in place; a different source on a non-empty session creates a new session instead of overwriting existing artifacts. If idea/script/revision_target are omitted and the active session has an idea, continue that session and fill missing structured text artifacts. "
                 "It does not generate keyframes, video clips, or final video. Call this before revising storyboard/shots when those artifacts do not exist."
             ),
             handler=adapter.vimax_narrative_planning,
@@ -68,7 +68,7 @@ def build_vimax_adapter_specs(workspace_root: str | Path, session_index: Any) ->
             description=(
                 "Create ViMax structured text artifacts from a novel or novel excerpt. "
                 "This writes novel2video/novel, events, relevant_chunks, scenes, and global_information text artifacts. "
-                "Use this when the user provides long prose, a novel excerpt, or asks for novel-to-video planning. "
+                "Use this when the user provides long prose, a novel excerpt, or asks for novel-to-video planning. Pass the active session_id when the user is working in a selected empty project. "
                 "It does not generate character portraits, scene videos, or final video."
             ),
             handler=adapter.vimax_novel_planning,
@@ -287,7 +287,7 @@ class ViMaxAdapters:
             return ToolResult("vimax_novel_planning", False, "novel_text is required for novel planning.", {"error_type": "missing_input"})
 
         session_id_arg = str(args.get("session_id", "") or "").strip()
-        session = self.session_index.create(idea=novel_text, user_requirement=user_requirement, style=style, session_id=session_id_arg or None)
+        session = self._resolve_session(session_id_arg, idea=novel_text, script="", user_requirement=user_requirement, style=style)
         session_id = session["session_id"]
         working_dir = self.session_index.working_dir(session_id)
         novel_dir = working_dir / "novel2video"
@@ -432,11 +432,23 @@ class ViMaxAdapters:
                 self.session_index.set_active(session_id)
         else:
             if requested_source:
-                session = self.session_index.create(idea=requested_source, user_requirement=user_requirement, style=style)
+                active = self.session_index.active()
+                if active is not None and self._session_is_empty(active):
+                    session = self.session_index.set_active(active["session_id"])
+                else:
+                    session = self.session_index.create(idea=requested_source, user_requirement=user_requirement, style=style)
             else:
                 session = self.session_index.active() or self.session_index.create(idea=requested_source, user_requirement=user_requirement, style=style)
         self._update_session_metadata(session["session_id"], idea=requested_source, user_requirement=user_requirement, style=style)
         return self.session_index.get(session["session_id"]) or session
+
+    def _session_is_empty(self, session: dict[str, Any]) -> bool:
+        if str(session.get("idea") or "").strip():
+            return False
+        session_id = str(session.get("session_id") or "").strip()
+        if not session_id:
+            return False
+        return not any(self.session_index.artifact_checklist(session_id).values())
 
     def _update_session_metadata(self, session_id: str, *, idea: str, user_requirement: str, style: str) -> None:
         data = self.session_index.load()

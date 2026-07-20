@@ -117,9 +117,8 @@ function agentCommand(): {command: string; args: string[]} {
   if (process.env.VIMAX_PYTHON_CMD) {
     return {command: process.env.VIMAX_PYTHON_CMD, args: baseAgentArgs()};
   }
-  const bundledUv = process.env.VIMAX_UV_CMD ?? '/home/xavierhuang/.local/bin/uv';
-  if (existsSync(bundledUv)) {
-    return {command: bundledUv, args: ['run', 'python', ...baseAgentArgs()]};
+  if (process.env.VIMAX_UV_CMD) {
+    return {command: process.env.VIMAX_UV_CMD, args: ['run', 'python', ...baseAgentArgs()]};
   }
   const venvPython = path.join(repoRoot, '.venv', 'bin', 'python3');
   if (existsSync(venvPython)) {
