@@ -187,7 +187,8 @@ Web UI 将 Agent 对话、项目产物、分镜预览与渲染进度集中在同
 - ✅ 🤖 **Agent Loop + TUI 交互式工作流**
 - ✅ 🎬 **Seedance 2.0 Fast 视频生成支持**
 - ✅ 🖼️ **GPT Image 2 图像生成支持**
-
+- ☑️ 🎬 **MiniMax H3 视频生成支持**
+- ☑️ 🧩 **可组合 Skills，用于自定义视频工作流**
 ---
 
 
