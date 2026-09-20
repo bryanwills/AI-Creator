@@ -202,7 +202,8 @@ ViMax now also includes an **Agents Loop + TUI** workflow for interactive planni
 - ✅ 🤖 **Agent Loop + TUI interactive workflow**
 - ✅ 🎬 **Seedance 2.0 Fast video generator support**
 - ✅ 🖼️ **GPT Image 2 image generator support**
-
+- ☑️ 🎬 **MiniMax H3 video generator support**
+- ☑️ 🧩 **Skill-based workflow extensions**
 ---
 
 
